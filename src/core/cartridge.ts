@@ -117,7 +117,8 @@ export class NROM implements Mapper {
     this.mirroring = info.mirroring;
     this.prg = info.prg;
     this.chr = info.chr;
-    // iNES 1.0 can't say whether there's PRG-RAM; test ROMs and Family BASIC use 8 KiB at $6000.
+    // iNES 1.0 can't say whether there's PRG-RAM, and NES 2.0 test builds often leave it at 0; blargg's
+    // $6000 protocol and Family BASIC both need it, so NROM always has at least 8 KiB at $6000.
     this.prgRam = new Uint8Array(info.prgRamSize || 0x2000);
   }
 

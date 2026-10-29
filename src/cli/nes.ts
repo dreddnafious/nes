@@ -23,6 +23,12 @@ function fail(message: string, code = 2): never {
   process.exit(code);
 }
 
+function number(flag: string, text: string, radix: number): number {
+  const n = parseInt(text, radix);
+  if (!Number.isFinite(n) || n < 0) fail(`${flag}: not a ${radix === 16 ? 'hex ' : ''}number: ${text}`);
+  return n;
+}
+
 function parseArgs(argv: string[]): Args {
   const [command, rom, ...rest] = argv;
   if (!command || !rom || !['trace', 'run'].includes(command)) fail(USAGE);
@@ -32,12 +38,12 @@ function parseArgs(argv: string[]): Args {
     const value = rest[++i];
     if (value === undefined) fail(`${flag} needs a value\n${USAGE}`);
     switch (flag) {
-      case '--pc': args.pc = parseInt(value, 16) & 0xffff; break;
-      case '--lines': args.lines = parseInt(value, 10); break;
-      case '--frames': args.frames = parseInt(value, 10); break;
+      case '--pc': args.pc = number(flag, value, 16) & 0xffff; break;
+      case '--lines': args.lines = number(flag, value, 10); break;
+      case '--frames': args.frames = number(flag, value, 10); break;
       case '--mem': {
         const [addr, n] = value.split(':');
-        args.mem.push([parseInt(addr, 16) & 0xffff, parseInt(n ?? '1', 10)]);
+        args.mem.push([number(flag, addr, 16) & 0xffff, number(flag, n ?? '1', 10)]);
         break;
       }
       default: fail(`unknown option ${flag}\n${USAGE}`);
