@@ -2,3 +2,4 @@
 # Set up with:  uv venv .venv && uv pip install --python .venv/bin/python -r requirements-dev.txt
 pytest>=9
 pyyaml>=6
+playwright>=1.40   # I3's cases drive the page in headless Chromium: also run `.venv/bin/python -m playwright install chromium`
