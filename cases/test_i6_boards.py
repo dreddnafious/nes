@@ -143,7 +143,7 @@ def conflict_probe(mapper: int, submapper: int) -> Probe:
 
 
 @pytest.mark.parametrize("mapper,submapper", [
-    pytest.param(m, s, id=f"mapper{m}-submapper{s}", marks=[] if (m, s) == (3, 2) else [DELTA])
+    pytest.param(m, s, id=f"mapper{m}-submapper{s}")
     for m in (2, 3, 7) for s in (1, 2)])
 def test_bus_conflicts_follow_the_nes2_submapper(tmp_path, mapper, submapper):
     """purpose: NES 2.0 submappers of 2, 3 and 7 say how a write over a different ROM byte lands
