@@ -1,0 +1,158 @@
+# I7: the MMC1 test ROMs. Read by test_i7_mapper_roms.py. Each ROM is fetched by hash (cases/i7_oracles.json).
+#
+# kind: mapperel. Holy Mapperel v0.02 (Damian Yerrick, zlib), its MMC1 builds (cut from the pinned release
+# archive). It detects the mapper by how the board answers mirroring and bank writes, measures PRG, CHR
+# and PRG-RAM from the bank tags it finds, tests every bank, and shows the result on screen (src/main.s,
+# README "Displayed result"), read with the font from the ROM's own CHR-ROM build (as I6 reads it; '0' and
+# 'O' share a glyph, so O reads as 0):
+#   - the mapper and board: "001 S" + the board letter + "R0M (MMC1)", the letter from boardletter.s's
+#     table of PRG, CHR and PRG-RAM sizes (SL: 128K CHR-ROM, no PRG-RAM; SK: with 8K; SF/SJ: 32K CHR-ROM
+#     without/with; SG: 8K CHR-RAM, no PRG-RAM; SU: 512K, 8K; SX: 512K, 32K), so the board line holds only
+#     if the PRG-RAM the header's NES 2.0 sizes give is the PRG-RAM the program finds;
+#   - "<n>K PRG R0M"; the PRG-RAM line ("PRG RAM MISSING", or "<n>K PRG RAM 0K"; a battery build shows
+#     " + BATTERY" only when its "SAVEDATA" tag survived from an earlier run, so never at a first power-on);
+#     the CHR line ending "0K";
+#   - "DETAILED TEST RESULT: wpic", where "Zero is normal; anything else reflects something unexpected"
+#     (w WRAM, p PRG ROM, i IRQ, c CHR). The WRAM digit is 1 when "$E000 bit 4 does not disable WRAM",
+#     which is MMC1A's behaviour and not MMC1B's (NESdev "MMC1", ASIC Revisions): the revision isn't
+#     pinned, so on builds with PRG-RAM the digit may be 0 or 1. A 4 ("$A000 bit 4 disables WRAM (all but
+#     SNROM)") or any other digit fails.
+#
+# kind: blargg. blargg's multi-test builds of suites whose single-test builds the corpus already runs on
+# NROM (I1, I2, I4); these are MMC1 (iNES 1.0, 8 KiB CHR-RAM, PRG-RAM at $6000 for the $6000 protocol), each
+# test in its own PRG bank. Run through the frozen cases/drive.ts: the signature DE B0 61, status $00, and
+# the text's last line "All N tests passed" (readme "Multi-tests": "The final result code refers to the
+# first sub-test that failed").
+cases:
+  - id: holy-mapperel/M1_P128K_C128K
+    kind: mapperel
+    purpose: Holy Mapperel on SLROM (128 KiB PRG, 128 KiB CHR-ROM, no PRG-RAM in the NES 2.0 header) detects mapper 1 as SLROM, reads back 128K of PRG ROM and all 32 4 KiB CHR banks' tags, finds no PRG-RAM, and reports detailed result 0000.
+    origin: design
+    delta: true
+    board: "001 SLR0M \\(MMC1\\)"
+    prg: "128K PRG R0M"
+    wram: "PRG RAM MISSING"
+    chr: "128K CHR R0M 0K"
+    detail: "DETAILED TEST RESULT: 0000"
+  - id: holy-mapperel/M1_P128K_C128K_S8K
+    kind: mapperel
+    purpose: Holy Mapperel on SKROM with 8 KiB of battery-backed PRG-RAM detects SKROM, reads back 128K of PRG ROM, 8K of PRG-RAM and 128K of CHR ROM, and reports detailed result 0000 (or 1000, the MMC1A reading of $E000 bit 4).
+    origin: design
+    delta: true
+    board: "001 SKR0M \\(MMC1\\)"
+    prg: "128K PRG R0M"
+    wram: "8K PRG RAM 0K"
+    chr: "128K CHR R0M 0K"
+    detail: "DETAILED TEST RESULT: [01]000"
+  - id: holy-mapperel/M1_P128K_C128K_W8K
+    kind: mapperel
+    purpose: Holy Mapperel on SKROM with 8 KiB of PRG-RAM and no battery detects SKROM, reads back 128K of PRG ROM, 8K of PRG-RAM and 128K of CHR ROM, and reports detailed result 0000 (or 1000).
+    origin: design
+    delta: true
+    board: "001 SKR0M \\(MMC1\\)"
+    prg: "128K PRG R0M"
+    wram: "8K PRG RAM 0K"
+    chr: "128K CHR R0M 0K"
+    detail: "DETAILED TEST RESULT: [01]000"
+  - id: holy-mapperel/M1_P128K_C32K
+    kind: mapperel
+    purpose: Holy Mapperel on SFROM (128 KiB PRG, 32 KiB CHR-ROM, no PRG-RAM) detects SFROM, reads back 128K of PRG ROM and 32K of CHR ROM (bank numbers past it wrapping), finds no PRG-RAM, and reports detailed result 0000.
+    origin: design
+    delta: true
+    board: "001 SFR0M \\(MMC1\\)"
+    prg: "128K PRG R0M"
+    wram: "PRG RAM MISSING"
+    chr: "32K CHR R0M 0K"
+    detail: "DETAILED TEST RESULT: 0000"
+  - id: holy-mapperel/M1_P128K_C32K_S8K
+    kind: mapperel
+    purpose: Holy Mapperel on SJROM with 8 KiB of battery-backed PRG-RAM detects SJROM, reads back 128K of PRG ROM, 8K of PRG-RAM and 32K of CHR ROM, and reports detailed result 0000 (or 1000).
+    origin: design
+    delta: true
+    board: "001 SJR0M \\(MMC1\\)"
+    prg: "128K PRG R0M"
+    wram: "8K PRG RAM 0K"
+    chr: "32K CHR R0M 0K"
+    detail: "DETAILED TEST RESULT: [01]000"
+  - id: holy-mapperel/M1_P128K_C32K_W8K
+    kind: mapperel
+    purpose: Holy Mapperel on SJROM with 8 KiB of PRG-RAM and no battery detects SJROM, reads back 128K of PRG ROM, 8K of PRG-RAM and 32K of CHR ROM, and reports detailed result 0000 (or 1000).
+    origin: design
+    delta: true
+    board: "001 SJR0M \\(MMC1\\)"
+    prg: "128K PRG R0M"
+    wram: "8K PRG RAM 0K"
+    chr: "32K CHR R0M 0K"
+    detail: "DETAILED TEST RESULT: [01]000"
+  - id: holy-mapperel/M1_P128K_CR8K
+    kind: mapperel
+    purpose: Holy Mapperel on SGROM (128 KiB PRG, 8 KiB CHR-RAM, no PRG-RAM) detects SGROM, reads back 128K of PRG ROM, passes its CHR-RAM pattern test in 8 KiB, finds no PRG-RAM, and reports detailed result 0000.
+    origin: design
+    delta: true
+    board: "001 SGR0M \\(MMC1\\)"
+    prg: "128K PRG R0M"
+    wram: "PRG RAM MISSING"
+    chr: "8K CHR RAM 0K"
+    detail: "DETAILED TEST RESULT: 0000"
+  - id: holy-mapperel/M1_P512K_CR8K_S32K
+    kind: mapperel
+    purpose: Holy Mapperel on SXROM (512 KiB PRG, 8 KiB CHR-RAM, 32 KiB battery-backed PRG-RAM) detects SXROM, reads back all 512K of PRG ROM through both 256 KiB halves (CHR bank bit 4) and all four 8 KiB PRG-RAM banks (CHR bank bits 3-2), and reports detailed result 0000 (or 1000).
+    origin: design
+    delta: true
+    board: "001 SXR0M \\(MMC1\\)"
+    prg: "512K PRG R0M"
+    wram: "32K PRG RAM 0K"
+    chr: "8K CHR RAM 0K"
+    detail: "DETAILED TEST RESULT: [01]000"
+  - id: holy-mapperel/M1_P512K_CR8K_S8K
+    kind: mapperel
+    purpose: Holy Mapperel on SUROM (512 KiB PRG, 8 KiB CHR-RAM, 8 KiB battery-backed PRG-RAM) detects SUROM, reads back all 512K of PRG ROM through both 256 KiB halves, and reports detailed result 0000 (or 1000); a board that can't reach the second half beeps Morse "SU" instead.
+    origin: design
+    delta: true
+    board: "001 SUR0M \\(MMC1\\)"
+    prg: "512K PRG R0M"
+    wram: "8K PRG RAM 0K"
+    chr: "8K CHR RAM 0K"
+    detail: "DETAILED TEST RESULT: [01]000"
+  - id: instr_test-v5/all_instrs
+    kind: blargg
+    purpose: blargg instr_test-v5 all_instrs (all 16 instruction tests, official and unofficial, on a 256 KiB MMC1 cartridge) reports "All 16 tests passed".
+    origin: design
+    delta: true
+    tests: 16
+  - id: instr_test-v5/official_only
+    kind: blargg
+    purpose: blargg instr_test-v5 official_only (the 16 tests, official opcodes only, 256 KiB MMC1) reports "All 16 tests passed".
+    origin: design
+    delta: true
+    tests: 16
+  - id: instr_timing/instr_timing
+    kind: blargg
+    purpose: blargg instr_timing's multi-test build (instruction and branch timing, MMC1) reports "All 2 tests passed".
+    origin: design
+    delta: true
+    tests: 2
+  - id: instr_misc/instr_misc
+    kind: blargg
+    purpose: blargg instr_misc's multi-test build (address wrapping and dummy reads, MMC1) reports "All 4 tests passed".
+    origin: design
+    delta: true
+    tests: 4
+  - id: cpu_interrupts_v2/cpu_interrupts
+    kind: blargg
+    purpose: blargg cpu_interrupts_v2's multi-test build (80 KiB of PRG, five banks, so the bank count isn't a power of two; MMC1) reports "All 5 tests passed".
+    origin: design
+    delta: true
+    tests: 5
+  - id: ppu_vbl_nmi/ppu_vbl_nmi
+    kind: blargg
+    purpose: blargg ppu_vbl_nmi's multi-test build (vblank and NMI timing to the PPU clock, 256 KiB MMC1) reports "All 10 tests passed".
+    origin: design
+    delta: true
+    tests: 10
+  - id: apu_test/apu_test
+    kind: blargg
+    purpose: blargg apu_test's multi-test build (length counters, frame IRQ, DMC, 128 KiB MMC1) reports "All 8 tests passed".
+    origin: design
+    delta: true
+    tests: 8
