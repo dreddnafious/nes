@@ -44,7 +44,7 @@ def test_cli_run_reads_memory_after_bank_switching(tmp_path, mapper):
     assert mem.get(LOG) == want, f"the log differs from the spec's: {mem.get(LOG)} vs {want}"
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 3, marks=DELTA), (3, 2), pytest.param(7, 1, marks=DELTA)])
+@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 3), (3, 2), pytest.param(7, 1)])
 def test_cli_screenshot_shows_the_banked_picture(tmp_path, mapper, choice):
     """purpose: `node src/cli/nes.ts screenshot <probe> --frames 30 --out f.png` on a mapper-2, -3 or -7
     picture probe writes a 256x240 PNG that is the spec's picture through one palette: each palette index
