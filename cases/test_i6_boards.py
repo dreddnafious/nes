@@ -391,7 +391,7 @@ def test_reset_and_power_rerun_a_game_that_sets_its_own_banks(tmp_path, mapper):
         assert o[2 * i + 1] == want, f"mapper {mapper}: after {what} the log differs from the spec's"
 
 
-@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
 def test_power_on_is_the_same_every_time(tmp_path, mapper):
     """purpose: which bank (and AxROM page) is mapped at power-on is unknown on hardware and isn't pinned
     here, but runs are deterministic (Decided): a probe whose first reads look at the switchable window
