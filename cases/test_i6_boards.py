@@ -360,7 +360,7 @@ def test_a_bank_or_page_switched_mid_frame_takes_effect_from_the_next_line(tmp_p
 
 # ---------------------------------------------------------------- Reset, power, and the loader
 
-@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
 def test_reset_and_power_rerun_a_game_that_sets_its_own_banks(tmp_path, mapper):
     """purpose: the wiki gives no power-on or reset state for these registers, so games select their
     banks in their reset code (AxROM games keep that code in every bank). A probe that does so, run to
