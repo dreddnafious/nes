@@ -69,8 +69,7 @@ def test_a_write_anywhere_in_8000_ffff_switches_the_bank(tmp_path, mapper, kib):
     check_probe(p, run_probe(p.write_to(tmp_path, "probe.nes"), frames=60), f"mapper {mapper}")
 
 
-@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k",
-                                                     marks=[] if m == 3 else [DELTA])
+@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k")
                                         for m, k in [(2, 64), (2, 128), (3, 16), (3, 32), (7, 64), (7, 128)]])
 def test_bank_numbers_past_the_last_bank_wrap(tmp_path, mapper, kib):
     """purpose: a bank number at or past the board's bank count selects that number modulo the count
