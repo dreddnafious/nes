@@ -31,6 +31,8 @@ allowed, redistribution not stated). A game whose terms are unclear isn't used.
 |---|---|---|---|---|
 | `nes15-1.0.0/nes15-NTSC.nes` | *nes15* 1.0.0 (the Fifteen Puzzle), Mathew Brenaman, 2011 | 0 (NROM-128, vertical mirroring) | BSD 2-clause ("Redistribution and use in source and binary forms ... are permitted") | **no: fetched by hash** (`cases/i3_oracles.json`, sha256 `01b0507abdee44e6b78edcbe95f1de951c9d7ec39e7fcc5306f5e06b732ef92c`) |
 | `nes15-1.0.0/gfx/title.nam`, `bgd.pal`, `spr.pal` | the title screen's name table and the two palettes, from the game's published source | | the same BSD licence | no: fetched by hash; the I3 cases build the title's expected picture from them |
+| `MK1_NES/examples/05_cheril_the_goddess_v1/dev/cart.nes` | *Cheril the Goddess* (v1), The Mojon Twins, 2015 | 3 (CNROM: 32 KiB PRG, 32 KiB CHR-ROM, horizontal) | engine LGPL-3.0; the README: the example games "are now free to produce, which means you can put them into carts and sell them, as long as you tell us first"; "the game assets ... are donationware". Its title screen says "COPYLEFT 2015 BY THE MOJON TWINS". Use allowed; redistribution of the ROM file isn't stated in so many words | **no: fetched by hash** (`cases/i6_oracles.json`, from `mojontwins/MK1_NES` at commit `ec3fbcc…`, sha256 `e03d52dd214a998997c003593d2d5921fd9679cea02a385d789f8e14d037ba16`) |
+| `240pee.nes` (v0.23) | *240p Test Suite* for NES, Damian Yerrick (PinoBatch), after Artemio Urbina's 240p Test Suite | 2 (UNROM: 64 KiB PRG, 8 KiB CHR-RAM, vertical, NES 2.0) | GPL-2.0-or-later (README: "free software under the GNU General Public License, version 2 or later"; the GitHub repo's licence is GPL-2.0) | **no: fetched by hash** (`cases/i6_oracles.json`, the `v0.23` release asset of `pinobatch/240p-test-mini`, sha256 `04f01d7372f66ea2befe325b9bd655a9fcc395a31fa46d9466286bb8f9d2e62e`); Decided: oracle ROMs are fetched by hash. A test utility, not a game: it boots and plays but has no end, so it isn't counted in Reach |
 
 - **nes15's source:** the copy in `christopherpow/nes-test-roms` at commit `95d8f62…` (the directory
   `nes15-1.0.0/`, which carries the author's own `LICENSE`, `README` and source). The README states "This
@@ -63,3 +65,21 @@ Same source and terms as the test ROMs above (no licence granting redistribution
 Same source and terms as the test ROMs above (no licence granting redistribution): fetched by SHA-256 from
 `cases/i4_oracles.json` into `roms/cache/`. Left out, and why: `apu_mixer` (judged by ear), `dmc_tests` (no
 readme or source, no machine-readable result), `pal_apu_tests` (PAL; Decided Q4 is NTSC only).
+
+## Mapper test ROMs (I6's oracles): fetched by hash, not committed
+| Suite | Author | Checks |
+|---|---|---|
+| Holy Mapperel v0.02 (`M2_P128K_CR8K_V`, `M3_P32K_C32K_H`, `M7_P128K_CR8K`) | Damian Yerrick (PinoBatch), 2013-2017 | Detects the mapper by how the board answers mirroring and bank writes, measures PRG and CHR by bank tags, tests every bank and CHR-RAM byte, and shows the result on screen. |
+
+- **Source:** the release asset `holy-mapperel-bin-0.02.7z` of `github.com/pinobatch/holy-mapperel` (tag
+  `v0.02`), sha256 `70f85671e21f293599baebb662faeb06a4c04e9c9ceb283d96d4197f09e4ce7a`. Each ROM is a pinned
+  slice of one of the archive's raw LZMA2 blocks, checked by its own SHA-256 (`cases/i6_oracles.json`).
+- **Terms:** the zlib licence (the repo's `LICENSE` and README "Legal": "Available under zlib License";
+  "Permission is granted to anyone to use this software for any purpose ... and to alter it and
+  redistribute it freely"). Redistribution is allowed, but under Decided ("Oracle ROMs are fetched by hash,
+  never committed") the ROMs are fetched, not vendored. Its README notes it is "Not sponsored or endorsed by
+  DC Comics, IREM, Nintendo, or Sunsoft" (it was renamed from "Holy Diver Batman" to avoid those marks).
+- **Left out, and why:** the collection's other mapper-2/3/7 files (`other/PCM.demo.wgraphics.nes`,
+  `other/oam3.nes`, `other/quantum_disco_brothers_by_wAMMA.nes`, `other/CMC80s.NES`, `other/TANESPOT.NES`)
+  carry no author's terms that could be checked; the collection's `240pee/240pee.nes` is an older build of
+  the same 240p Test Suite, replaced by the author's own tagged release.
