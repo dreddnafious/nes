@@ -1,0 +1,4 @@
+# The Python side of the test rig (the corpus in cases/ and the project tests in tests/).
+# Set up with:  uv venv .venv && uv pip install --python .venv/bin/python -r requirements-dev.txt
+pytest>=9
+pyyaml>=6
