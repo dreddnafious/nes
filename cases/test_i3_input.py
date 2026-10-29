@@ -35,7 +35,6 @@ def after(tab, n=LAG) -> dict:
     return pad_read(tab.canvas())
 
 
-@DELTA
 def test_each_mapped_key_reads_as_its_own_button_and_nothing_else(site, browser, tmp_path):
     """purpose: the key map Decided at approval (X = A, Z = B, Right Shift = Select, Enter = Start,
     arrows = the pad), read through $4016 in the standard order A, B, Select, Start, Up, Down, Left,
@@ -56,7 +55,6 @@ def test_each_mapped_key_reads_as_its_own_button_and_nothing_else(site, browser,
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_the_port_reads_as_an_official_controller_and_port_2_is_left_alone(site, browser, tmp_path):
     """purpose: "controller 1 (and 2) through $4016/$4017 with the strobe" (Intent), per NESdev
     "Standard controller": after the 8th read, reads 9-24 of $4016 return 1, whether or not a button is
@@ -75,7 +73,6 @@ def test_the_port_reads_as_an_official_controller_and_port_2_is_left_alone(site,
         assert got["port2"] == NOTHING, f"controller 2 reads {got['port2']} with keys held"
 
 
-@DELTA
 def test_with_the_strobe_held_high_every_read_is_button_a(site, browser, tmp_path):
     """purpose: the strobe (Intent; NESdev "Standard controller": while $4016 bit 0 is 1 the controller
     keeps reloading, and every read returns A): three reads with the strobe high read 1, 1, 1 while X
@@ -92,7 +89,6 @@ def test_with_the_strobe_held_high_every_read_is_button_a(site, browser, tmp_pat
         assert got["strobe"] == [0, 0, 0], f"strobe-high reads with B, Up, Right held: {got['strobe']}"
 
 
-@DELTA
 def test_left_shift_and_unmapped_keys_press_no_button(site, browser, tmp_path):
     """purpose: "Select is Right Shift only" (Decided, axes), and only the mapped keys are buttons:
     holding Left Shift, A, C, Space, Tab or Escape reads no button at all.
@@ -105,7 +101,6 @@ def test_left_shift_and_unmapped_keys_press_no_button(site, browser, tmp_path):
             tab.up(code)
 
 
-@DELTA
 def test_shift_held_does_not_change_what_z_and_x_are(site, browser, tmp_path):
     """purpose: J1v: keys are physical keys, so holding Right Shift (Select) while pressing Z, X and Enter
     reads Select + B + A + Start: a shifted letter is still B or A.
@@ -118,7 +113,6 @@ def test_shift_held_does_not_change_what_z_and_x_are(site, browser, tmp_path):
             f"Right Shift + Z + X + Enter reads {got}, not Select + B + A + Start"
 
 
-@DELTA
 def test_the_newest_of_two_opposite_directions_wins(site, browser, tmp_path):
     """purpose: "when opposite directions are held at once, the newest press wins" (Decided, axes): hold
     Left, then Right: Right alone; let Right go with Left still held: Left again. The same for Up then
@@ -138,7 +132,6 @@ def test_the_newest_of_two_opposite_directions_wins(site, browser, tmp_path):
             assert after(tab)["port1"][:8] == NOTHING
 
 
-@DELTA
 def test_blur_releases_every_button(site, browser, tmp_path):
     """purpose: J1g: on window blur every button is released: with Right and X held, a blur makes the
     next reads show nothing held; coming back (focus) brings no phantom press, and a fresh press of
@@ -159,7 +152,6 @@ def test_blur_releases_every_button(site, browser, tmp_path):
         assert after(tab)["port1"][:8] == held(["Right"]), "Right pressed again after the blur doesn't read"
 
 
-@DELTA
 def test_blargg_test_buttons_passes_with_the_keyboard(site, browser):
     """purpose: a controller test ROM, as the roadmap asks: blargg's read_joy3/test_buttons (CNROM) asks
     for A, B, Select, Start, Up, Down, Left, Right in turn and fails on any other bit; pressing X, Z,
@@ -189,7 +181,6 @@ TITLE_END = 240
 START = [(120, "down", "Enter"), (126, "up", "Enter")]
 
 
-@DELTA
 def test_start_pressed_at_frame_120_leaves_the_title_and_no_press_stays_on_it(site, browser):
     """purpose: J1e, a key press changes the screen against a reproducible baseline: two runs of nes15
     with no key both show the author's title at frame 240, identical; the same run with Enter held at
@@ -211,7 +202,6 @@ RIGHT = [(300, "down", "ArrowRight"), (306, "up", "ArrowRight")]
 DOWN = [(300, "down", "ArrowDown"), (306, "up", "ArrowDown")]
 
 
-@DELTA
 def test_the_arrow_keys_move_nes15s_cursor(site, browser):
     """purpose: J1 step 4, "play it with the keyboard": in nes15's game (Start at frame 120), the cursor
     starts at the board's top-left (its play.s); Right at frame 300, or Down at frame 300, each gives
@@ -226,7 +216,6 @@ def test_the_arrow_keys_move_nes15s_cursor(site, browser):
     assert right != down, "Right and Down did the same thing"
 
 
-@DELTA
 def test_the_same_key_script_gives_the_same_screen_three_times(site, browser):
     """purpose: J1m: inputs replay frame-exact: nes15 with Enter at frame 120 and Right at 300 gives the
     same frame 420 on three fresh pages; with Enter one frame later (121, which seeds a different
@@ -240,7 +229,6 @@ def test_the_same_key_script_gives_the_same_screen_three_times(site, browser):
     assert shifted != runs[0], "Enter one frame later gave the same screen: the press frame isn't honoured"
 
 
-@DELTA
 def test_mapped_keys_never_scroll_the_page_and_unmapped_ones_are_left_alone(site, browser):
     """purpose: J1f: with nes15 running on a page made taller and wider than the window, every mapped
     key's keydown has had preventDefault called by the time it reaches window, and pressing each

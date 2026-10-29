@@ -44,7 +44,6 @@ def slope(points):
     return sum((x - mx) * (y - my) for x, y in points) / sum((x - mx) ** 2 for x, _ in points)
 
 
-@DELTA
 @pytest.mark.parametrize("hz", [30, 60, 144])
 def test_the_core_runs_60_1_frames_a_second_whatever_the_display_rate(site, browser, hz):
     """purpose: J1o and the clock-reconciliation choice (axes: "pace by an accumulator against real
@@ -76,7 +75,6 @@ def own_origin(url: str, origin: str) -> bool:
     return url.startswith(("data:", "blob:")) or urlsplit(url)[:2] == urlsplit(origin)[:2]
 
 
-@DELTA
 def test_the_page_only_talks_to_its_own_server(site, browser):
     """purpose: "a page served locally" (Intent) with no runtime dependencies (Decided): through a page
     load, a game load, its title and a few seconds of keys, every request the page makes goes to the
@@ -94,7 +92,6 @@ def test_the_page_only_talks_to_its_own_server(site, browser):
         assert tab.requests and not outside, f"requests outside {site.url}: {outside[:5]}"
 
 
-@DELTA
 def test_keys_and_buttons_before_any_rom_do_nothing_and_raise_nothing(site, browser):
     """purpose: J1w: on a fresh page with no ROM, every mapped key pressed, Reset and Power clicked,
     and a blur, raise no page error and run no frame (frames stays 0); a ROM loaded afterwards still
@@ -118,7 +115,6 @@ def test_keys_and_buttons_before_any_rom_do_nothing_and_raise_nothing(site, brow
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_the_server_refuses_a_port_in_use_with_a_message_not_a_stack_trace(tmp_path):
     """purpose: the server is a command Jason runs (J1 step 1): started on a port another program
     already listens on, `node src/web/serve.ts --port N` exits non-zero within 5 s with a message that

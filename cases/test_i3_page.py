@@ -26,7 +26,6 @@ def left_title(title):
     return lambda rgb: not same_picture(rgb, title) and len(set(rgb)) >= 4
 
 
-@DELTA
 def test_the_page_is_served_with_its_screen_file_input_and_buttons(site, browser):
     """purpose: J1 step 1, "open the page (served locally)": `node src/web/serve.ts --port N` answers
     GET / with the page, which loads without a page error and has a file input #rom-file, a 256x240
@@ -41,7 +40,6 @@ def test_the_page_is_served_with_its_screen_file_input_and_buttons(site, browser
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_j1_a_game_boots_to_its_title_starts_and_restarts_without_a_reload(site, browser):
     """purpose: J1 steps 1-4 and 7 in one sitting, through the page's real entry points only: open the
     page; give nes15 to the file input; its title (the author's own picture, by palette index) is on the
@@ -69,7 +67,6 @@ def test_j1_a_game_boots_to_its_title_starts_and_restarts_without_a_reload(site,
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_the_title_is_on_the_canvas_by_its_stated_frame_and_not_before_the_game_draws_it(site, browser):
     """purpose: J1c/J1d: at nes15's stated title frame (60, well inside the 5 s, about 300 frames) the
     canvas is the author's title, index for index on all 240 lines; at frame 1, before the game has
@@ -87,7 +84,6 @@ def test_the_title_is_on_the_canvas_by_its_stated_frame_and_not_before_the_game_
         assert same_picture(rgb, title), f"frame {NES15_TITLE_FRAME} isn't the title: {compare_by_index(rgb, title)}"
 
 
-@DELTA
 def test_the_canvas_is_the_cli_screenshot_pixel_for_pixel(site, browser, tmp_path):
     """purpose: Q5's "one standard 2C02 palette" across the two pictures out: the canvas at nes15's
     frame 60 is, RGB for RGB on all 61,440 pixels, the PNG `node src/cli/nes.ts screenshot --frames 60`
@@ -118,7 +114,6 @@ def bad_files(tmp_path) -> dict:
     }
 
 
-@DELTA
 @pytest.mark.parametrize("kind", ["not-nes", "truncated", "mapper-30", "cancelled"])
 def test_a_refused_file_leaves_the_running_game_running(site, browser, tmp_path, kind):
     """purpose: the axes choice for a bad file, or a cancelled picker, while a game plays (J1a, J1b):
@@ -147,7 +142,6 @@ def test_a_refused_file_leaves_the_running_game_running(site, browser, tmp_path,
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_a_refused_file_on_a_fresh_page_starts_nothing_and_names_the_mapper(site, browser, tmp_path):
     """purpose: J1a, "nothing starts": on a fresh page, a mapper-30 file runs no frame (frames stays 0
     and the canvas is unchanged after 1 s), and the visible #message carries the core's reason, which
@@ -167,7 +161,6 @@ def test_a_refused_file_on_a_fresh_page_starts_nothing_and_names_the_mapper(site
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_reset_keeps_ram_and_power_cycles_it_but_keeps_the_battery_save(site, browser, tmp_path):
     """purpose: J1 step 7's two buttons (Decided at approval) and Q3: on boot_probe, a load boots with
     RAM clean and both counters at 1; each Reset re-runs the game's reset path with RAM and battery
@@ -196,7 +189,6 @@ def test_reset_keeps_ram_and_power_cycles_it_but_keeps_the_battery_save(site, br
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_a_second_game_loaded_over_a_running_one_starts_clean(site, browser, tmp_path):
     """purpose: J1q (and J2's switch, as far as I3 goes): with nes15 200 frames in, loading boot_probe
     through the same file input powers boot_probe on at frame 0 with clean RAM (none of nes15's RAM
@@ -222,7 +214,6 @@ def test_a_second_game_loaded_over_a_running_one_starts_clean(site, browser, tmp
         assert tab.loaded_once() and not tab.errors, (tab.navigations, tab.errors)
 
 
-@DELTA
 @pytest.mark.parametrize("button", ["reset", "power"])
 def test_enter_after_clicking_a_button_is_start_not_another_click(site, browser, button):
     """purpose: J1f: in the middle of a game, a click on #reset or #power restarts nes15 at its title;
@@ -245,7 +236,6 @@ def test_enter_after_clicking_a_button_is_start_not_another_click(site, browser,
         assert not same_picture(tab.canvas(), title), f"Enter clicked {button} again: the title came back"
 
 
-@DELTA
 def test_a_pal_flagged_rom_runs_at_ntsc_behind_a_notice(site, browser, tmp_path):
     """purpose: Q4 (Decided): "NTSC only. PAL-flagged ROMs run at NTSC timing behind a notice": nes15
     with an NES 2.0 header whose byte 12 says PAL (1) still boots to its title within 5 s, and #message
