@@ -6,6 +6,11 @@ corpus: cases
 test_command: .venv/bin/python -m pytest cases -p no:cacheprovider -q
 source: src
 plateau_k: 3
+held_out_command: cd /home/jason/dev/AI_Experiments/nes && /home/jason/dev/AI_Experiments/nes/.venv/bin/python -m pytest /home/jason/.cache/agentfng/climb/nes/held_out -q -p no:cacheprovider --rootdir /home/jason/dev/AI_Experiments/nes
+held_out:
+  count: 8
+  passed: 0
+  burned: 0
 readiness_open: 0
 phases:
 - name: brief
@@ -22,6 +27,28 @@ phases:
   log: 25
 - name: approve
   start: '2026-10-29T11:21:15-05:00'
+  end: '2026-10-29T11:23:33-05:00'
+  log: 26
+- name: climb
+  start: '2026-10-29T11:23:33-05:00'
+  log: 27
+fingerprint: b990abe1d6665a36337102bf089c4790ec9865998828fb8729ab28383742423a
+deltas: 42
+setup_fingerprint: 4fdd25c93a3689fd08b9a9481a97dad9b10488b3b5a65f44f5f455e100e163e2
+corpus_commit: b18516006ec43a5f6180cf79ccecc9c7e9ce645d
+approved_counts:
+  weakened: 0
+  field: 0
+  visits: 4
+  parked: 0
+intent_fingerprint: b09cb145e9a055c905bdfa51b7e1a402ac59e10043925caf937b9f830af19b86
+stories_fingerprint: 707b5d80dcceec3769e3c332bed370a4b995b1d8852ea6f212bf32244d3496aa
+seed_pins:
+  J1: 2
+  J2: 1
+  J3: 1
+  J4: 1
+runs_from: 0
 ---
 # Climb: nes
 
@@ -951,3 +978,4 @@ after merge`):
 - approve_route: person, because this is the first approval (the design session): Jason approves the journeys, the roadmap and I1 together.
 - mark_approve: up for approval: the journeys, the 9-increment roadmap and I1's 44-case corpus; readiness has 23 open items, each with a recommendation.
 - approved: Jason approved and froze it at the gate; all 23 open items took their recommendations (no per-item answers given). The forks are settled, J2–J4 confirmed, the proposed parts accepted, axes Q1–Q5 answered.
+- set_aside: a fresh subagent wrote 8 held-out cases for I1, under ~/.cache/agentfng/climb/nes/held_out/ (sealed, unread); all 8 fail for want of the build, none broken.
