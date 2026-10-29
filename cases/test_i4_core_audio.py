@@ -428,20 +428,39 @@ def sweep_target(t: int, shift: int, negate: bool, ch: int) -> int:
 def plateaus(x, rate) -> list:
     """The pulse's period register over time, read off the stream: each rising-to-rising cycle's length
     gives t = CPU * length / 16 - 1; runs of cycles within 3 % of their run's median are one register
-    value (sweep steps are 1/8 or more apart, at shift 3), and each run's t is read from its whole span
-    (its first crossing to its last, over its cycle count). Returns (start s, end s, t, cycles) for each
-    run of 4 or more cycles."""
+    value (sweep steps are 1/8 or more apart, at shift 3). A cycle at either end of a run can straddle a
+    step (part the old period, part the new) and still fall within 3 % of the run, so each run is read
+    from its interior (its second crossing to its second-to-last): its period T, and t from it. Each
+    step's instant is placed between two neighbouring runs from those clean cycles: the m cycles from
+    the old run's last interior crossing to the new run's first take G = u T_old + (m - u) T_new, so
+    the step comes u old cycles after that crossing. Returns (start s, end s, t, cycles) for each run
+    of 4 or more cycles, start and end being the steps into and out of it (its first or last crossing
+    where it has no neighbour)."""
     c, _ = crossings(x)
     runs = []
-    for a, b in zip(c, c[1:]):
-        t = CPU_HZ * (b - a) / rate / 16 - 1
-        if runs and abs(t - median(runs[-1][2])) <= 0.03 * median(runs[-1][2]):
-            runs[-1][1] = b
-            runs[-1][2].append(t)
+    for i in range(len(c) - 1):
+        t = CPU_HZ * (c[i + 1] - c[i]) / rate / 16 - 1
+        if runs and abs(t - median(runs[-1][1])) <= 0.03 * median(runs[-1][1]):
+            runs[-1][0].append(i + 1)
+            runs[-1][1].append(t)
         else:
-            runs.append([a, b, [t]])
-    return [(a / rate, b / rate, CPU_HZ * (b - a) / rate / len(ts) / 16 - 1, len(ts))
-            for a, b, ts in runs if len(ts) >= 4]
+            runs.append([[i, i + 1], [t]])
+    kept = []
+    for idx, ts in runs:
+        if len(ts) >= 4:
+            a, b = idx[1], idx[-2]
+            kept.append((idx, a, b, (c[b] - c[a]) / (b - a)))
+    steps = []
+    for (_, _, b1, T1), (_, a2, _, T2) in zip(kept, kept[1:]):
+        m, gap = a2 - b1, c[a2] - c[b1]
+        u = min(max((m * T2 - gap) / (T2 - T1), 0.0), float(m)) if T2 != T1 else m / 2
+        steps.append(c[b1] + u * T1)
+    out = []
+    for k, (idx, _, _, T) in enumerate(kept):
+        start = steps[k - 1] if k > 0 else c[idx[0]]
+        end = steps[k] if k < len(steps) else c[idx[-1]]
+        out.append((start / rate, end / rate, CPU_HZ * T / rate / 16 - 1, len(idx) - 1))
+    return out
 
 
 @DELTA
@@ -466,9 +485,19 @@ def test_the_sweep_unit_moves_the_pitch_by_its_shift_every_divider_period(tmp_pa
         want.append(nxt)
         t = nxt
     got = plateaus(after(res, 0, 0.0, 2.6), RATE)
+    # The divider's counter is 0 when the sweep is written (its period was 0 before), so the first
+    # half-frame clock after the write already sets the target (NESdev "APU Sweep": "If the sweep clock
+    # counter is zero ... the pulse's current period is updated"): the written period lasts under one
+    # half-frame, which can be too short to read (plateaus() needs 4 cycles). Then the first reading is
+    # the first target, and it starts within one half-frame (and 5 ms) of the write.
+    expect = want
+    if got and round(got[0][2]) != start:
+        assert got[0][0] <= HALF_FRAME_S + 0.005, \
+            f"the written period ${start:X} isn't read, yet the first step comes {got[0][0] * 1000:.1f} ms after the write"
+        expect = want[1:]
     seen = [round(p[2]) for p in got[:steps]]
-    assert seen == want[:steps], f"periods read off the stream {seen}, want {want[:steps]}"
-    lengths = [p[1] - p[0] + (16 * (p[2] + 1) / CPU_HZ) for p in got[1:steps - 1]]
+    assert seen == expect[:steps], f"periods read off the stream {seen}, want {expect[:steps]}"
+    lengths = [p[1] - p[0] for p in got[1:steps - 1]]
     off = [round(L * 1000, 1) for L in lengths if abs(L - 8 * HALF_FRAME_S) > 0.005]
     assert not off, f"steps lasting {off} ms, not {8 * HALF_FRAME_S * 1000:.1f} ms (8 half-frames)"
     if not negate:
