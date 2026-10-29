@@ -105,7 +105,7 @@ def test_a_4_mib_uxrom_reaches_all_256_banks(tmp_path):
 
 # ---------------------------------------------------------------- what a write doesn't do
 
-@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
 def test_writes_below_8000_never_switch_a_bank(tmp_path, mapper):
     """purpose: the register is enabled only by /ROMSEL ($8000-$FFFF): writes to $4020, $5000, $5FFF,
     $6000 and $7FFF, of values that are other bank numbers, leave the selected bank (and AxROM's
