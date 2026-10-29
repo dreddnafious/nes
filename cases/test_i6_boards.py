@@ -30,8 +30,7 @@ def probe(mapper: int, kib: int, **kw) -> Probe:
 SIZES = [(2, 64), (2, 128), (2, 256), (3, 16), (3, 32), (7, 64), (7, 128), (7, 256)]
 
 
-@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k",
-                                                     marks=[] if m == 3 else [DELTA]) for m, k in SIZES])
+@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k") for m, k in SIZES])
 def test_every_bank_is_selected_by_its_number_and_the_fixed_bank_stays(tmp_path, mapper, kib):
     """purpose: on each board at each size the wiki gives (UxROM 64/128/256 KiB PRG; CNROM 16/32 KiB CHR;
     AxROM 64/128/256 KiB PRG), writing bank number n to $8000-$FFFF maps bank n: UxROM's 16 KiB at
