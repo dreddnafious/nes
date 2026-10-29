@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NES</title>
+<link rel="icon" href="data:,">
+<style>
+  body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 14px/1.4 system-ui, sans-serif; }
+  #screen { display: block; width: 768px; height: 720px; image-rendering: pixelated; background: #000; }
+  .bar { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+  #message { margin: 0 0 12px; padding: 6px 10px; background: #522; color: #fdd; border-radius: 4px; }
+  .keys { margin-top: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <label>ROM file: <input type="file" id="rom-file" accept=".nes"></label>
+  <button id="reset" type="button">Reset</button>
+  <button id="power" type="button">Power</button>
+</div>
+<p id="message" hidden></p>
+<canvas id="screen" width="256" height="240"></canvas>
+<p class="keys">Arrows: the pad · Z: B · X: A · Enter: Start · Right Shift: Select</p>
+<script type="module" src="/src/web/main.ts"></script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 // Spec: https://www.nesdev.org/wiki/CPU_memory_map, Open_bus_behavior.
 import { APU } from './apu.ts';
 import { createMapper, parseRom, type Mapper } from './cartridge.ts';
+import { Controller } from './controller.ts';
 import { CPU, type CpuBus } from './cpu.ts';
 import { PPU } from './ppu.ts';
 
@@ -12,6 +13,8 @@ export class NES implements CpuBus {
   readonly mapper: Mapper;
   /** CPU RAM, $0000-$07FF, mirrored to $1FFF. Power-on fill is all $00, so runs are deterministic. */
   readonly ram = new Uint8Array(0x800);
+  /** Controller 1 ($4016) and controller 2 ($4017). */
+  readonly controllers: [Controller, Controller] = [new Controller(), new Controller()];
   irq = 0;
   /** The last value on the CPU's data bus: what a read of nothing returns. */
   private openBus = 0;
@@ -49,6 +52,23 @@ export class NES implements CpuBus {
     return this.ppu.pixels;
   }
 
+  /** The buttons held on a controller port (0 or 1), one bit each (controller.ts's BUTTON_*). */
+  setButtons(port: number, buttons: number): void {
+    this.controllers[port].buttons = buttons & 0xff;
+  }
+
+  /** The cartridge's battery-backed PRG-RAM, or null when it has none. The array is the cartridge's
+   * own, so a power cycle can carry a save across by copying it into the new console's. */
+  batteryRam(): Uint8Array | null {
+    return this.mapper.info.battery ? this.mapper.prgRam : null;
+  }
+
+  /** The TV system the file's header names: 0 NTSC, 1 PAL, 2 either, 3 Dendy. Only NTSC is
+   * emulated (Decided, Q4). */
+  get region(): number {
+    return this.mapper.info.region;
+  }
+
   /** Run one instruction (or the interrupt or DMA due before it). */
   step(): void {
     this.cpu.step();
@@ -84,8 +104,9 @@ export class NES implements CpuBus {
         // An internal read: bit 5 is open bus, and the external data bus keeps its value.
         return this.apu.readStatus() | (this.openBus & 0x20);
       }
-      // $4016/$4017 controllers come with the input increment: no buttons, upper bits open bus.
-      v = addr === 0x4016 || addr === 0x4017 ? this.openBus & 0xe0 : this.openBus;
+      // The controllers drive bit 0; bits 5-7 are open bus.
+      if (addr === 0x4016 || addr === 0x4017) v = (this.openBus & 0xe0) | this.controllers[addr - 0x4016].read();
+      else v = this.openBus;
     } else {
       v = this.mapper.cpuRead(addr);
       if (v < 0) v = this.openBus;
@@ -101,8 +122,14 @@ export class NES implements CpuBus {
     } else if (addr < 0x4000) {
       this.ppu.writeRegister(addr & 7, value);
     } else if (addr < 0x4020) {
-      if (addr === 0x4014) this.cpu.dmaPage = value;
-      else if (addr <= 0x4017 && addr !== 0x4016) this.apu.writeRegister(addr, value);
+      if (addr === 0x4014) {
+        this.cpu.dmaPage = value;
+      } else if (addr === 0x4016) {
+        this.controllers[0].writeStrobe(value);
+        this.controllers[1].writeStrobe(value);
+      } else if (addr <= 0x4017) {
+        this.apu.writeRegister(addr, value);
+      }
     } else {
       this.mapper.cpuWrite(addr, value);
     }
