@@ -23,7 +23,7 @@ def mem_lines(stdout: str) -> dict:
     return out
 
 
-@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
+@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
 def test_cli_run_reads_memory_after_bank_switching(tmp_path, mapper):
     """purpose: `node src/cli/nes.ts run <probe> --frames 30 --mem 0200:3 --mem 0300:n` runs a mapper-2,
     -3 or -7 probe (it switches banks and logs reads) and prints, for each --mem, the bytes the CPU bus
@@ -44,7 +44,7 @@ def test_cli_run_reads_memory_after_bank_switching(tmp_path, mapper):
     assert mem.get(LOG) == want, f"the log differs from the spec's: {mem.get(LOG)} vs {want}"
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 3), (3, 2), pytest.param(7, 1)])
+@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 3, marks=DELTA), (3, 2), pytest.param(7, 1, marks=DELTA)])
 def test_cli_screenshot_shows_the_banked_picture(tmp_path, mapper, choice):
     """purpose: `node src/cli/nes.ts screenshot <probe> --frames 30 --out f.png` on a mapper-2, -3 or -7
     picture probe writes a 256x240 PNG that is the spec's picture through one palette: each palette index
@@ -62,7 +62,7 @@ def test_cli_screenshot_shows_the_banked_picture(tmp_path, mapper, choice):
     assert c["mismatched"] == 0 and not c["merged_indices"], c
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 5), (3, 3), pytest.param(7, 0)])
+@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 5, marks=DELTA), (3, 3), pytest.param(7, 0, marks=DELTA)])
 def test_the_page_plays_a_mapper_2_3_or_7_file(site, browser, tmp_path, mapper, choice):
     """purpose: J1 step 2 for these boards: the page loads a mapper-2, -3 or -7 file through #rom-file
     instead of refusing it (#message hidden or empty), runs it, and after 60 frames its canvas is the

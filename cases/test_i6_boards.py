@@ -30,7 +30,8 @@ def probe(mapper: int, kib: int, **kw) -> Probe:
 SIZES = [(2, 64), (2, 128), (2, 256), (3, 16), (3, 32), (7, 64), (7, 128), (7, 256)]
 
 
-@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k") for m, k in SIZES])
+@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k",
+                                                     marks=[] if m == 3 else [DELTA]) for m, k in SIZES])
 def test_every_bank_is_selected_by_its_number_and_the_fixed_bank_stays(tmp_path, mapper, kib):
     """purpose: on each board at each size the wiki gives (UxROM 64/128/256 KiB PRG; CNROM 16/32 KiB CHR;
     AxROM 64/128/256 KiB PRG), writing bank number n to $8000-$FFFF maps bank n: UxROM's 16 KiB at
@@ -48,7 +49,8 @@ def test_every_bank_is_selected_by_its_number_and_the_fixed_bank_stays(tmp_path,
     check_probe(p, run_probe(p.write_to(tmp_path, "probe.nes"), frames=60), f"mapper {mapper}, {kib} KiB")
 
 
-@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k")
+@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k",
+                                                     marks=[] if m == 3 else [DELTA])
                                         for m, k in [(2, 128), (3, 32), (7, 128)]])
 def test_a_write_anywhere_in_8000_ffff_switches_the_bank(tmp_path, mapper, kib):
     """purpose: the bank register answers a write at any address in $8000-$FFFF (NESdev: "Bank select
@@ -69,7 +71,8 @@ def test_a_write_anywhere_in_8000_ffff_switches_the_bank(tmp_path, mapper, kib):
     check_probe(p, run_probe(p.write_to(tmp_path, "probe.nes"), frames=60), f"mapper {mapper}")
 
 
-@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k")
+@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k",
+                                                     marks=[] if m == 3 else [DELTA])
                                         for m, k in [(2, 64), (2, 128), (3, 16), (3, 32), (7, 64), (7, 128)]])
 def test_bank_numbers_past_the_last_bank_wrap(tmp_path, mapper, kib):
     """purpose: a bank number at or past the board's bank count selects that number modulo the count
@@ -105,7 +108,7 @@ def test_a_4_mib_uxrom_reaches_all_256_banks(tmp_path):
 
 # ---------------------------------------------------------------- what a write doesn't do
 
-@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
+@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
 def test_writes_below_8000_never_switch_a_bank(tmp_path, mapper):
     """purpose: the register is enabled only by /ROMSEL ($8000-$FFFF): writes to $4020, $5000, $5FFF,
     $6000 and $7FFF, of values that are other bank numbers, leave the selected bank (and AxROM's
@@ -143,7 +146,7 @@ def conflict_probe(mapper: int, submapper: int) -> Probe:
 
 
 @pytest.mark.parametrize("mapper,submapper", [
-    pytest.param(m, s, id=f"mapper{m}-submapper{s}")
+    pytest.param(m, s, id=f"mapper{m}-submapper{s}", marks=[] if (m, s) == (3, 2) else [DELTA])
     for m in (2, 3, 7) for s in (1, 2)])
 def test_bus_conflicts_follow_the_nes2_submapper(tmp_path, mapper, submapper):
     """purpose: NES 2.0 submappers of 2, 3 and 7 say how a write over a different ROM byte lands
@@ -179,7 +182,7 @@ def test_axrom_on_an_ines_1_header_has_no_bus_conflicts(tmp_path):
 # ---------------------------------------------------------------- nametables
 
 @pytest.mark.parametrize("mapper,mirroring", [
-    pytest.param(m, mi, id=f"mapper{m}-{mi}")
+    pytest.param(m, mi, id=f"mapper{m}-{mi}", marks=[] if m == 3 else [DELTA])
     for m in (2, 3) for mi in ("v", "h")])
 def test_uxrom_and_cnrom_mirroring_is_the_headers_and_bank_writes_dont_change_it(tmp_path, mapper, mirroring):
     """purpose: UxROM and CNROM mirroring is fixed ("Fixed H or V, controlled by solder pads"): the
@@ -224,7 +227,7 @@ def test_axrom_bit_4_picks_one_page_for_all_four_nametables(tmp_path, mirroring)
 
 # ---------------------------------------------------------------- CHR: RAM on UxROM/AxROM, ROM where the file has it
 
-@pytest.mark.parametrize("mapper", [pytest.param(2), pytest.param(7)])
+@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), pytest.param(7, marks=DELTA)])
 def test_chr_ram_holds_what_is_written_through_every_prg_switch(tmp_path, mapper):
     """purpose: a UxROM or AxROM file with no CHR-ROM (header byte 5 = 0) has 8 KiB of CHR-RAM at PPU
     $0000-$1FFF: bytes written through $2007 at both ends of both pattern tables, and a 256-byte run
@@ -245,7 +248,7 @@ def test_chr_ram_holds_what_is_written_through_every_prg_switch(tmp_path, mapper
     check_probe(p, run_probe(p.write_to(tmp_path, "probe.nes"), frames=60), f"mapper {mapper} CHR-RAM")
 
 
-@pytest.mark.parametrize("mapper", [pytest.param(2), pytest.param(7)])
+@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), pytest.param(7, marks=DELTA)])
 def test_chr_rom_in_the_file_is_read_and_never_written(tmp_path, mapper):
     """purpose: a UxROM or AxROM file that carries 8 KiB of CHR-ROM (header byte 5 = 1) shows it at PPU
     $0000-$1FFF, and writes through $2007 don't change it (it's ROM), while the nametables still take
@@ -271,7 +274,7 @@ def test_chr_rom_in_the_file_is_read_and_never_written(tmp_path, mapper):
 PICTURES = [(2, 0), (2, 5), (3, 0), (3, 1), (3, 2), (3, 3), (7, 0), (7, 1)]
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(m, c, id=f"mapper{m}-{c}")
+@pytest.mark.parametrize("mapper,choice", [pytest.param(m, c, id=f"mapper{m}-{c}", marks=[] if m == 3 else [DELTA])
                                            for m, c in PICTURES])
 def test_the_picture_comes_from_the_banks_and_page_the_game_chose(tmp_path, mapper, choice):
     """purpose: the frame is drawn from what the board maps: UxROM's tiles copied into CHR-RAM from the
@@ -338,7 +341,7 @@ def split_probe(mapper: int) -> tuple:
     return p, first[:row * 256] + second[row * 256:], y
 
 
-@pytest.mark.parametrize("mapper", [3, pytest.param(7)])
+@pytest.mark.parametrize("mapper", [3, pytest.param(7, marks=DELTA)])
 def test_a_bank_or_page_switched_mid_frame_takes_effect_from_the_next_line(tmp_path, mapper):
     """purpose: J4's status bar on a discrete board: a CNROM CHR bank or AxROM nametable page selected
     after sprite 0 hits (on line y + 1, at x 248-254, so the write lands in that line's hblank, after its
@@ -360,7 +363,7 @@ def test_a_bank_or_page_switched_mid_frame_takes_effect_from_the_next_line(tmp_p
 
 # ---------------------------------------------------------------- Reset, power, and the loader
 
-@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
+@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
 def test_reset_and_power_rerun_a_game_that_sets_its_own_banks(tmp_path, mapper):
     """purpose: the wiki gives no power-on or reset state for these registers, so games select their
     banks in their reset code (AxROM games keep that code in every bank). A probe that does so, run to
@@ -391,7 +394,7 @@ def test_reset_and_power_rerun_a_game_that_sets_its_own_banks(tmp_path, mapper):
         assert o[2 * i + 1] == want, f"mapper {mapper}: after {what} the log differs from the spec's"
 
 
-@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
+@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
 def test_power_on_is_the_same_every_time(tmp_path, mapper):
     """purpose: which bank (and AxROM page) is mapped at power-on is unknown on hardware and isn't pinned
     here, but runs are deterministic (Decided): a probe whose first reads look at the switchable window
