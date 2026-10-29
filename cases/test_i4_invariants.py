@@ -12,7 +12,6 @@ DELTA = pytest.mark.xfail(strict=True, reason="delta")
 START = 0x08
 
 
-@DELTA
 def test_the_sound_is_deterministic_and_the_same_however_it_is_taken():
     """purpose: "power-on state is fixed, so runs are deterministic" (Decided, axes), for the sound too:
     the base of J2c's "the new game's first 2 s of audio match a fresh page's, sample for sample".
@@ -37,7 +36,6 @@ def all_channels_probe() -> bytes:
     return apu_probe(script, {0xE000: repeat(b"\xff\xff\x00\x00", dmc_length(0x7F))})
 
 
-@DELTA
 def test_headless_core_with_every_channel_sounding_runs_at_least_five_times_real_time(tmp_path):
     """purpose: "headless, the core runs at >= 5x real time, so the corpus runs in minutes" (J3) holds
     with the sound being made: 1,800 frames (30 s of NTSC time) of a probe with all five channels

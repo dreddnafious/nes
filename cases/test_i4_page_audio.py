@@ -84,7 +84,6 @@ def windows_after(cap, mark, t0, t1):
 
 # ---------------------------------------------------------------- J1 with sound
 
-@DELTA
 def test_j1_nes15_from_load_to_its_end_with_sound_and_a_restart(site, browser):
     """purpose: J1 whole for an NROM game, as a person meets it, under the browser's autoplay policy
     (simulated): open the page; give nes15 to the file input (no click anywhere); its title is on the
@@ -139,7 +138,6 @@ def test_j1_nes15_from_load_to_its_end_with_sound_and_a_restart(site, browser):
         assert tab.loaded_once() and not tab.errors, (tab.navigations, tab.errors)
 
 
-@DELTA
 def test_on_nes15s_silent_title_the_page_is_below_the_floor_and_its_music_above(site, browser):
     """purpose: J1h at the page's output, with its sound running: nes15's title makes no sound, and
     the 1.5 s of output before Enter measure below -60 dBFS with DC removed (whatever DC the mix or the
@@ -168,7 +166,6 @@ def test_on_nes15s_silent_title_the_page_is_below_the_floor_and_its_music_above(
 
 # ---------------------------------------------------------------- J1k, J1j
 
-@DELTA
 @pytest.mark.parametrize("rate", [44100, 48000])
 def test_a_440_hz_pulse_reads_440_hz_at_the_output_at_44_1_and_48_khz(site, browser, rate, tmp_path):
     """purpose: J1k: with the page's AudioContext at 44.1 or 48 kHz (a device at that rate), the tone
@@ -203,7 +200,6 @@ def dc_probe():
     return apu_probe([(0, 0x4011, 64)])
 
 
-@DELTA
 def test_the_pages_output_carries_no_dc(site, browser, tmp_path):
     """purpose: J1h at the speakers: the mix's DC (the core's stream is the mixer's level, 0.35 here
     with the DAC at 64, and a stopped triangle holds a level too) is removed before the output, as the
@@ -222,7 +218,6 @@ def test_the_pages_output_carries_no_dc(site, browser, tmp_path):
         assert abs(mean) <= 0.002, f"the output sits at {mean:.4f}: the mix's DC reaches the speakers"
 
 
-@DELTA
 def test_after_a_load_with_no_click_sound_starts_by_the_first_key_press(site, browser, tmp_path):
     """purpose: J1j: under the browser's autoplay policy (simulated), a ROM loaded through the file
     input with no click plays silent, with the #sound-off indicator visible, for its first second;
@@ -247,7 +242,6 @@ def test_after_a_load_with_no_click_sound_starts_by_the_first_key_press(site, br
         assert not tab.sound_off_shown(), "#sound-off still shows 0.6 s after the key press"
 
 
-@DELTA
 def test_opened_from_a_file_url_the_page_says_to_serve_it(browser):
     """purpose: J1j: opened straight from disk (file://.../src/web/index.html), where its module
     scripts and worklet can't load, the page shows a visible #message that names the command that
@@ -268,7 +262,6 @@ def test_opened_from_a_file_url_the_page_says_to_serve_it(browser):
 
 # ---------------------------------------------------------------- J1n, J2c, J2g
 
-@DELTA
 @pytest.mark.parametrize("button", ["reset", "power"])
 def test_no_sound_from_before_a_restart_is_heard_after_it(site, browser, button, tmp_path):
     """purpose: J1n: with restart_probe's tone playing, a click on #reset or #power restarts it, and it
@@ -295,7 +288,6 @@ def test_no_sound_from_before_a_restart_is_heard_after_it(site, browser, button,
         assert dbfs(back) > -40, f"the tone didn't come back after {button} ({dbfs(back):.1f} dBFS)"
 
 
-@DELTA
 def test_no_sound_of_the_previous_game_is_heard_after_a_load(site, browser, tmp_path):
     """purpose: J2c and J2g (I4's share): while game A holds a long triangle note (440.4 Hz), game B
     (restart_probe, silent for its first second) is loaded through the same file input; from 30 ms
@@ -343,7 +335,6 @@ def segments(cap, threshold=-50.0, gap=0.05, least=0.2):
     return [(a, b) for a, b in runs if b - a >= least], ctx
 
 
-@DELTA
 def test_every_channel_is_heard_at_the_output(site, browser, tmp_path):
     """purpose: the five channels reach the speakers (I4's oracle: "audio captured non-silent in the
     browser"; J4 step 3, the DMC heard): channels_probe's five half-second sounds come out of the page

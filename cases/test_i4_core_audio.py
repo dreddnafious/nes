@@ -57,7 +57,6 @@ def median(v):
 
 # ---------------------------------------------------------------- the stream
 
-@DELTA
 @pytest.mark.parametrize("rate", [44100, 48000])
 def test_the_sample_stream_runs_at_the_stated_rate_against_the_cpu_clock(tmp_path, rate):
     """purpose: the core's stream is `rate` samples per second of emulated time (the CPU's 1,789,772.7
@@ -78,7 +77,6 @@ def test_the_sample_stream_runs_at_the_stated_rate_against_the_cpu_clock(tmp_pat
     assert not bad, f"samples outside 0.0-1.0: {bad[:8]}"
 
 
-@DELTA
 def test_dc_is_not_sound_the_floor_is_minus_60_dbfs_and_the_quietest_note_is_above_it(tmp_path):
     """purpose: J1h: the core's stream is the mixer's output with its DC left in, so a ROM that only
     sets the DMC's DAC to 64 ($4011, a constant level) measures at -9 dBFS with the DC in (above -20)
@@ -98,7 +96,6 @@ def test_dc_is_not_sound_the_floor_is_minus_60_dbfs_and_the_quietest_note_is_abo
 
 # ---------------------------------------------------------------- the pulses
 
-@DELTA
 @pytest.mark.parametrize("t", [253, 126, 400, 1000, 2000])
 def test_pulse_pitch_follows_its_period_register(tmp_path, t):
     """purpose: a pulse with period register t sounds at CPU / (16 (t + 1)) Hz (NESdev "APU Pulse"),
@@ -110,7 +107,6 @@ def test_pulse_pitch_follows_its_period_register(tmp_path, t):
     assert abs(got - want) <= want * 0.001, f"period {t}: {got:.2f} Hz, want {want:.2f} Hz +- 0.1 %"
 
 
-@DELTA
 @pytest.mark.parametrize("d,want", [(0, 0.125), (1, 0.25), (2, 0.5), (3, 0.75)])
 def test_pulse_duty_is_one_of_the_four_sequences(tmp_path, d, want):
     """purpose: duty d of $4000 bits 6-7 holds the pulse high for 1, 2, 4 or 6 of its 8 steps
@@ -121,7 +117,6 @@ def test_pulse_duty_is_one_of_the_four_sequences(tmp_path, d, want):
     assert abs(got - want) <= 0.02, f"duty {d}: high {got:.3f} of each period, want {want}"
 
 
-@DELTA
 @pytest.mark.parametrize("t,sweep,sounds", [(7, 0x08, False), (8, 0x08, True), (0x3FF, 0x00, True),
                                             (0x400, 0x00, False), (0x400, 0x08, True)],
                          ids=["period7-muted", "period8-sounds", "3FF-sweep00-sounds", "400-sweep00-muted",
@@ -143,7 +138,6 @@ def test_the_sweep_unit_mutes_below_8_and_on_overflow_even_when_disabled(tmp_pat
 
 # ---------------------------------------------------------------- the triangle, the noise, the DMC
 
-@DELTA
 @pytest.mark.parametrize("t", [126, 253, 63])
 def test_triangle_pitch_and_shape(tmp_path, t):
     """purpose: the triangle with period register t sounds at CPU / (32 (t + 1)) Hz (its 32-step
@@ -180,7 +174,6 @@ def noise_bits(x, period: int, rate=RATE) -> str:
     return "".join(out)
 
 
-@DELTA
 def test_noise_is_the_15_bit_shift_register_at_its_timer_period(tmp_path):
     """purpose: NESdev "APU Noise": the noise channel sounds its volume while bit 0 of a 15-bit shift
     register is 0, clocked at the period table's rate (index 15: every 4068 CPU cycles; index 13: every
@@ -214,7 +207,6 @@ def dmc_rom_samples():
     return {SAMPLE_A: repeat(b"\xff\xff\x00\x00", n), SAMPLE_B: repeat(b"\xff\x00", n)}
 
 
-@DELTA
 @pytest.mark.parametrize("address,bits_per_cycle,steps", [(SAMPLE_A, 32, 32), (SAMPLE_B, 16, 16)],
                          ids=["E000", "F000"])
 def test_dmc_plays_the_sample_at_its_address_by_dma_and_falls_silent_after(tmp_path, address, bits_per_cycle, steps):
@@ -248,7 +240,6 @@ def test_dmc_plays_the_sample_at_its_address_by_dma_and_falls_silent_after(tmp_p
     assert abs(later - before) <= 2, f"idle-loop count {later} after the sample vs {before} before: DMA goes on"
 
 
-@DELTA
 @pytest.mark.parametrize("r", [0, 8, 15])
 def test_dmc_rate_table(tmp_path, r):
     """purpose: the DMC's rate index r ($4010 bits 0-3) plays a bit every DMC_RATES[r] CPU cycles
@@ -265,7 +256,6 @@ def test_dmc_rate_table(tmp_path, r):
 
 # ---------------------------------------------------------------- the mixer
 
-@DELTA
 def test_the_mixer_is_the_specs_nonlinear_sum(tmp_path):
     """purpose: NESdev "APU Mixer", whose values the stream carries (CONTRACT-I4): output = pulse_out +
     tnd_out, pulse_out = 95.88 / (8128 / (p1 + p2) + 100), tnd_out = 159.79 / (1 / (t / 8227 + n / 12241
@@ -296,7 +286,6 @@ def test_the_mixer_is_the_specs_nonlinear_sum(tmp_path):
 
 # ---------------------------------------------------------------- notes end on time
 
-@DELTA
 def test_envelope_length_counter_and_linear_counter_end_notes_on_time(tmp_path):
     """purpose: the APU's note-ending units, each on both sides of its time (NESdev "APU Envelope",
     "APU Length Counter", "APU Triangle", "APU Frame Counter": quarter frames every 7457 CPU cycles,
@@ -336,7 +325,6 @@ START = 0x08
 NES15_SCRIPT = [[150, START], [154, 0], [500, START], [504, 0], [900, START], [904, 0]]
 
 
-@DELTA
 def test_nes15_is_silent_on_its_title_has_music_and_effects_and_falls_silent_when_paused():
     """purpose: J1 step 5 and J1h/J1i on a real game, headless: nes15 (its sound engine is nes-lib/
     muse.s): on its title (frames 60-150) it makes no sound (below -60 dBFS); Start at frame 150 starts
@@ -383,7 +371,6 @@ def read_wav(path):
     return tag, channels, rate, bits, None
 
 
-@DELTA
 def test_the_cli_writes_the_cores_sound_as_a_wav(tmp_path):
     """purpose: `node src/cli/nes.ts audio <rom> --frames 120 --rate 44100 --out f.wav` (Decided: the
     CLI gives "audio samples" headless) exits 0 and writes a mono WAV at 44,100 Hz, 32-bit float or
@@ -463,7 +450,6 @@ def plateaus(x, rate) -> list:
     return out
 
 
-@DELTA
 @pytest.mark.parametrize("ch,start,negate,steps", [(2, 400, True, 8), (1, 400, True, 8), (2, 200, False, 10)],
                          ids=["pulse2-down", "pulse1-down-ones-complement", "pulse2-up-to-the-mute"])
 def test_the_sweep_unit_moves_the_pitch_by_its_shift_every_divider_period(tmp_path, ch, start, negate, steps):

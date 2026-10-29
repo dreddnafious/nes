@@ -50,12 +50,10 @@ cases:
     kind: blargg
     purpose: apu_test 7-dmc_basics reports passed (DMC start, restart, stop, length reload from $4013, the one-byte buffer, the IRQ flag and looping, items 2-19 of the readme).
     origin: design
-    delta: true
   - id: apu_test/8-dmc_rates
     kind: blargg
     purpose: apu_test 8-dmc_rates reports passed (the DMC's 16 rates).
     origin: design
-    delta: true
   # ---- blargg_apu_2005.07.30 (screen only)
   - id: blargg_apu_2005/01.len_ctr
     kind: apu2005
@@ -97,12 +95,10 @@ cases:
     kind: apu2005
     purpose: blargg_apu_2005 10.len_halt_timing shows $01 (a halt-flag change takes effect after the length clock at 14915, not before; both sides of that clock, halting and unhalting).
     origin: design
-    delta: true
   - id: blargg_apu_2005/11.len_reload_timing
     kind: apu2005
     purpose: blargg_apu_2005 11.len_reload_timing shows $01 (a length reload written during the length clock is ignored when the counter is non-zero, and works just before, just after, or when it is zero).
     origin: design
-    delta: true
   # ---- cpu_interrupts_v2 (blargg, $6000; needs the APU's frame IRQ, and DMA)
   - id: cpu_interrupts_v2/1-cli_latency
     kind: blargg
@@ -124,7 +120,6 @@ cases:
     kind: blargg
     purpose: cpu_interrupts_v2 5-branch_delays_irq reports passed (a taken non-page-crossing branch ignores an IRQ during its last clock).
     origin: design
-    delta: true
   # ---- apu_reset (blargg, $6000; asks for the Reset button)
   - id: apu_reset/4015_cleared
     kind: blargg
@@ -134,7 +129,6 @@ cases:
     kind: blargg
     purpose: apu_reset 4017_timing reports passed (at power, and at Reset with the last value written, it is as if $4017 were written 9-12 clocks before the reset vector runs).
     origin: design
-    delta: true
   - id: apu_reset/4017_written
     kind: blargg
     purpose: apu_reset 4017_written reports passed ($4017 is $00 at power; Reset rewrites the last value written).
@@ -152,14 +146,12 @@ cases:
     kind: blargg
     purpose: apu_reset works_immediately reports passed ($4017, $4015 and the length counters work from the first instruction, at power and after Reset).
     origin: design
-    delta: true
   # ---- dmc_dma_during_read4 (blargg, older shell: screen only)
   - id: dmc_dma_during_read4/dma_2007_read
     kind: console
     purpose: dmc_dma_during_read4 dma_2007_read prints one of the CRCs its source lists for hardware (159A7A8F or 5E3DF9C4) (a DMC DMA during a $2007 read causes 2-3 extra $2007 reads).
     origin: design
     accept: ["159A7A8F", "5E3DF9C4"]
-    delta: true
   - id: dmc_dma_during_read4/dma_2007_write
     kind: console
     purpose: dmc_dma_during_read4 dma_2007_write prints Passed (a DMC DMA during a $2007 write has no effect).
@@ -168,13 +160,11 @@ cases:
     kind: console
     purpose: dmc_dma_during_read4 dma_4016_read prints Passed (a DMC DMA during a $4016 read causes one extra $4016 read, so a game's controller bits shift; J4g).
     origin: design
-    delta: true
   - id: dmc_dma_during_read4/double_2007_read
     kind: console
     purpose: dmc_dma_during_read4 double_2007_read prints one of the CRCs its source lists for hardware (85CFD627, F018C287, 440EF923 or E52F41A5) (two $2007 reads on successive cycles, by LDA $20F7,X with a page cross).
     origin: design
     accept: ["85CFD627", "F018C287", "440EF923", "E52F41A5"]
-    delta: true
   - id: dmc_dma_during_read4/read_write_2007
     kind: console
     purpose: dmc_dma_during_read4 read_write_2007 prints Passed (a $2007 read just before a write behaves normally).
@@ -184,9 +174,7 @@ cases:
     kind: blargg
     purpose: sprdma_and_dmc_dma reports passed (DMC DMA landing during sprite DMA, at each clock; NTSC only, as the ROM says).
     origin: design
-    delta: true
   - id: sprdma_and_dmc_dma/sprdma_and_dmc_dma_512
     kind: blargg
     purpose: sprdma_and_dmc_dma_512 reports passed (the same test built with two timing constants and its expected CRC changed; there is no readme to say more).
     origin: design
-    delta: true
