@@ -24,9 +24,10 @@ function fail(message: string, code = 2): never {
 }
 
 function number(flag: string, text: string, radix: number): number {
-  const n = parseInt(text, radix);
-  if (!Number.isFinite(n) || n < 0) fail(`${flag}: not a ${radix === 16 ? 'hex ' : ''}number: ${text}`);
-  return n;
+  const digits = radix === 16 ? /^(?:\$|0x)?([0-9a-f]+)$/i : /^([0-9]+)$/;
+  const m = digits.exec(text);
+  if (!m) fail(`${flag}: not a ${radix === 16 ? 'hex ' : ''}number: ${text}`);
+  return parseInt(m[1], radix);
 }
 
 function parseArgs(argv: string[]): Args {
@@ -53,10 +54,21 @@ function parseArgs(argv: string[]): Args {
 }
 
 function main(): void {
+  // A reader that stops early (`| head`, quitting `less`) isn't an error.
+  process.stdout.on('error', (e: NodeJS.ErrnoException) => {
+    if (e.code === 'EPIPE') process.exit(0);
+    throw e;
+  });
   const args = parseArgs(process.argv.slice(2));
+  let data: Uint8Array;
+  try {
+    data = new Uint8Array(readFileSync(args.rom));
+  } catch (e) {
+    fail(`${args.rom}: can't read the file: ${(e as NodeJS.ErrnoException).code ?? String(e)}`);
+  }
   let nes: NES;
   try {
-    nes = new NES(new Uint8Array(readFileSync(args.rom)));
+    nes = new NES(data);
   } catch (e) {
     if (e instanceof RomError) fail(`${args.rom}: ${e.message}`);
     throw e;
