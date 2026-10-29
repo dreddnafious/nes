@@ -245,7 +245,7 @@ def test_chr_ram_holds_what_is_written_through_every_prg_switch(tmp_path, mapper
     check_probe(p, run_probe(p.write_to(tmp_path, "probe.nes"), frames=60), f"mapper {mapper} CHR-RAM")
 
 
-@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [pytest.param(2), pytest.param(7)])
 def test_chr_rom_in_the_file_is_read_and_never_written(tmp_path, mapper):
     """purpose: a UxROM or AxROM file that carries 8 KiB of CHR-ROM (header byte 5 = 1) shows it at PPU
     $0000-$1FFF, and writes through $2007 don't change it (it's ROM), while the nametables still take
