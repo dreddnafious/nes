@@ -42,7 +42,9 @@ async function main() {
       out({ ok: true, ram });
     } else if (req.mode === 'blargg') {
       const maxFrames: number = req.maxFrames ?? 3600;
-      let frames = 0, resets = 0, resetAt = -1;
+      // After a Reset press, $6000 still holds the $81 from before it until the ROM writes again:
+      // that stale $81 isn't a new request, so the count of 6 frames starts only from a fresh one.
+      let frames = 0, resets = 0, resetAt = -1, stale = false;
       const text = () => {
         let s = '';
         for (let a = 0x6004; a < 0x6004 + 2048; a++) {
@@ -58,12 +60,14 @@ async function main() {
         frames++;
         if (!signed()) continue;
         const st = peek(0x6000);
-        if (st === 0x80) continue;
         if (st === 0x81) {
+          if (stale) continue;
           if (resetAt < 0) resetAt = frames + 6;
-          else if (frames >= resetAt) { nes.reset(); resets++; resetAt = -1; }
+          else if (frames >= resetAt) { nes.reset(); resets++; resetAt = -1; stale = true; }
           continue;
         }
+        stale = false;
+        if (st === 0x80) { resetAt = -1; continue; }
         out({ ok: true, done: true, signature: true, status: st, text: text(), frames, resets,
               ram: hash(0x0000, 0x07ff), prgRam: hash(0x6000, 0x7fff) });
         return;

@@ -133,7 +133,6 @@ cases:
     kind: blargg
     purpose: apu_reset 4017_written reports passed ($4017 is $00 at power; Reset rewrites the last value written).
     origin: design
-    delta: true
   - id: apu_reset/irq_flag_cleared
     kind: blargg
     purpose: apu_reset irq_flag_cleared reports passed (the frame IRQ flag is clear at power and after Reset).
