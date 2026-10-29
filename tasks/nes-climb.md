@@ -31,7 +31,7 @@ phases:
   log: 26
 - name: climb
   start: '2026-10-29T11:23:33-05:00'
-  log: 27
+  log: 29
 fingerprint: b990abe1d6665a36337102bf089c4790ec9865998828fb8729ab28383742423a
 deltas: 42
 setup_fingerprint: 4fdd25c93a3689fd08b9a9481a97dad9b10488b3b5a65f44f5f455e100e163e2
@@ -49,6 +49,60 @@ seed_pins:
   J3: 1
   J4: 1
 runs_from: 0
+runs:
+- at: '2026-10-29T11:34:25-05:00'
+  green: 2
+  red: 42
+  promote: 0
+  broken: 0
+  code: 0
+  secs: 2
+  met:
+  - test_no_rom_is_committed_without_a_licence_saying_so
+  - test_the_build_never_calls_out_to_another_program
+  unmet:
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[cpu_reset/ram_after_reset]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[cpu_reset/registers]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/01-abs_x_wrap]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/02-branch_wrap]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/03-dummy_reads]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/04-dummy_reads_apu]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/01-basics]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/02-implied]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/03-immediate]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/04-zero_page]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/05-zp_xy]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/06-absolute]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/07-abs_xy]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/08-ind_x]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/09-ind_y]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/10-branches]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/11-stack]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/12-jmp_jsr]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/13-rts]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/14-rti]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/15-brk]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/16-special]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_timing/1-instr_timing]
+  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_timing/2-branch_timing]
+  - cases.test_i1_cartridge::test_archaic_header_junk_is_ignored
+  - cases.test_i1_cartridge::test_nes2_header_is_read_as_nes2
+  - cases.test_i1_cartridge::test_not_an_nes_file_is_refused_with_a_reason
+  - cases.test_i1_cartridge::test_nrom128_runs_with_its_16k_bank_mirrored
+  - cases.test_i1_cartridge::test_power_on_ram_is_zero_filled
+  - cases.test_i1_cartridge::test_trainer_is_skipped
+  - cases.test_i1_cartridge::test_truncated_file_is_refused_naming_the_mismatch
+  - cases.test_i1_cartridge::test_unsupported_mapper_is_refused_by_number
+  - cases.test_i1_invariants::test_headless_core_runs_at_least_five_times_real_time
+  - cases.test_i1_invariants::test_no_emulator_is_vendored_or_depended_on
+  - cases.test_i1_invariants::test_runs_are_deterministic
+  - cases.test_i1_invariants::test_the_core_is_pure_and_has_no_browser_code
+  - cases.test_i1_invariants::test_the_typescript_type_checks_under_strict
+  - cases.test_i1_nestest::test_nestest_official_opcodes_match_the_golden_trace
+  - cases.test_i1_nestest::test_nestest_official_opcodes_take_the_golden_cycles
+  - cases.test_i1_nestest::test_nestest_reports_no_errors_in_its_result_bytes
+  - cases.test_i1_nestest::test_nestest_unofficial_opcodes_match_the_golden_trace
+  - cases.test_i1_nestest::test_nestest_unofficial_opcodes_take_the_golden_cycles
 ---
 # Climb: nes
 
@@ -223,6 +277,17 @@ plateaus with their real causes.
     (`4ec9a05`).
   - **Branch** `climb/nes`, base `main`. Each increment ships its own PR, stacked on the last; the stack is
     merged once, at the end.
+- (run) PRG-RAM on an iNES 1.0 NROM file: none | 8 KiB at $6000; chose 8 KiB because iNES 1.0 can't say,
+  and blargg's protocol and Family BASIC both need it; revisit if a homebrew game misbehaves on reads of $6000.
+- (run) LAX #imm ($AB, unstable on hardware): A = X = (A | magic) & imm with magic $00, $EE or $FF; chose $FF
+  (A = X = imm), which `instr_test-v5/03-immediate` passes; revisit if a game relies on another magic.
+- (run) XAA ($8B, untested by instr_test): chose the common model A = (A | $EE) & X & imm; revisit if a test
+  ROM pins it.
+- (run) Where `runFrame()` stops: at vblank start | at the wrap to scanline 0; chose the wrap to (0,0), so the
+  picture lines 0-239 are all drawn inside the call that returns them; revisit if I2/I3 want vblank instead.
+- (run) The type-checker: a global `tsc` | a project devDependency; chose devDependencies `typescript`
+  (7.0.2) and `@types/node` because the case runs `npx --no-install tsc`, and runtime dependencies stay none;
+  revisit if TypeScript 7 rejects syntax Node's type stripping accepts.
 
 ## References
 - **NESdev wiki** (https://www.nesdev.org/wiki): the spec for the CPU, PPU, APU, mappers, the iNES/NES 2.0
@@ -950,6 +1015,7 @@ after merge`):
 - 2026-10-29 · git clone (GitHub) · `https://github.com/christopherpow/nes-test-roms` (depth 1, into gitignored `.oracle-src/`) · inventory of the test-ROM oracles: their readmes, iNES headers and terms; the hashes for `cases/oracles.json`. Test ROMs and their readmes only; no emulator source was opened.
 - 2026-10-29 · uv/PyPI · installed `pyyaml` into `.venv` · the corpus reads its case data from YAML.
 - 2026-10-29 · HTTP fetch (by the corpus, at test time) · the 26 pinned `raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f62…/…` URLs in `cases/oracles.json` · the oracle ROMs, cached in `roms/cache/`; each is checked by SHA-256.
+- 2026-10-29 · npm registry · `npm install --save-dev typescript @types/node` · the strict type-check case's compiler and Node's types (no emulator packages).
 ## Log
 - brief: wrote the Intent (Jason's words, every feature named), Decided (language, oracle, harness,
   verification 3, parking, legal and honesty rules, repo and branch), References (the oracles to vendor in
@@ -979,3 +1045,5 @@ after merge`):
 - mark_approve: up for approval: the journeys, the 9-increment roadmap and I1's 44-case corpus; readiness has 23 open items, each with a recommendation.
 - approved: Jason approved and froze it at the gate; all 23 open items took their recommendations (no per-item answers given). The forks are settled, J2–J4 confirmed, the proposed parts accepted, axes Q1–Q5 answered.
 - set_aside: a fresh subagent wrote 8 held-out cases for I1, under ~/.cache/agentfng/climb/nes/held_out/ (sealed, unread); all 8 fail for want of the build, none broken.
+- climb: entered in a fresh context, from the approval logged above (Jason: "Approve and freeze it"); 44 cases
+  frozen at `b185160` (42 strict deltas, 2 green invariants). Board and every case read; held-outs unread.
