@@ -2,16 +2,19 @@
 //   node src/cli/nes.ts trace <rom.nes> [--pc <hex>] [--lines <n>] [--mem <hexaddr>:<n>]...
 //   node src/cli/nes.ts run   <rom.nes> [--frames <n>] [--mem <hexaddr>:<n>]...
 //   node src/cli/nes.ts screenshot <rom.nes> [--frames <n>] --out <file.png>   (cases/CONTRACT-I2.md)
+//   node src/cli/nes.ts audio <rom.nes> [--frames <n>] [--rate <hz>] --out <file.wav>   (cases/CONTRACT-I4.md)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { NES, RomError } from '../core/index.ts';
 import { traceLine } from '../core/disasm.ts';
 import { RGB } from '../core/palette.ts';
 import { encodePng } from './png.ts';
+import { encodeWav } from './wav.ts';
 
 const USAGE = `usage:
   node src/cli/nes.ts trace <rom.nes> [--pc <hex>] [--lines <n>] [--mem <hexaddr>:<n>]...
   node src/cli/nes.ts run   <rom.nes> [--frames <n>] [--mem <hexaddr>:<n>]...
-  node src/cli/nes.ts screenshot <rom.nes> [--frames <n>] --out <file.png>`;
+  node src/cli/nes.ts screenshot <rom.nes> [--frames <n>] --out <file.png>
+  node src/cli/nes.ts audio <rom.nes> [--frames <n>] [--rate <hz>] --out <file.wav>`;
 
 interface Args {
   command: string;
@@ -21,6 +24,7 @@ interface Args {
   frames: number;
   mem: Array<[number, number]>;
   out?: string;
+  rate: number;
 }
 
 function fail(message: string, code = 2): never {
@@ -37,8 +41,8 @@ function number(flag: string, text: string, radix: number): number {
 
 function parseArgs(argv: string[]): Args {
   const [command, rom, ...rest] = argv;
-  if (!command || !rom || !['trace', 'run', 'screenshot'].includes(command)) fail(USAGE);
-  const args: Args = { command, rom, lines: 100, frames: 60, mem: [] };
+  if (!command || !rom || !['trace', 'run', 'screenshot', 'audio'].includes(command)) fail(USAGE);
+  const args: Args = { command, rom, lines: 100, frames: 60, mem: [], rate: 48000 };
   for (let i = 0; i < rest.length; i++) {
     const flag = rest[i];
     const value = rest[++i];
@@ -47,8 +51,13 @@ function parseArgs(argv: string[]): Args {
       case '--pc': args.pc = number(flag, value, 16) & 0xffff; break;
       case '--lines': args.lines = number(flag, value, 10); break;
       case '--frames': args.frames = number(flag, value, 10); break;
+      case '--rate':
+        if (command !== 'audio') fail(`--rate is only for audio\n${USAGE}`);
+        args.rate = number(flag, value, 10);
+        if (args.rate < 8000 || args.rate > 192000) fail(`--rate: ${args.rate} Hz is outside 8000-192000`);
+        break;
       case '--out':
-        if (command !== 'screenshot') fail(`--out is only for screenshot\n${USAGE}`);
+        if (command !== 'screenshot' && command !== 'audio') fail(`--out is only for screenshot and audio\n${USAGE}`);
         args.out = value;
         break;
       case '--mem': {
@@ -60,7 +69,16 @@ function parseArgs(argv: string[]): Args {
     }
   }
   if (command === 'screenshot' && args.out === undefined) fail(`screenshot needs --out <file.png>\n${USAGE}`);
+  if (command === 'audio' && args.out === undefined) fail(`audio needs --out <file.wav>\n${USAGE}`);
   return args;
+}
+
+function write(path: string, data: Uint8Array): void {
+  try {
+    writeFileSync(path, data);
+  } catch (e) {
+    fail(`${path}: can't write the file: ${(e as NodeJS.ErrnoException).code ?? String(e)}`);
+  }
 }
 
 function main(): void {
@@ -95,17 +113,21 @@ function main(): void {
       out.push(traceLine(nes));
       nes.step();
     }
+  } else if (args.command === 'audio') {
+    nes.setSampleRate(args.rate);
+    const chunks: Float32Array[] = [];
+    for (let f = 0; f < args.frames; f++) {
+      nes.runFrame();
+      chunks.push(nes.audioSamples());
+    }
+    write(args.out!, encodeWav(args.rate, chunks));
   } else {
     for (let f = 0; f < args.frames; f++) nes.runFrame();
     if (args.out !== undefined) {
       const frame = nes.frameBuffer();
       const rgb = new Uint32Array(frame.length);
       for (let i = 0; i < frame.length; i++) rgb[i] = RGB[frame[i] & 0x1ff];
-      try {
-        writeFileSync(args.out, encodePng(256, 240, rgb));
-      } catch (e) {
-        fail(`${args.out}: can't write the file: ${(e as NodeJS.ErrnoException).code ?? String(e)}`);
-      }
+      write(args.out, encodePng(256, 240, rgb));
     }
   }
   for (const [addr, n] of args.mem) {

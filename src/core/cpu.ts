@@ -25,6 +25,13 @@ export interface CpuBus {
   irq: number;
   /** True while the PPU holds the NMI line low. */
   readonly nmi: boolean;
+  /** True while the DMC wants a sample byte: the CPU halts at its next read for a DMC DMA. */
+  readonly dmcDue: boolean;
+  /** The DMC DMA's own read (its "get" cycle's access). */
+  dmcGet(): void;
+  /** A read the halted CPU repeats while a DMA runs: the same address again, with what side effects
+   * a repeated read has on the hardware there. */
+  reread(addr: number): void;
 }
 
 const NMI_VECTOR = 0xfffa;
@@ -75,6 +82,7 @@ export class CPU {
   }
 
   private rd(addr: number): number {
+    if (this.bus.dmcDue) this.dma(addr);
     this.cycles++;
     this.bus.cycleStart();
     const v = this.bus.read(addr);
@@ -154,7 +162,9 @@ export class CPU {
   /** Run one instruction, or the interrupt or DMA due before it. */
   step(): void {
     if (this.dmaPage >= 0) {
-      this.oamDma();
+      // OAM DMA halts the CPU on the read after the $4014 write: the next opcode fetch (or the
+      // interrupt sequence's first read, at the same address).
+      this.dma(this.pc);
       return;
     }
     if (this.interruptDue) {
@@ -172,23 +182,48 @@ export class CPU {
     this.interruptDue = this.prevPending;
   }
 
-  /** OAM DMA: one halt cycle, one more to align to a read cycle, then 256 read/write pairs. */
-  private oamDma(): void {
+  /** OAM DMA and DMC DMA (NESdev "DMA"), cycle by cycle. The CPU is halted on a read of `addr`: that
+   * read happens (the halt cycle), and it is repeated on every cycle neither DMA uses. CPU cycles
+   * alternate between get cycles (the odd ones here), when a DMA may read, and put cycles, when OAM
+   * DMA writes $2004. A DMC DMA spends its halt cycle and a dummy cycle, then reads on the next get
+   * cycle; its get takes precedence over OAM DMA's, and its other cycles overlap OAM DMA's. Then
+   * the CPU makes its read again. */
+  private dma(addr: number): void {
+    let oam = this.dmaPage >= 0;
     const page = this.dmaPage << 8;
     this.dmaPage = -1;
-    this.idle();
-    if (this.cycles & 1) this.idle();
-    for (let i = 0; i < 256; i++) {
-      const v = this.rd(page | i);
-      this.wr(0x2004, v);
-    }
-  }
-
-  private idle(): void {
+    let index = 0;
+    let value = -1;
+    // The DMC's setup: 0 none, -1 halting this cycle, 1 halted, 2 dummy cycle done.
+    let dmc = this.bus.dmcDue ? -1 : 0;
     this.cycles++;
     this.bus.cycleStart();
+    this.bus.read(addr);
     this.bus.cycleEnd();
     this.poll();
+    if (dmc === -1) dmc = 1;
+    while (oam || dmc !== 0 || this.bus.dmcDue) {
+      if (dmc === 0 && this.bus.dmcDue) dmc = -1;
+      const get = ((this.cycles + 1) & 1) === 1;
+      this.cycles++;
+      this.bus.cycleStart();
+      if (dmc === 2 && get) {
+        this.bus.dmcGet();
+        dmc = 0;
+      } else if (oam && get && value < 0) {
+        value = this.bus.read(page | index);
+      } else if (oam && !get && value >= 0) {
+        this.bus.write(0x2004, value);
+        value = -1;
+        if (++index === 256) oam = false;
+      } else {
+        this.bus.reread(addr);
+      }
+      this.bus.cycleEnd();
+      this.poll();
+      if (dmc === -1) dmc = 1;
+      else if (dmc === 1) dmc = 2;
+    }
   }
 
   // ---- addressing ----
@@ -311,11 +346,18 @@ export class CPU {
   }
 
   private branch(taken: boolean): void {
+    const afterOpcode = this.pending;
     const off = this.fetch();
     if (!taken) return;
     this.rd(this.pc);
     const target = (this.pc + ((off ^ 0x80) - 0x80)) & 0xffff;
-    if ((target ^ this.pc) & 0xff00) this.rd((this.pc & 0xff00) | (target & 0xff));
+    if ((target ^ this.pc) & 0xff00) {
+      this.rd((this.pc & 0xff00) | (target & 0xff));
+    } else {
+      // A taken branch that stays on its page ignores an interrupt that arrives in its last
+      // clock: the next instruction runs first.
+      this.prevPending = this.prevPending && afterOpcode;
+    }
     this.pc = target;
   }
 

@@ -1,9 +1,10 @@
-// The page (see cases/CONTRACT-I3.md): a ROM from the file input, the canvas, the keyboard on
-// controller 1, the Reset and Power buttons, and a loop paced against real time. Everything here is
-// presentation; the console itself is src/core.
+// The page (see cases/CONTRACT-I3.md and CONTRACT-I4.md): a ROM from the file input, the canvas, the
+// sound, the keyboard on controller 1, the Reset and Power buttons, and a loop paced against real
+// time. Everything here is presentation; the console itself is src/core.
 import { NES, RomError } from '../core/index.ts';
 import { RGB } from '../core/palette.ts';
 import { Keys } from './keyboard.ts';
+import { Sound } from './sound.ts';
 
 /** NTSC: 1,789,772.7 CPU cycles a second, 29,780.5 a frame (NESdev "Cycle reference chart"). */
 const FRAME_MS = 1000 / (1789772.7272 / 29780.5);
@@ -17,6 +18,7 @@ const canvas = document.getElementById('screen') as HTMLCanvasElement;
 const message = document.getElementById('message') as HTMLElement;
 const resetButton = document.getElementById('reset') as HTMLButtonElement;
 const powerButton = document.getElementById('power') as HTMLButtonElement;
+const soundOff = document.getElementById('sound-off') as HTMLElement;
 
 const ctx = canvas.getContext('2d', { alpha: false })!;
 const image = ctx.createImageData(256, 240);
@@ -25,6 +27,7 @@ const pixels = new Uint32Array(image.data.buffer);
 const ABGR = RGB.map(c => (0xff000000 | ((c & 0xff) << 16) | (c & 0xff00) | (c >>> 16)) >>> 0);
 
 const keys = new Keys();
+const sound = new Sound(soundOff);
 let nes: NES | null = null;
 let rom: Uint8Array | null = null;
 let frames = 0;
@@ -47,11 +50,16 @@ function draw(): void {
 function runFrame(): void {
   nes!.setButtons(0, keys.buttons());
   nes!.runFrame();
+  sound.play(nes!.audioSamples());
   frames++;
 }
 
-/** Start a console on these bytes: a fresh power-on. The battery save carries over only on Power. */
+/** Start a console on these bytes: a fresh power-on. The battery save carries over only on Power.
+ * The old console's sound, sent or not, is never heard after this. */
 function start(next: NES, bytes: Uint8Array): void {
+  sound.start();
+  next.setSampleRate(sound.rate);
+  sound.flush();
   nes = next;
   rom = bytes;
   frames = 0;
@@ -116,7 +124,10 @@ input.addEventListener('change', () => {
 
 resetButton.addEventListener('click', () => {
   resetButton.blur();
-  nes?.reset();
+  if (!nes) return;
+  nes.audioSamples();                // made before the reset: never heard
+  nes.reset();
+  sound.flush();
 });
 
 powerButton.addEventListener('click', () => {

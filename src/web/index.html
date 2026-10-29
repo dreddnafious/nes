@@ -9,6 +9,7 @@
   #screen { display: block; width: 768px; height: 720px; image-rendering: pixelated; background: #000; }
   .bar { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
   #message { margin: 0 0 12px; padding: 6px 10px; background: #522; color: #fdd; border-radius: 4px; }
+  #sound-off { margin: 0 0 12px; color: #fc6; }
   .keys { margin-top: 12px; color: #999; }
 </style>
 </head>
@@ -19,6 +20,15 @@
   <button id="power" type="button">Power</button>
 </div>
 <p id="message" hidden></p>
+<p id="sound-off">Sound is off: press any key or click to turn it on.</p>
+<script>
+  // Opened from disk, the page's modules and its audio worklet can't load: say how to serve it.
+  if (location.protocol === 'file:') {
+    const m = document.getElementById('message');
+    m.textContent = 'This page has to be served: run node src/web/serve.ts --port 8080 in the project, then open http://127.0.0.1:8080/';
+    m.hidden = false;
+  }
+</script>
 <canvas id="screen" width="256" height="240"></canvas>
 <p class="keys">Arrows: the pad · Z: B · X: A · Enter: Start · Right Shift: Select</p>
 <script type="module" src="/src/web/main.ts"></script>

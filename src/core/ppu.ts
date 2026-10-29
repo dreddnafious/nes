@@ -40,6 +40,10 @@ export class PPU {
   x = 0;
   w = 0;
   private readBuffer = 0;
+  /** The read buffer before the last $2007 read's fill. */
+  private bufferBefore = 0;
+  /** Set by the console for a $2007 read made on the CPU cycle right after another. */
+  successiveRead = false;
   /** The PPU's I/O latch: what reads of write-only registers return (open bus). */
   latch = 0;
   /** The frame each latch bit was last refreshed with a 1. */
@@ -414,7 +418,10 @@ export class PPU {
           this.readBuffer = this.vram[this.ntIndex(addr - 0x1000)];
           this.refresh(v, 0x3f);
         } else {
-          v = this.readBuffer;
+          // A read on the CPU cycle after another lands before that one's fill reaches the buffer:
+          // it returns the buffer as it was, and its own fill replaces the other's.
+          v = this.successiveRead ? this.bufferBefore : this.readBuffer;
+          this.bufferBefore = v;
           this.readBuffer = this.memRead(addr);
           this.refresh(v, 0xff);
         }

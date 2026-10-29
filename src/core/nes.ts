@@ -18,6 +18,8 @@ export class NES implements CpuBus {
   irq = 0;
   /** The last value on the CPU's data bus: what a read of nothing returns. */
   private openBus = 0;
+  /** The CPU cycle of the last $2007 read. */
+  private lastDataRead = -2;
 
   /** Power on with a ROM file; throws RomError for a file it can't or won't run. */
   constructor(rom: Uint8Array) {
@@ -52,6 +54,17 @@ export class NES implements CpuBus {
     return this.ppu.pixels;
   }
 
+  /** Samples per second for the sound stream from now on (8,000-192,000; 48,000 until set). */
+  setSampleRate(hz: number): void {
+    this.apu.setSampleRate(hz);
+  }
+
+  /** The sound made since the last call (or power-on): mono, oldest first, each sample the APU
+   * mixer's level (NESdev "APU Mixer", 0 to about 1, DC included). */
+  audioSamples(): Float32Array {
+    return this.apu.takeSamples();
+  }
+
   /** The buttons held on a controller port (0 or 1), one bit each (controller.ts's BUTTON_*). */
   setButtons(port: number, buttons: number): void {
     this.controllers[port].buttons = buttons & 0xff;
@@ -80,6 +93,20 @@ export class NES implements CpuBus {
     return this.ppu.nmiOutput;
   }
 
+  get dmcDue(): boolean {
+    return this.apu.dmcDue;
+  }
+
+  dmcGet(): void {
+    this.apu.dmcFill(this.read(this.apu.dmcFetchAddress));
+  }
+
+  /** The controllers see one long read, not several, while their port stays selected: only the
+   * first read of a run clocks them. Everything else is read again. */
+  reread(addr: number): void {
+    if (addr !== 0x4016 && addr !== 0x4017) this.read(addr);
+  }
+
   /** The first two of the cycle's three PPU dots, and the APU's cycle. */
   cycleStart(): void {
     const ppu = this.ppu;
@@ -98,6 +125,11 @@ export class NES implements CpuBus {
     if (addr < 0x2000) {
       v = this.ram[addr & 0x7ff];
     } else if (addr < 0x4000) {
+      if ((addr & 7) === 7) {
+        const now = this.cpu.cycles;
+        this.ppu.successiveRead = now - this.lastDataRead === 1;
+        this.lastDataRead = now;
+      }
       v = this.ppu.readRegister(addr & 7);
     } else if (addr < 0x4020) {
       if (addr === 0x4015) {
