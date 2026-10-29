@@ -1,0 +1,10 @@
+.agentfng/
+substrate-snapshot.md
+.substrate/
+substrate-peek.md
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+out/
+.pytest_cache/
