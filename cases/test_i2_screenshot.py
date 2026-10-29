@@ -32,7 +32,6 @@ def font():
     return font_from_chr(data[16 + prg:16 + prg + 0x2000])
 
 
-@DELTA
 def test_core_frame_shows_the_roms_text_by_palette_index():
     """purpose: at fixed frame 200 of ppu_vbl_nmi 01-vbl_basics, the core's frame holds only the
     console's two colour indices ($0F and $30), and read cell by cell with the ROM's CHR font it shows
@@ -53,7 +52,6 @@ def test_core_frame_shows_the_roms_text_by_palette_index():
     assert all(ln.startswith(" ") and ln[1] != " " for ln in text_lines(screen)), text_lines(screen)
 
 
-@DELTA
 def test_screenshot_png_is_256x240_and_shows_the_text(tmp_path):
     """purpose: `nes.ts screenshot <rom> --frames 200 --out f.png` writes a 256x240 PNG (all 240
     lines, none cropped) in which the ROM's text reads, with its own CHR font, as the lines it wrote at
@@ -69,7 +67,6 @@ def test_screenshot_png_is_256x240_and_shows_the_text(tmp_path):
     assert [ln.strip() for ln in screen] == ["01-vbl_basics", "Passed"], screen
 
 
-@DELTA
 def test_screenshot_is_the_core_frame_through_one_palette(tmp_path):
     """purpose: the CLI's PNG after N frames is the core's frame after N frames mapped through one
     palette: over a scene drawn with 31 colour indices, every pixel with the same frame value (colour
@@ -96,7 +93,6 @@ def test_screenshot_is_the_core_frame_through_one_palette(tmp_path):
         f"{len(seen)} frame values, {distinct} RGBs (floor {floor}); values with more than one RGB: {split}"
 
 
-@DELTA
 def test_screenshot_without_out_is_refused_with_a_usage_message(tmp_path):
     """purpose: `nes.ts screenshot <rom>` with no --out exits non-zero with a message naming --out on
     stderr, not a stack trace (as the I1 CLI refuses bad options).

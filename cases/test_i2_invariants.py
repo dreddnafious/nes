@@ -11,7 +11,6 @@ from i2_support import build_rom, decode_frame, drive_ppu, make_chr, scene_rom, 
 DELTA = pytest.mark.xfail(strict=True, reason="delta")
 
 
-@DELTA
 def test_frames_are_deterministic(tmp_path):
     """purpose: "power-on state is fixed, so runs are deterministic and title frames can be compared"
     (Decided, axes): the same ROM run twice from power-on draws the same frame, index for index, at
@@ -26,7 +25,6 @@ def test_frames_are_deterministic(tmp_path):
         f"first different frame: {next((i + 1 for i, (x, y) in enumerate(zip(a['hashes'], b['hashes'])) if x != y), None)}"
 
 
-@DELTA
 def test_headless_core_with_rendering_on_runs_at_least_five_times_real_time(tmp_path):
     """purpose: "headless, the core runs at >= 5x real time, so the corpus runs in minutes" (J3) holds
     with the picture being drawn: 1,800 frames (30 s of NTSC time) of a busy scene, background and 64

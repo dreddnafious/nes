@@ -24,7 +24,6 @@ def same(got, want, what):
     assert n == 0, f"{what}: {n} pixels differ from the spec; first (x, y, got, want): {first_diffs(got, want)}"
 
 
-@DELTA
 def test_background_tiles_and_attributes_are_drawn_as_the_spec_says(tmp_path):
     """purpose: an unscrolled background of random tiles and attributes is drawn index-exact: each 8x8
     cell is its nametable tile's two planes, coloured by the 2-bit palette its attribute byte gives
@@ -34,7 +33,6 @@ def test_background_tiles_and_attributes_are_drawn_as_the_spec_says(tmp_path):
     same(drawn(tmp_path, s, "bg"), reference_frame(s), "background")
 
 
-@DELTA
 def test_fine_and_coarse_scroll_shift_the_background(tmp_path):
     """purpose: $2005 = (77, 45) shifts the picture left 77 and up 45 pixels, fine and coarse parts both,
     wrapping into the nametable to the right at X 256 and below at Y 240 (vertical mirroring), with
@@ -44,7 +42,6 @@ def test_fine_and_coarse_scroll_shift_the_background(tmp_path):
     same(drawn(tmp_path, s, "scroll"), reference_frame(s), "scroll (77, 45)")
 
 
-@DELTA
 def test_horizontal_mirroring_maps_the_nametables(tmp_path):
     """purpose: with the header's horizontal mirroring, $2400 shows what was written to $2000 and $2800
     what was written to $2C00, so a picture scrolled across all four shows two tables, each twice.
@@ -53,7 +50,6 @@ def test_horizontal_mirroring_maps_the_nametables(tmp_path):
     same(drawn(tmp_path, s, "hmirror"), reference_frame(s), "horizontal mirroring")
 
 
-@DELTA
 def test_four_screen_has_four_nametables(tmp_path):
     """purpose: with the header's four-screen bit, $2000, $2400, $2800 and $2C00 are four separate
     tables, and a picture scrolled by (128, 120) shows a quarter of each.
@@ -62,7 +58,6 @@ def test_four_screen_has_four_nametables(tmp_path):
     same(drawn(tmp_path, s, "four"), reference_frame(s), "four-screen")
 
 
-@DELTA
 def test_sprites_show_one_line_below_their_y_and_flip(tmp_path):
     """purpose: an 8x8 sprite with OAM Y = y covers lines y+1 to y+8 (Y = 0 starts on line 1, Y = 238
     shows only on line 239, Y = 239 and 255 not at all), is clipped at the right edge, and attribute
@@ -72,7 +67,6 @@ def test_sprites_show_one_line_below_their_y_and_flip(tmp_path):
     same(drawn(tmp_path, s, "sprites"), reference_frame(s), "8x8 sprites")
 
 
-@DELTA
 def test_sprite_priority_bit_and_the_lower_index_rule(tmp_path):
     """purpose: a sprite with attribute bit 5 shows only where the background is transparent; and where
     sprites overlap, the lowest-indexed opaque one is chosen first and only then weighed against the
@@ -83,7 +77,6 @@ def test_sprite_priority_bit_and_the_lower_index_rule(tmp_path):
     same(drawn(tmp_path, s, "priority"), reference_frame(s), "sprite priority")
 
 
-@DELTA
 def test_8x16_sprites_take_their_table_from_bit_0_and_flip_whole(tmp_path):
     """purpose: with $2000 bit 5, a sprite is 8x16: tile number bit 0 picks $0000 or $1000, the top half
     is tile N & $FE and the bottom the next one, vertical flip turns all 16 rows over, and one at
@@ -93,7 +86,6 @@ def test_8x16_sprites_take_their_table_from_bit_0_and_flip_whole(tmp_path):
     same(drawn(tmp_path, s, "tall"), reference_frame(s), "8x16 sprites")
 
 
-@DELTA
 def test_only_eight_sprites_are_drawn_on_a_line(tmp_path):
     """purpose: with nine sprites on lines 101-108, the first eight in OAM order are drawn and the ninth
     (sprite 8, at X 202) isn't; on lines 151-158, eight sprites are all drawn.
@@ -107,7 +99,6 @@ def test_only_eight_sprites_are_drawn_on_a_line(tmp_path):
 
 
 @pytest.mark.parametrize("mask", [0x18, 0x1A, 0x1C], ids=["both-clipped", "bg-shown", "sprites-shown"])
-@DELTA
 def test_left_column_clipping_follows_the_mask_bits(tmp_path, mask):
     """purpose: in the leftmost 8 pixels, the background shows only when $2001 bit 1 is set and sprites
     only when bit 2 is set; a pixel with neither shows the backdrop; from X 8 on, both show.
@@ -116,7 +107,6 @@ def test_left_column_clipping_follows_the_mask_bits(tmp_path, mask):
     same(drawn(tmp_path, s, f"clip{mask:02x}"), reference_frame(s), f"left clip, $2001 = ${mask:02X}")
 
 
-@DELTA
 def test_greyscale_ands_every_colour_with_30(tmp_path):
     """purpose: with $2001 bit 0 set, every pixel's colour index, background, sprite and backdrop alike,
     is its palette entry AND $30.
@@ -127,7 +117,6 @@ def test_greyscale_ands_every_colour_with_30(tmp_path):
     same(got, reference_frame(s), "greyscale")
 
 
-@DELTA
 def test_emphasis_bits_ride_along_with_every_pixel(tmp_path):
     """purpose: with $2001 = $BE (emphasis bits 5 and 7), every pixel's frame value carries %101 in bits
     6-8 over the colour index it would have without emphasis.
@@ -138,7 +127,6 @@ def test_emphasis_bits_ride_along_with_every_pixel(tmp_path):
     same(got, reference_frame(s), "emphasis")
 
 
-@DELTA
 def test_3f10_writes_the_backdrop(tmp_path):
     """purpose: $3F10 is the same palette byte as $3F00: writing $15 there after $21 at $3F00 makes the
     backdrop $15 wherever the background is transparent.
@@ -159,7 +147,6 @@ def split_rows(got, s):
     return "".join(rows)
 
 
-@DELTA
 def test_mid_frame_scroll_split_starts_on_the_line_after_sprite_0_hits(tmp_path):
     """purpose: a game that waits for sprite-0 hit and then writes a new X scroll (a status bar) gets
     the split on the row the spec gives: with sprite 0's OAM Y = 99 the hit is on line 100 and the
@@ -173,7 +160,6 @@ def test_mid_frame_scroll_split_starts_on_the_line_after_sprite_0_hits(tmp_path)
     assert diff_count(got, want) == 0, f"rows (0 = unscrolled, S = scrolled): {split_rows(got, s)}"
 
 
-@DELTA
 def test_the_split_row_holds_for_600_frames(tmp_path):
     """purpose: over 600 consecutive frames of the status-bar loop (frames 21-620), every frame is the
     same picture, the split on row 101 each time (J4: the split doesn't jitter).
