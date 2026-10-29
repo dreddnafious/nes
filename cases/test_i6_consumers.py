@@ -23,7 +23,7 @@ def mem_lines(stdout: str) -> dict:
     return out
 
 
-@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
 def test_cli_run_reads_memory_after_bank_switching(tmp_path, mapper):
     """purpose: `node src/cli/nes.ts run <probe> --frames 30 --mem 0200:3 --mem 0300:n` runs a mapper-2,
     -3 or -7 probe (it switches banks and logs reads) and prints, for each --mem, the bytes the CPU bus
