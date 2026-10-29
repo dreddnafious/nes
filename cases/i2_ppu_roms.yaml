@@ -1,0 +1,169 @@
+# I2: the PPU test ROMs, all NROM single-test builds except ppu_read_buffer (mapper 3, CNROM; see its
+# entry). Read by test_i2_ppu_roms.py. The denominator is this fixed list (J4e): a hang, a timeout, a
+# crash or a ROM that won't load counts as a fail, never a skip.
+#
+# kind "blargg": the ROM reports through $6000 (signature DE B0 61, $80 running, $81 reset, $00-$7F result),
+#   read by the frozen I1 driver cases/drive.ts. Pass = status $00 and "Passed" in the text at $6004.
+# kind "screen": blargg's 2005 runtime, which reports on screen only (and by beeps). Its result is drawn
+#   with the ROM's own font as "PASSED" or "FAILED #n" (runtime/validation.a). The case reads the screen
+#   by palette index off the core's frame, using the glyphs the ROM itself loads into CHR-RAM. The run
+#   ends when the console's ready byte at $07F1 has been set to $A5 (console up, result being printed)
+#   and then cleared to $00 (`forever:` after the beeps), plus 2 frames for the last write to show.
+#
+# Boundaries: ppu_vbl_nmi's timing ROMs each step one PPU clock across a line and print one row per
+# clock, so each pins both sides of its number: the vblank flag set at scanline 241 dot 1 (02, 06),
+# cleared at the pre-render line's dot 1 (03), the NMI edge (05, 07, 08) and the odd-frame skipped dot
+# (09, 10). The rows the hardware gives are in ppu_vbl_nmi/readme.txt.
+#
+# Revision: the target is the RP2C02G. Every ROM here passes on an NTSC NES per its readme; none is
+# expected to fail on that revision, so none carries an expected-fail label.
+cases:
+  - id: ppu_vbl_nmi/01-vbl_basics
+    kind: blargg
+    purpose: ppu_vbl_nmi 01-vbl_basics reports passed (the vblank flag sets once a frame, reading $2002 clears it, $2002 is mirrored every 8 bytes to $3FFA, and the frame period with BG off is right).
+    origin: design
+  - id: ppu_vbl_nmi/02-vbl_set_time
+    kind: blargg
+    purpose: ppu_vbl_nmi 02-vbl_set_time reports passed (a $2002 read one PPU clock before scanline 241 dot 1 sees the flag clear and the next read sees it set; a read on the set clock sees it clear and suppresses it).
+    origin: design
+    delta: true
+  - id: ppu_vbl_nmi/03-vbl_clear_time
+    kind: blargg
+    purpose: ppu_vbl_nmi 03-vbl_clear_time reports passed (the vblank flag still reads set up to the clock before the pre-render line's dot 1, and clear from it on).
+    origin: design
+  - id: ppu_vbl_nmi/04-nmi_control
+    kind: blargg
+    purpose: ppu_vbl_nmi 04-nmi_control reports passed (enabling NMI while the vblank flag is set fires one NMI, after the next instruction; re-writing $80 doesn't fire another; $2000 is mirrored every 8 bytes).
+    origin: design
+  - id: ppu_vbl_nmi/05-nmi_timing
+    kind: blargg
+    purpose: ppu_vbl_nmi 05-nmi_timing reports passed (the NMI lands after the instruction the readme's table gives, for each PPU clock across the vblank start).
+    origin: design
+    delta: true
+  - id: ppu_vbl_nmi/06-suppression
+    kind: blargg
+    purpose: ppu_vbl_nmi 06-suppression reports passed (a $2002 read one clock before the flag sets reads clear and leaves no flag and no NMI; reads on the next two clocks see the flag but suppress the NMI; later reads see both).
+    origin: design
+    delta: true
+  - id: ppu_vbl_nmi/07-nmi_on_timing
+    kind: blargg
+    purpose: ppu_vbl_nmi 07-nmi_on_timing reports passed (enabling NMI up to the clock the vblank flag clears still fires it; from that clock on, it doesn't).
+    origin: design
+    delta: true
+  - id: ppu_vbl_nmi/08-nmi_off_timing
+    kind: blargg
+    purpose: ppu_vbl_nmi 08-nmi_off_timing reports passed (disabling NMI up to the readme's clock near the vblank start prevents it; disabling later doesn't).
+    origin: design
+    delta: true
+  - id: ppu_vbl_nmi/09-even_odd_frames
+    kind: blargg
+    purpose: ppu_vbl_nmi 09-even_odd_frames reports passed (with BG rendering on, every other frame is one PPU clock short; with it off, none is; the skips counted are 00 01 01 02).
+    origin: design
+  - id: ppu_vbl_nmi/10-even_odd_timing
+    kind: blargg
+    purpose: ppu_vbl_nmi 10-even_odd_timing reports passed (whether the odd frame's clock is skipped follows the BG-enable state at the exact clock the readme gives, on both sides, when enabling and when disabling).
+    origin: design
+    delta: true
+  - id: ppu_open_bus
+    kind: blargg
+    purpose: ppu_open_bus reports passed (reads of write-only PPU registers and undefined bits return the PPU's own decay latch, each bit refreshed by the reads and writes the readme's table gives, decaying to 0 within about a second).
+    origin: design
+    delta: true
+  - id: ppu_read_buffer
+    kind: blargg
+    max_frames: 4800
+    purpose: test_ppu_read_buffer reports passed (the $2007 read buffer, palette reads unbuffered, CIRAM and CHR reads and their mirrors, the $2005/$2006 address relationship, open bus, $4014 DMA side effects and sprite 0 hit through DMA); its CHR is 32 KiB on mapper 3 (CNROM), so it needs that mapper's CHR bank register, which its tests 70-72 check.
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/01.basics
+    kind: screen
+    purpose: sprite_hit_tests 01.basics shows PASSED (a hit when an opaque sprite-0 pixel meets an opaque BG pixel, even behind the BG; none with BG, sprites or both off, none for transparent pixels or other sprites).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/02.alignment
+    kind: screen
+    purpose: sprite_hit_tests 02.alignment shows PASSED (sprite 0 hits a BG tile exactly when they overlap on each of its four edges, and misses one pixel away).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/03.corners
+    kind: screen
+    purpose: sprite_hit_tests 03.corners shows PASSED (a one-pixel sprite hits at each of its four corners).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/04.flip
+    kind: screen
+    purpose: sprite_hit_tests 04.flip shows PASSED (horizontal, vertical and both flips move the hit pixel).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/05.left_clip
+    kind: screen
+    purpose: sprite_hit_tests 05.left_clip shows PASSED (no hit in the left 8 pixels unless $2001 shows both BG and sprites there; X = 0 is blocked only by the clip).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/06.right_edge
+    kind: screen
+    purpose: sprite_hit_tests 06.right_edge shows PASSED (no hit at X = 255 itself; a hit at 254).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/07.screen_bottom
+    kind: screen
+    purpose: sprite_hit_tests 07.screen_bottom shows PASSED (a hit on line 238; none on line 239 or below, and none for Y = 255).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/08.double_height
+    kind: screen
+    purpose: sprite_hit_tests 08.double_height shows PASSED (an 8x16 sprite 0 hits with its lower tile).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/09.timing_basics
+    kind: screen
+    purpose: sprite_hit_tests 09.timing_basics shows PASSED (the hit flag sets within about 12 PPU clocks of its pixel, at each corner, and clears at the end of vblank).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/10.timing_order
+    kind: screen
+    purpose: sprite_hit_tests 10.timing_order shows PASSED (the flag sets at the first overlapping pixel, not before or after, whichever corner of the sprite it is).
+    origin: design
+    delta: true
+  - id: sprite_hit_tests_2005/11.edge_timing
+    kind: screen
+    purpose: sprite_hit_tests 11.edge_timing shows PASSED (the hit time ignores pixels under the left clip, at X = 255, or off the right edge). It only checks that the flag is still clear at those times, so it leans on 01-10 passing too, as its readme says to run them in order.
+    origin: design
+    delta: true
+  - id: sprite_overflow_tests/1.Basics
+    kind: screen
+    purpose: sprite_overflow_tests 1.Basics shows PASSED (the overflow flag sets with 9 sprites on a line, survives $2002 reads and the start of vblank, clears at its end, and works with either layer on, not with both off).
+    origin: design
+    delta: true
+  - id: sprite_overflow_tests/2.Details
+    kind: screen
+    purpose: sprite_overflow_tests 2.Details shows PASSED (overflow at X = 0 and Y = 239; none at Y = 240 or 255 or with 7 or fewer per line; 8x16 sprites counted by their height).
+    origin: design
+    delta: true
+  - id: sprite_overflow_tests/3.Timing
+    kind: screen
+    purpose: sprite_overflow_tests 3.Timing shows PASSED (the flag sets and clears within a CPU clock or two of the readme's times, first line to last).
+    origin: design
+    delta: true
+  - id: sprite_overflow_tests/4.Obscure
+    kind: screen
+    purpose: sprite_overflow_tests 4.Obscure shows PASSED (the hardware bug, where after 8 sprites on a line, the evaluator steps through the next sprites' bytes diagonally as Y, as the readme lays out).
+    origin: design
+    delta: true
+  - id: sprite_overflow_tests/5.Emulator
+    kind: screen
+    purpose: sprite_overflow_tests 5.Emulator shows PASSED (the flag is computed even with no $2002 read in the frame, and follows changes to rendering, OAM and sprite height mid-frame).
+    origin: design
+    delta: true
+  - id: cpu_dummy_writes/cpu_dummy_writes_ppumem
+    kind: blargg
+    purpose: cpu_dummy_writes_ppumem reports passed (every read-modify-write opcode writes the original value back before the new one, seen through PPU memory at $2007, with the PPU open bus it relies on).
+    origin: design
+  - id: cpu_dummy_writes/cpu_dummy_writes_oam
+    kind: blargg
+    purpose: cpu_dummy_writes_oam reports passed (the same double writes, seen through OAM data at $2004; its readme says it holds on emulators, whose OAM reads are reliable).
+    origin: design
+  - id: cpu_exec_space/test_cpu_exec_space_ppuio
+    kind: blargg
+    purpose: test_cpu_exec_space_ppuio reports passed (the CPU executes code fetched from the PPU's I/O space, $2000-$3FFF, with the PPU open bus updated by every write).
+    origin: design
