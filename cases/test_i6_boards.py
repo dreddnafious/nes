@@ -179,7 +179,7 @@ def test_axrom_on_an_ines_1_header_has_no_bus_conflicts(tmp_path):
 # ---------------------------------------------------------------- nametables
 
 @pytest.mark.parametrize("mapper,mirroring", [
-    pytest.param(m, mi, id=f"mapper{m}-{mi}", marks=[] if m == 3 else [DELTA])
+    pytest.param(m, mi, id=f"mapper{m}-{mi}")
     for m in (2, 3) for mi in ("v", "h")])
 def test_uxrom_and_cnrom_mirroring_is_the_headers_and_bank_writes_dont_change_it(tmp_path, mapper, mirroring):
     """purpose: UxROM and CNROM mirroring is fixed ("Fixed H or V, controlled by solder pads"): the
