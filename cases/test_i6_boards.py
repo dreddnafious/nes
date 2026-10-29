@@ -271,7 +271,7 @@ def test_chr_rom_in_the_file_is_read_and_never_written(tmp_path, mapper):
 PICTURES = [(2, 0), (2, 5), (3, 0), (3, 1), (3, 2), (3, 3), (7, 0), (7, 1)]
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(m, c, id=f"mapper{m}-{c}", marks=[] if m == 3 else [DELTA])
+@pytest.mark.parametrize("mapper,choice", [pytest.param(m, c, id=f"mapper{m}-{c}")
                                            for m, c in PICTURES])
 def test_the_picture_comes_from_the_banks_and_page_the_game_chose(tmp_path, mapper, choice):
     """purpose: the frame is drawn from what the board maps: UxROM's tiles copied into CHR-RAM from the
