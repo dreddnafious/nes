@@ -62,7 +62,7 @@ def test_cli_screenshot_shows_the_banked_picture(tmp_path, mapper, choice):
     assert c["mismatched"] == 0 and not c["merged_indices"], c
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 5, marks=DELTA), (3, 3), pytest.param(7, 0, marks=DELTA)])
+@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 5), (3, 3), pytest.param(7, 0)])
 def test_the_page_plays_a_mapper_2_3_or_7_file(site, browser, tmp_path, mapper, choice):
     """purpose: J1 step 2 for these boards: the page loads a mapper-2, -3 or -7 file through #rom-file
     instead of refusing it (#message hidden or empty), runs it, and after 60 frames its canvas is the
