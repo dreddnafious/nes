@@ -224,7 +224,7 @@ def test_axrom_bit_4_picks_one_page_for_all_four_nametables(tmp_path, mirroring)
 
 # ---------------------------------------------------------------- CHR: RAM on UxROM/AxROM, ROM where the file has it
 
-@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [pytest.param(2), pytest.param(7)])
 def test_chr_ram_holds_what_is_written_through_every_prg_switch(tmp_path, mapper):
     """purpose: a UxROM or AxROM file with no CHR-ROM (header byte 5 = 0) has 8 KiB of CHR-RAM at PPU
     $0000-$1FFF: bytes written through $2007 at both ends of both pattern tables, and a 256-byte run
