@@ -10,7 +10,6 @@ from conftest import ROOT, drive, oracle, run
 DELTA = pytest.mark.xfail(strict=True, reason="delta")
 
 
-@DELTA
 def test_the_core_is_pure_and_has_no_browser_code():
     """purpose: "The core in src/core is pure TypeScript with no DOM": it exists (src/core/index.ts),
     and no file under src/core names a browser global (window, document, navigator,
@@ -25,7 +24,6 @@ def test_the_core_is_pure_and_has_no_browser_code():
     assert not hits, hits
 
 
-@DELTA
 def test_no_emulator_is_vendored_or_depended_on():
     """purpose: "don't vendor one in": package.json exists, has no runtime dependencies at all, and no
     package anywhere in it or its lockfile is an emulator or NES/6502 package by name.
@@ -71,7 +69,6 @@ def test_no_rom_is_committed_without_a_licence_saying_so():
     assert not unlisted, f"ROMs in git with no licence line marking them committed: {unlisted}"
 
 
-@DELTA
 def test_the_typescript_type_checks_under_strict():
     """purpose: the TypeScript source type-checks with the project's own compiler under strict mode
     (tsconfig.json compilerOptions.strict true; `npx --no-install tsc --noEmit -p .` exits 0).
@@ -84,7 +81,6 @@ def test_the_typescript_type_checks_under_strict():
     assert r.returncode == 0, (r.stdout or "")[-3000:] + repr(r)
 
 
-@DELTA
 def test_runs_are_deterministic():
     """purpose: the same ROM run twice from power-on gives the same result, frame count, RAM and
     PRG-RAM contents (power-on state is fixed; nothing reads the wall clock or a random source).
@@ -96,7 +92,6 @@ def test_runs_are_deterministic():
     assert {k: a.get(k) for k in keys} == {k: b.get(k) for k in keys}
 
 
-@DELTA
 def test_headless_core_runs_at_least_five_times_real_time():
     """purpose: headless, the core emulates 1,800 frames (30 s of NTSC time) of a real test ROM in at
     most 6.0 s of wall time on this machine: at least 5x real time, so the corpus runs in minutes

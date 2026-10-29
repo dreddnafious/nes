@@ -57,52 +57,61 @@ runs:
   broken: 0
   code: 0
   secs: 2
+- at: '2026-10-29T11:44:19-05:00'
+  green: 2
+  red: 0
+  promote: 42
+  broken: 0
+  code: 1
+  secs: 5
   met:
+  - cpu_reset/ram_after_reset
+  - cpu_reset/registers
+  - instr_misc/01-abs_x_wrap
+  - instr_misc/02-branch_wrap
+  - instr_misc/03-dummy_reads
+  - instr_misc/04-dummy_reads_apu
+  - instr_test-v5/01-basics
+  - instr_test-v5/02-implied
+  - instr_test-v5/03-immediate
+  - instr_test-v5/04-zero_page
+  - instr_test-v5/05-zp_xy
+  - instr_test-v5/06-absolute
+  - instr_test-v5/07-abs_xy
+  - instr_test-v5/08-ind_x
+  - instr_test-v5/09-ind_y
+  - instr_test-v5/10-branches
+  - instr_test-v5/11-stack
+  - instr_test-v5/12-jmp_jsr
+  - instr_test-v5/13-rts
+  - instr_test-v5/14-rti
+  - instr_test-v5/15-brk
+  - instr_test-v5/16-special
+  - instr_timing/1-instr_timing
+  - instr_timing/2-branch_timing
+  - test_archaic_header_junk_is_ignored
+  - test_blargg_cpu_rom_reports_passed
+  - test_headless_core_runs_at_least_five_times_real_time
+  - test_nes2_header_is_read_as_nes2
+  - test_nestest_official_opcodes_match_the_golden_trace
+  - test_nestest_official_opcodes_take_the_golden_cycles
+  - test_nestest_reports_no_errors_in_its_result_bytes
+  - test_nestest_unofficial_opcodes_match_the_golden_trace
+  - test_nestest_unofficial_opcodes_take_the_golden_cycles
+  - test_no_emulator_is_vendored_or_depended_on
   - test_no_rom_is_committed_without_a_licence_saying_so
+  - test_not_an_nes_file_is_refused_with_a_reason
+  - test_nrom128_runs_with_its_16k_bank_mirrored
+  - test_power_on_ram_is_zero_filled
+  - test_runs_are_deterministic
   - test_the_build_never_calls_out_to_another_program
-  unmet:
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[cpu_reset/ram_after_reset]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[cpu_reset/registers]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/01-abs_x_wrap]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/02-branch_wrap]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/03-dummy_reads]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_misc/04-dummy_reads_apu]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/01-basics]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/02-implied]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/03-immediate]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/04-zero_page]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/05-zp_xy]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/06-absolute]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/07-abs_xy]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/08-ind_x]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/09-ind_y]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/10-branches]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/11-stack]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/12-jmp_jsr]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/13-rts]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/14-rti]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/15-brk]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_test-v5/16-special]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_timing/1-instr_timing]
-  - cases.test_i1_blargg_cpu::test_blargg_cpu_rom_reports_passed[instr_timing/2-branch_timing]
-  - cases.test_i1_cartridge::test_archaic_header_junk_is_ignored
-  - cases.test_i1_cartridge::test_nes2_header_is_read_as_nes2
-  - cases.test_i1_cartridge::test_not_an_nes_file_is_refused_with_a_reason
-  - cases.test_i1_cartridge::test_nrom128_runs_with_its_16k_bank_mirrored
-  - cases.test_i1_cartridge::test_power_on_ram_is_zero_filled
-  - cases.test_i1_cartridge::test_trainer_is_skipped
-  - cases.test_i1_cartridge::test_truncated_file_is_refused_naming_the_mismatch
-  - cases.test_i1_cartridge::test_unsupported_mapper_is_refused_by_number
-  - cases.test_i1_invariants::test_headless_core_runs_at_least_five_times_real_time
-  - cases.test_i1_invariants::test_no_emulator_is_vendored_or_depended_on
-  - cases.test_i1_invariants::test_runs_are_deterministic
-  - cases.test_i1_invariants::test_the_core_is_pure_and_has_no_browser_code
-  - cases.test_i1_invariants::test_the_typescript_type_checks_under_strict
-  - cases.test_i1_nestest::test_nestest_official_opcodes_match_the_golden_trace
-  - cases.test_i1_nestest::test_nestest_official_opcodes_take_the_golden_cycles
-  - cases.test_i1_nestest::test_nestest_reports_no_errors_in_its_result_bytes
-  - cases.test_i1_nestest::test_nestest_unofficial_opcodes_match_the_golden_trace
-  - cases.test_i1_nestest::test_nestest_unofficial_opcodes_take_the_golden_cycles
+  - test_the_core_is_pure_and_has_no_browser_code
+  - test_the_typescript_type_checks_under_strict
+  - test_trainer_is_skipped
+  - test_truncated_file_is_refused_naming_the_mismatch
+  - test_unsupported_mapper_is_refused_by_number
+  unmet: []
+  build: a1a76e2c41d32c4f
 ---
 # Climb: nes
 

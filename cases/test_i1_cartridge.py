@@ -59,7 +59,6 @@ def runs_and_passes(path):
     return res
 
 
-@DELTA
 def test_nrom128_runs_with_its_16k_bank_mirrored(tmp_path):
     """purpose: a plain iNES NROM-128 file (16 KiB PRG, 8 KiB CHR) loads and runs, its single PRG bank
     seen at both $8000 and $C000, and the PRG-RAM at $6000 holds what the program writes there.
@@ -67,7 +66,6 @@ def test_nrom128_runs_with_its_16k_bank_mirrored(tmp_path):
     runs_and_passes(write(tmp_path, "nrom128.nes", ines() + PRG + CHR))
 
 
-@DELTA
 def test_nes2_header_is_read_as_nes2(tmp_path):
     """purpose: the same program in an NES 2.0 file (byte 7 bits 2-3 = %10, the size MSBs in byte 9
     zero) loads and runs as NROM.
@@ -76,7 +74,6 @@ def test_nes2_header_is_read_as_nes2(tmp_path):
     runs_and_passes(write(tmp_path, "nes2.nes", ines(rest=rest) + PRG + CHR))
 
 
-@DELTA
 def test_trainer_is_skipped(tmp_path):
     """purpose: a file with the trainer flag (byte 6 bit 2) has 512 bytes before its PRG; the loader
     skips them, so the program still runs from the right bytes.
@@ -85,7 +82,6 @@ def test_trainer_is_skipped(tmp_path):
     runs_and_passes(write(tmp_path, "trainer.nes", ines(flags6=0x04) + trainer + PRG + CHR))
 
 
-@DELTA
 def test_archaic_header_junk_is_ignored(tmp_path):
     """purpose: an old file with "DiskDude!" in header bytes 7-15 is read as mapper 0 (the upper
     mapper nibble in byte 7 is ignored when bytes 12-15 aren't zero), so it runs instead of being
@@ -95,7 +91,6 @@ def test_archaic_header_junk_is_ignored(tmp_path):
     runs_and_passes(write(tmp_path, "diskdude.nes", data))
 
 
-@DELTA
 def test_power_on_ram_is_zero_filled(tmp_path):
     """purpose: straight after power-on, before any frame runs, CPU RAM $0000-$07FF reads all $00
     (the fixed power-on fill decided at axes, so runs are deterministic).
@@ -105,7 +100,6 @@ def test_power_on_ram_is_zero_filled(tmp_path):
     assert len(res["ram"]) == 0x800 and set(res["ram"]) == {0}, f"non-zero bytes: {sorted(set(res['ram']))[:8]}"
 
 
-@DELTA
 def test_not_an_nes_file_is_refused_with_a_reason(tmp_path):
     """purpose: a file that isn't an iNES/NES 2.0 ROM (a text file) is refused with a RomError whose
     message says it isn't an NES ROM; nothing runs (variant J1a).
@@ -116,7 +110,6 @@ def test_not_an_nes_file_is_refused_with_a_reason(tmp_path):
     assert re.search(r"\b(i?NES|header)\b", res["error"], re.I), res["error"]
 
 
-@DELTA
 def test_truncated_file_is_refused_naming_the_mismatch(tmp_path):
     """purpose: a file whose header promises 32 KiB PRG + 8 KiB CHR but holds only 20 KiB of data is
     refused with a RomError that says the file is too short for its header, giving the sizes
@@ -130,7 +123,6 @@ def test_truncated_file_is_refused_naming_the_mismatch(tmp_path):
     assert re.search(r"\d", res["error"]), f"no size given: {res['error']}"
 
 
-@DELTA
 def test_unsupported_mapper_is_refused_by_number(tmp_path):
     """purpose: an NES 2.0 file for mapper 3000 (an unassigned number, spread across bytes 6, 7 and 8)
     is refused with a RomError naming mapper 3000, rather than running garbage (variant J1a).

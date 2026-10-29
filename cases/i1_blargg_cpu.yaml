@@ -5,96 +5,72 @@ cases:
   - id: instr_test-v5/01-basics
     purpose: blargg instr_test-v5 01-basics reports passed (basic instruction behaviour the other tests rely on).
     origin: design
-    delta: true
   - id: instr_test-v5/02-implied
     purpose: blargg instr_test-v5 02-implied reports passed (every implied-mode opcode, official then unofficial).
     origin: design
-    delta: true
   - id: instr_test-v5/03-immediate
     purpose: blargg instr_test-v5 03-immediate reports passed (immediate mode, including AAC, ASR, ARR, ATX, AXS).
     origin: design
-    delta: true
   - id: instr_test-v5/04-zero_page
     purpose: blargg instr_test-v5 04-zero_page reports passed.
     origin: design
-    delta: true
   - id: instr_test-v5/05-zp_xy
     purpose: blargg instr_test-v5 05-zp_xy reports passed (zero-page indexed, with wrap within page zero).
     origin: design
-    delta: true
   - id: instr_test-v5/06-absolute
     purpose: blargg instr_test-v5 06-absolute reports passed.
     origin: design
-    delta: true
   - id: instr_test-v5/07-abs_xy
     purpose: blargg instr_test-v5 07-abs_xy reports passed (absolute indexed, including the unstable SHY/SHX family as tested).
     origin: design
-    delta: true
   - id: instr_test-v5/08-ind_x
     purpose: blargg instr_test-v5 08-ind_x reports passed ((zp,X), with the pointer wrapping in page zero).
     origin: design
-    delta: true
   - id: instr_test-v5/09-ind_y
     purpose: blargg instr_test-v5 09-ind_y reports passed ((zp),Y).
     origin: design
-    delta: true
   - id: instr_test-v5/10-branches
     purpose: blargg instr_test-v5 10-branches reports passed.
     origin: design
-    delta: true
   - id: instr_test-v5/11-stack
     purpose: blargg instr_test-v5 11-stack reports passed (PHA, PHP, PLA, PLP, TSX, TXS; B and unused flag bits as pushed).
     origin: design
-    delta: true
   - id: instr_test-v5/12-jmp_jsr
     purpose: blargg instr_test-v5 12-jmp_jsr reports passed (including JMP (ind) page-wrap bug).
     origin: design
-    delta: true
   - id: instr_test-v5/13-rts
     purpose: blargg instr_test-v5 13-rts reports passed.
     origin: design
-    delta: true
   - id: instr_test-v5/14-rti
     purpose: blargg instr_test-v5 14-rti reports passed.
     origin: design
-    delta: true
   - id: instr_test-v5/15-brk
     purpose: blargg instr_test-v5 15-brk reports passed (BRK pushes PC+2 and B set, through the IRQ/BRK vector).
     origin: design
-    delta: true
   - id: instr_test-v5/16-special
     purpose: blargg instr_test-v5 16-special reports passed (special cases of the above).
     origin: design
-    delta: true
   - id: instr_timing/1-instr_timing
     purpose: blargg instr_timing 1-instr_timing reports passed (every non-freezing opcode takes the right number of cycles, timed against the APU length counter).
     origin: design
-    delta: true
   - id: instr_timing/2-branch_timing
     purpose: blargg instr_timing 2-branch_timing reports passed (branches take 2, 3, or 4 cycles by taken and page-cross).
     origin: design
-    delta: true
   - id: instr_misc/01-abs_x_wrap
     purpose: blargg instr_misc 01-abs_x_wrap reports passed (absolute,X wraps at $FFFF).
     origin: design
-    delta: true
   - id: instr_misc/02-branch_wrap
     purpose: blargg instr_misc 02-branch_wrap reports passed (branches wrap across $FFFF/$0000).
     origin: design
-    delta: true
   - id: instr_misc/03-dummy_reads
     purpose: blargg instr_misc 03-dummy_reads reports passed (indexed and RMW instructions make their dummy reads, seen through $2002).
     origin: design
-    delta: true
   - id: instr_misc/04-dummy_reads_apu
     purpose: blargg instr_misc 04-dummy_reads_apu reports passed (dummy reads seen through the APU's $4015).
     origin: design
-    delta: true
   - id: cpu_reset/registers
     purpose: blargg cpu_reset registers reports passed after the reset it asks for (A, X, Y kept; SP decremented by 3; I set).
     origin: design
-    delta: true
   - id: cpu_reset/ram_after_reset
     purpose: blargg cpu_reset ram_after_reset reports passed (RAM is unchanged by the Reset button).
     origin: design
-    delta: true

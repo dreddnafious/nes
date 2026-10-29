@@ -61,7 +61,6 @@ def first_mismatch(lo: int, hi: int, fields):
     return None
 
 
-@DELTA
 def test_nestest_official_opcodes_match_the_golden_trace():
     """purpose: every official-opcode instruction nestest runs (golden lines 1-5003) leaves PC, the
     instruction bytes, A, X, Y, P and SP exactly as the golden log says.
@@ -69,7 +68,6 @@ def test_nestest_official_opcodes_match_the_golden_trace():
     assert first_mismatch(1, FIRST_UNOFFICIAL - 1, fields=(0, 1, 2)) is None
 
 
-@DELTA
 def test_nestest_official_opcodes_take_the_golden_cycles():
     """purpose: over golden lines 1-5003, the CPU cycle count and the PPU scanline/dot (three dots per
     CPU cycle) match the golden log on every line: official opcodes are cycle-exact, page-cross and
@@ -78,7 +76,6 @@ def test_nestest_official_opcodes_take_the_golden_cycles():
     assert first_mismatch(1, FIRST_UNOFFICIAL - 1, fields=(0, 3, 4)) is None
 
 
-@DELTA
 def test_nestest_unofficial_opcodes_match_the_golden_trace():
     """purpose: from golden line 5004 to the end (8991), where nestest tests the unofficial opcodes
     (NOP variants, LAX, SAX, SBC $EB, DCP, ISB, SLO, RLA, SRE, RRA), PC, bytes and registers match
@@ -87,7 +84,6 @@ def test_nestest_unofficial_opcodes_match_the_golden_trace():
     assert first_mismatch(FIRST_UNOFFICIAL, LINES, fields=(0, 1, 2)) is None
 
 
-@DELTA
 def test_nestest_unofficial_opcodes_take_the_golden_cycles():
     """purpose: from golden line 5004 to 8991, cycles and PPU scanline/dot match the golden log on
     every line.
@@ -95,7 +91,6 @@ def test_nestest_unofficial_opcodes_take_the_golden_cycles():
     assert first_mismatch(FIRST_UNOFFICIAL, LINES, fields=(0, 3, 4)) is None
 
 
-@DELTA
 def test_nestest_reports_no_errors_in_its_result_bytes():
     """purpose: after the 8,991 traced instructions, nestest's own error bytes at $02 and $03 are both
     $00 (it writes the number of the first failed test there), read through the CLI's --mem.
