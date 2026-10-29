@@ -24,7 +24,6 @@ cases:
     board: "002 U[*N]R0M"
     prg: "128K PRG R0M"
     chr: "8K CHR RAM 0K"
-    delta: true
   - id: holy-mapperel/M3_P32K_C32K_H
     purpose: Holy Mapperel on a 32 KiB CNROM (mapper 3, 32 KiB CHR-ROM, horizontal) detects mapper 3, reads back 32K of PRG ROM and all four CHR-ROM banks' tags, and reports detailed result 0000.
     origin: design
@@ -37,4 +36,3 @@ cases:
     board: "007 A[*N0]R0M"
     prg: "128K PRG R0M"
     chr: "8K CHR RAM 0K"
-    delta: true

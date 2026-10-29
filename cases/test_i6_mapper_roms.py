@@ -136,7 +136,6 @@ def digest(pixels) -> str:
     return hashlib.sha256(bytes(str(pixels), "ascii")).hexdigest()[:12]
 
 
-@DELTA
 def test_240p_test_suite_boots_and_its_menu_answers_the_pad():
     """purpose: J1 steps 2-4 on a UNROM homebrew program (64 KiB in four banks, CHR-RAM): the 240p Test
     Suite powers on to a still About page by frame 60 (8+ colours, unchanged at frame 120); B leaves it
@@ -163,7 +162,6 @@ def test_240p_test_suite_boots_and_its_menu_answers_the_pad():
     assert back == menu, f"B didn't return to the menu exactly ({diff_count(back, menu)} pixels differ)"
 
 
-@DELTA
 def test_240p_test_suite_restarts_on_reset_as_at_power_on():
     """purpose: J1 step 7 on UNROM: Reset from the menu goes back through the reset vector in the fixed
     bank to the About page, and 60 frames after Reset the picture is the one 60 frames after power-on.

@@ -23,7 +23,7 @@ def mem_lines(stdout: str) -> dict:
     return out
 
 
-@pytest.mark.parametrize("mapper", [pytest.param(2, marks=DELTA), 3, pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [pytest.param(2), 3, pytest.param(7)])
 def test_cli_run_reads_memory_after_bank_switching(tmp_path, mapper):
     """purpose: `node src/cli/nes.ts run <probe> --frames 30 --mem 0200:3 --mem 0300:n` runs a mapper-2,
     -3 or -7 probe (it switches banks and logs reads) and prints, for each --mem, the bytes the CPU bus
@@ -44,7 +44,7 @@ def test_cli_run_reads_memory_after_bank_switching(tmp_path, mapper):
     assert mem.get(LOG) == want, f"the log differs from the spec's: {mem.get(LOG)} vs {want}"
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 3, marks=DELTA), (3, 2), pytest.param(7, 1, marks=DELTA)])
+@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 3), (3, 2), pytest.param(7, 1)])
 def test_cli_screenshot_shows_the_banked_picture(tmp_path, mapper, choice):
     """purpose: `node src/cli/nes.ts screenshot <probe> --frames 30 --out f.png` on a mapper-2, -3 or -7
     picture probe writes a 256x240 PNG that is the spec's picture through one palette: each palette index
@@ -62,7 +62,7 @@ def test_cli_screenshot_shows_the_banked_picture(tmp_path, mapper, choice):
     assert c["mismatched"] == 0 and not c["merged_indices"], c
 
 
-@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 5, marks=DELTA), (3, 3), pytest.param(7, 0, marks=DELTA)])
+@pytest.mark.parametrize("mapper,choice", [pytest.param(2, 5), (3, 3), pytest.param(7, 0)])
 def test_the_page_plays_a_mapper_2_3_or_7_file(site, browser, tmp_path, mapper, choice):
     """purpose: J1 step 2 for these boards: the page loads a mapper-2, -3 or -7 file through #rom-file
     instead of refusing it (#message hidden or empty), runs it, and after 60 frames its canvas is the
@@ -81,7 +81,6 @@ def test_the_page_plays_a_mapper_2_3_or_7_file(site, browser, tmp_path, mapper, 
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_switching_between_boards_leaves_nothing_behind(site, browser, tmp_path):
     """purpose: J2 steps 2-4 across boards (J2d, J2i): in one page, an AxROM game showing VRAM page 1
     (single-screen), then a vertically mirrored UxROM game, then the AxROM game again, then a
@@ -102,7 +101,6 @@ def test_switching_between_boards_leaves_nothing_behind(site, browser, tmp_path)
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_a_still_unsupported_mapper_is_refused_by_number_while_an_axrom_game_runs(site, browser, tmp_path):
     """purpose: J1a after I6: with an AxROM game running on the page, picking a file for mapper 180 (an
     UNROM relative I6 doesn't build) shows #message naming 180, and the AxROM game keeps running (its
@@ -126,7 +124,6 @@ def test_a_still_unsupported_mapper_is_refused_by_number_while_an_axrom_game_run
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_headless_core_on_a_uxrom_program_runs_at_least_five_times_real_time():
     """purpose: J3's ">= 5x real time" holds on a bank-switched cartridge: 1,800 frames (30 s of NTSC time)
     of the 240p Test Suite (UNROM) take at most 6.0 s of wall time, and its last frame shows its About
