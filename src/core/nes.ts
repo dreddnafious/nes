@@ -3,9 +3,9 @@
 import { APU } from './apu.ts';
 import { createMapper, parseRom, type Mapper } from './cartridge.ts';
 import { CPU, type CpuBus } from './cpu.ts';
-import { PPU, type PpuHost } from './ppu.ts';
+import { PPU } from './ppu.ts';
 
-export class NES implements CpuBus, PpuHost {
+export class NES implements CpuBus {
   readonly cpu: CPU;
   readonly ppu: PPU;
   readonly apu: APU;
@@ -20,7 +20,7 @@ export class NES implements CpuBus, PpuHost {
   constructor(rom: Uint8Array) {
     this.mapper = createMapper(parseRom(rom));
     this.cpu = new CPU(this);
-    this.ppu = new PPU(this.mapper, this);
+    this.ppu = new PPU(this.mapper);
     this.apu = new APU(this);
     this.cpu.reset();
   }
@@ -43,25 +43,34 @@ export class NES implements CpuBus, PpuHost {
     ppu.frameDone = false;
   }
 
+  /** The frame the last runFrame() drew: 256x240 values, row-major from the top line. Bits 0-5 are
+   * the colour index (greyscale applied), bits 6-8 the emphasis bits. The buffer is reused. */
+  frameBuffer(): Uint16Array {
+    return this.ppu.pixels;
+  }
+
   /** Run one instruction (or the interrupt or DMA due before it). */
   step(): void {
     this.cpu.step();
   }
 
-  // ---- PpuHost ----
-
-  nmi(): void {
-    this.cpu.nmiLatch = true;
-  }
-
   // ---- CpuBus ----
 
-  cycle(): void {
+  get nmi(): boolean {
+    return this.ppu.nmiOutput;
+  }
+
+  /** The first two of the cycle's three PPU dots, and the APU's cycle. */
+  cycleStart(): void {
     const ppu = this.ppu;
     ppu.step();
     ppu.step();
-    ppu.step();
     this.apu.tick();
+  }
+
+  /** The cycle's third PPU dot. */
+  cycleEnd(): void {
+    this.ppu.step();
   }
 
   read(addr: number): number {

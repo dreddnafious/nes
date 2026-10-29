@@ -145,9 +145,29 @@ export class NROM implements Mapper {
   }
 }
 
+/** Mapper 3: NROM's PRG, with 8 KiB CHR banks chosen by any write to $8000-$FFFF. The board has
+ * bus conflicts: the value latched is the one written ANDed with the ROM byte at that address. */
+export class CNROM extends NROM {
+  private chrBank = 0;
+
+  override cpuWrite(addr: number, value: number): void {
+    if (addr >= 0x8000) this.chrBank = value & this.cpuPeek(addr);
+    else super.cpuWrite(addr, value);
+  }
+
+  override chrRead(addr: number): number {
+    return super.chrRead(((this.chrBank << 13) | (addr & 0x1fff)));
+  }
+
+  override chrWrite(addr: number, value: number): void {
+    super.chrWrite(((this.chrBank << 13) | (addr & 0x1fff)), value);
+  }
+}
+
 export function createMapper(info: RomInfo): Mapper {
   switch (info.mapper) {
     case 0: return new NROM(info);
+    case 3: return new CNROM(info);
     default: throw new RomError(`mapper ${info.mapper} is not supported`);
   }
 }
