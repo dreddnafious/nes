@@ -49,3 +49,17 @@ allowed, redistribution not stated). A game whose terms are unclear isn't used.
 
 Same source and terms as the test ROMs above (no licence granting redistribution): fetched by SHA-256 from
 `cases/i3_oracles.json` into `roms/cache/`.
+
+## APU test ROMs (I4's oracles): fetched by hash, not committed
+| Suite | Author | Checks |
+|---|---|---|
+| `apu_test` (8 singles) | Shay Green (blargg) | Length counters and table, the frame IRQ flag and its timing, clock jitter, DMC basics and rates. |
+| `blargg_apu_2005.07.30` (11) | Shay Green (blargg) | The frame counter's and length counters' exact timing; reports on screen only. |
+| `cpu_interrupts_v2` (5 singles) | Shay Green (blargg) | CLI/SEI/PLP/RTI latency, NMI against BRK and IRQ, IRQ around DMA, branch delays; uses the APU's frame IRQ. |
+| `apu_reset` (6) | Shay Green (blargg) | The APU's state at power and after Reset. |
+| `dmc_dma_during_read4` (5) | Shay Green (blargg) | DMC DMA landing on `$2007` and `$4016` reads and writes; reports on screen only. |
+| `sprdma_and_dmc_dma` (2) | Shay Green (blargg) | DMC DMA landing during sprite DMA. |
+
+Same source and terms as the test ROMs above (no licence granting redistribution): fetched by SHA-256 from
+`cases/i4_oracles.json` into `roms/cache/`. Left out, and why: `apu_mixer` (judged by ear), `dmc_tests` (no
+readme or source, no machine-readable result), `pal_apu_tests` (PAL; Decided Q4 is NTSC only).
