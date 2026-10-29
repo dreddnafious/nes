@@ -48,8 +48,7 @@ def test_every_bank_is_selected_by_its_number_and_the_fixed_bank_stays(tmp_path,
     check_probe(p, run_probe(p.write_to(tmp_path, "probe.nes"), frames=60), f"mapper {mapper}, {kib} KiB")
 
 
-@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k",
-                                                     marks=[] if m == 3 else [DELTA])
+@pytest.mark.parametrize("mapper,kib", [pytest.param(m, k, id=f"mapper{m}-{k}k")
                                         for m, k in [(2, 128), (3, 32), (7, 128)]])
 def test_a_write_anywhere_in_8000_ffff_switches_the_bank(tmp_path, mapper, kib):
     """purpose: the bank register answers a write at any address in $8000-$FFFF (NESdev: "Bank select
