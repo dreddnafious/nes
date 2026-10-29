@@ -338,7 +338,7 @@ def split_probe(mapper: int) -> tuple:
     return p, first[:row * 256] + second[row * 256:], y
 
 
-@pytest.mark.parametrize("mapper", [3, pytest.param(7, marks=DELTA)])
+@pytest.mark.parametrize("mapper", [3, pytest.param(7)])
 def test_a_bank_or_page_switched_mid_frame_takes_effect_from_the_next_line(tmp_path, mapper):
     """purpose: J4's status bar on a discrete board: a CNROM CHR bank or AxROM nametable page selected
     after sprite 0 hits (on line y + 1, at x 248-254, so the write lands in that line's hblank, after its
