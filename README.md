@@ -196,3 +196,8 @@ Chase on top, and the CNROM probe, File Fixers and the AxROM probe below.
   others listed in `cases/oracles.json`.
 - **The hardware documentation:** the [NESdev wiki](https://www.nesdev.org/wiki/), read for its spec
   facts.
+
+## License
+The emulator's code is under the [MIT License](LICENSE). The games in `roms/games/` aren't covered by it:
+each keeps its own licence (GPL-3.0-or-later, public domain, MIT), recorded in
+[`roms/LICENSES.md`](roms/LICENSES.md), with the full texts in [`roms/licenses/`](roms/licenses/).

@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "A NES emulator in TypeScript: a pure core run headless under Node, and a browser front end.",
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=24"
