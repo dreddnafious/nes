@@ -60,3 +60,16 @@ def test_a_reader_that_stops_early_is_not_an_error(rom):
     assert r.stdout.startswith("C000  4C 00 C0"), r.stdout
     assert "EPIPE" not in r.stderr, r.stderr
     assert r.returncode == 0, r.stderr
+
+
+def test_a_screenshot_that_cant_be_written_is_a_message_not_a_stack_trace(rom, tmp_path):
+    r = cli("screenshot", rom, "--frames", "1", "--out", str(tmp_path / "no-such-dir" / "shot.png"))
+    assert r.returncode == 2
+    assert "can't write the file" in r.stderr and "ENOENT" in r.stderr
+    assert "at " not in r.stderr, r.stderr  # no stack frames
+
+
+def test_out_is_refused_on_commands_other_than_screenshot(rom, tmp_path):
+    r = cli("run", rom, "--out", str(tmp_path / "shot.png"))
+    assert r.returncode == 2 and "--out is only for screenshot" in r.stderr, r.stderr
+    assert not (tmp_path / "shot.png").exists()

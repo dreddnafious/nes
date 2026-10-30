@@ -14,13 +14,17 @@ export const FLAG_U = 0x20;
 export const FLAG_V = 0x40;
 export const FLAG_N = 0x80;
 
-/** What the CPU is wired to. `cycle` advances the rest of the console by one CPU cycle. */
+/** What the CPU is wired to. A CPU cycle is `cycleStart`, then the cycle's bus access (if any), then
+ * `cycleEnd`: the access falls between the PPU's second and third dot of the cycle. */
 export interface CpuBus {
-  cycle(): void;
+  cycleStart(): void;
+  cycleEnd(): void;
   read(addr: number): number;
   write(addr: number, value: number): void;
   /** Non-zero while any device holds the IRQ line low. */
   irq: number;
+  /** True while the PPU holds the NMI line low. */
+  readonly nmi: boolean;
 }
 
 const NMI_VECTOR = 0xfffa;
@@ -41,6 +45,8 @@ export class CPU {
   jammed = false;
   /** Set by the NMI line's falling edge; cleared when the NMI is taken. */
   nmiLatch = false;
+  /** The NMI line as the edge detector last sampled it. */
+  private nmiLine = false;
   /** The interrupt to take before the next instruction (polled at the end of the one before). */
   interruptDue = false;
   /** The page an OAM DMA ($4014 write) is waiting to copy, or -1. */
@@ -57,23 +63,31 @@ export class CPU {
 
   // ---- cycles ----
 
+  /** The end of every cycle: the NMI edge detector samples the line, and the interrupt lines are
+   * polled. An NMI whose line rises again before the sample (a $2002 read just after the flag sets)
+   * is never seen. */
   private poll(): void {
+    const line = this.bus.nmi;
+    if (line && !this.nmiLine) this.nmiLatch = true;
+    this.nmiLine = line;
     this.prevPending = this.pending;
     this.pending = this.nmiLatch || (this.bus.irq !== 0 && (this.p & FLAG_I) === 0);
   }
 
   private rd(addr: number): number {
     this.cycles++;
-    this.bus.cycle();
+    this.bus.cycleStart();
     const v = this.bus.read(addr);
+    this.bus.cycleEnd();
     this.poll();
     return v;
   }
 
   private wr(addr: number, value: number): void {
     this.cycles++;
-    this.bus.cycle();
+    this.bus.cycleStart();
     this.bus.write(addr, value);
+    this.bus.cycleEnd();
     this.poll();
   }
 
@@ -150,7 +164,8 @@ export class CPU {
     }
     if (this.jammed) {
       this.cycles++;
-      this.bus.cycle();
+      this.bus.cycleStart();
+      this.bus.cycleEnd();
       return;
     }
     this.execute(this.fetch());
@@ -171,7 +186,8 @@ export class CPU {
 
   private idle(): void {
     this.cycles++;
-    this.bus.cycle();
+    this.bus.cycleStart();
+    this.bus.cycleEnd();
     this.poll();
   }
 
