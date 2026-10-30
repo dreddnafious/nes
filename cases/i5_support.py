@@ -275,6 +275,14 @@ class I5Tab(Tab):
         self._cdp.send("HeapProfiler.collectGarbage")
         return int(self._cdp.send("Runtime.getHeapUsage")["usedSize"])
 
+    def settled_heap(self) -> int:
+        """The heap as heap() reads it, after a heap snapshot first: the snapshot's fuller collection frees
+        V8's own reclaimable memory, which two forced GCs leave in place and which moves a ~2 MB heap's
+        reading by about 10 % with nothing switched."""
+        self.heap()
+        self._cdp.send("HeapProfiler.takeHeapSnapshot", {"reportProgress": False})
+        return self.heap()
+
     def wait(self, seconds: float):
         self.page.wait_for_timeout(int(seconds * 1000))
 
