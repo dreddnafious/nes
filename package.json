@@ -8,6 +8,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "start": "node src/web/serve.ts --port 8080",
     "typecheck": "tsc --noEmit -p .",
     "test": ".venv/bin/python -m pytest cases tests -p no:cacheprovider -q",
     "smoke": ".venv/bin/python -B smoke/smoke.py"
