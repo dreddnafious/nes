@@ -7,7 +7,8 @@
 <style>
   body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 14px/1.4 system-ui, sans-serif; }
   #screen { display: block; width: 768px; height: 720px; image-rendering: pixelated; background: #000; }
-  .bar { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .bar { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  #game-menu { display: flex; gap: 6px; align-items: center; }
   #message { margin: 0 0 12px; padding: 6px 10px; background: #522; color: #fdd; border-radius: 4px; }
   #sound-off { margin: 0 0 12px; color: #fc6; }
   .keys { margin-top: 12px; color: #999; }
@@ -16,6 +17,9 @@
 <body>
 <div class="bar">
   <label>ROM file: <input type="file" id="rom-file" accept=".nes"></label>
+  <span id="game-menu">Games:
+  <!-- game menu entries -->
+  </span>
   <button id="reset" type="button">Reset</button>
   <button id="power" type="button">Power</button>
 </div>
