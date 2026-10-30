@@ -384,14 +384,15 @@ export class MMC1 implements Mapper {
 /** Mapper 4 (MMC3B/C, the TxROM boards; NES 2.0 submapper 0). Spec: https://www.nesdev.org/wiki/MMC3
  * - Registers by `addr & $E001`: $8000 bank select (bits 2-0 the register R0-R7, bit 6 PRG mode, bit 7
  *   CHR A12 inversion), $8001 bank data, $A000 arrangement (0 vertical, 1 horizontal; nothing with a
- *   four-screen header), $A001 PRG-RAM protect (bit 7 enable, bit 6 write-protect; NES 2.0 files only),
+ *   four-screen header), $A001 PRG-RAM protect (bit 7 enable, bit 6 write-protect; NES 2.0 submapper 0 only),
  *   $C000 IRQ latch, $C001 IRQ reload, $E000 IRQ disable and acknowledge, $E001 IRQ enable. No bus conflicts.
  * - PRG, 8 KiB banks: mode 0 R6, R7, second-last, last; mode 1 second-last, R7, R6, last (R6/R7 6 bits).
  * - CHR, 1 KiB units: R0/R1 2 KiB (low bit ignored) at $0000/$0800, R2-R5 1 KiB at $1000-$1C00; inversion
  *   swaps the halves. Bank numbers past the end wrap, for ROM and RAM alike.
- * - PRG-RAM: the NES 2.0 header's size (0: none), 8 KiB on iNES 1.0, where $A001 is ignored and the RAM
- *   is always enabled ("many implementations of iNES Mapper 004 simply omit the write protection").
- * - The IRQ counter, clocked by a rise of PPU A12 after it has been low for three falling edges of M2:
+ * - PRG-RAM: the NES 2.0 header's size (0: none), 8 KiB on iNES 1.0. On iNES 1.0 and on the other NES 2.0
+ *   submappers (1 is the MMC6, whose $A001 means something else) $A001 is ignored and the RAM is always
+ *   enabled ("many implementations of iNES Mapper 004 simply omit the write protection").
+ * - The IRQ counter, clocked by a rise of PPU A12 after it has been low for more than 10 PPU dots:
  *   reloaded from the latch when it's 0 or $C001 asked, else decremented; then at 0, with IRQs enabled,
  *   /IRQ is asserted until $E000 (the MMC3B/C: a latch of 0 asserts it at every clock). */
 export class MMC3 implements Mapper {
@@ -422,6 +423,7 @@ export class MMC3 implements Mapper {
     this.chr = info.chr;
     this.mirroring = info.mirroring;
     this.prgRam = new Uint8Array(info.nes2 ? info.prgRamSize : 0x2000);
+    this.protect = info.nes2 && info.submapper === 0;
     this.update();
   }
 
@@ -445,8 +447,11 @@ export class MMC3 implements Mapper {
     }
   }
 
+  /** Whether $A001 protects the PRG-RAM: on a NES 2.0 file of submapper 0 (the MMC3 itself) only. */
+  private readonly protect: boolean;
+
   private ramOn(): boolean {
-    return this.prgRam.length > 0 && (!this.info.nes2 || (this.ramCtl & 0x80) !== 0);
+    return this.prgRam.length > 0 && (!this.protect || (this.ramCtl & 0x80) !== 0);
   }
 
   cpuRead(addr: number): number {
@@ -462,7 +467,7 @@ export class MMC3 implements Mapper {
   cpuWrite(addr: number, value: number): void {
     if (addr < 0x6000) return;
     if (addr < 0x8000) {
-      if (this.ramOn() && (!this.info.nes2 || (this.ramCtl & 0x40) === 0)) {
+      if (this.ramOn() && (!this.protect || (this.ramCtl & 0x40) === 0)) {
         this.prgRam[(addr & 0x1fff) % this.prgRam.length] = value;
       }
       return;
