@@ -3,11 +3,13 @@
   "private": true,
   "version": "0.1.0",
   "description": "A NES emulator in TypeScript: a pure core run headless under Node, and a browser front end.",
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=24"
   },
   "scripts": {
+    "start": "node src/web/serve.ts --port 8080",
     "typecheck": "tsc --noEmit -p .",
     "test": ".venv/bin/python -m pytest cases tests -p no:cacheprovider -q",
     "smoke": ".venv/bin/python -B smoke/smoke.py"
