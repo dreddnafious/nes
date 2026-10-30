@@ -1,6 +1,6 @@
-// The page (see cases/CONTRACT-I3.md and CONTRACT-I4.md): a ROM from the file input, the canvas, the
-// sound, the keyboard on controller 1, the Reset and Power buttons, and a loop paced against real
-// time. Everything here is presentation; the console itself is src/core.
+// The page (see cases/CONTRACT-I3.md, CONTRACT-I4.md and CONTRACT-I9.md): a ROM from the file input or
+// the game menu, the canvas, the sound, the keyboard on controller 1, the Reset and Power buttons, and a
+// loop paced against real time. Everything here is presentation; the console itself is src/core.
 import { NES, RomError } from '../core/index.ts';
 import { RGB } from '../core/palette.ts';
 import { Keys } from './keyboard.ts';
@@ -14,6 +14,7 @@ const MAX_BEHIND = 4;
 const REGIONS = ['NTSC', 'PAL', 'NTSC/PAL', 'Dendy'];
 
 const input = document.getElementById('rom-file') as HTMLInputElement;
+const gameMenu = document.getElementById('game-menu') as HTMLElement;
 const canvas = document.getElementById('screen') as HTMLCanvasElement;
 const message = document.getElementById('message') as HTMLElement;
 const resetButton = document.getElementById('reset') as HTMLButtonElement;
@@ -31,6 +32,9 @@ const sound = new Sound(soundOff);
 let nes: NES | null = null;
 let rom: Uint8Array | null = null;
 let frames = 0;
+let loads = 0;
+/** The latest load asked for: a load that finishes after a later one was asked for is dropped. */
+let asked = 0;
 let paused = false;
 let behind = 0;
 let last = 0;
@@ -67,7 +71,9 @@ function start(next: NES, bytes: Uint8Array): void {
   last = performance.now();
 }
 
-function load(bytes: Uint8Array, name: string): void {
+/** Load these bytes for the ask-th load asked for, unless a later one has been asked for since. */
+function load(bytes: Uint8Array, name: string, ask: number): void {
+  if (ask !== asked) return;
   let next: NES;
   try {
     next = new NES(bytes);
@@ -78,6 +84,7 @@ function load(bytes: Uint8Array, name: string): void {
   }
   keys.clear();
   start(next, bytes);
+  loads++;
   show(next.region === 1 || next.region === 3
     ? `${name} is a ${REGIONS[next.region]} game: it runs here at NTSC timing, so it may play too fast.`
     : '');
@@ -116,10 +123,54 @@ input.addEventListener('change', () => {
   const file = input.files?.[0];
   input.blur();
   if (!file) return;                 // a cancelled pick changes nothing
+  const ask = ++asked;
   const bytes = readNow(file);
-  if (bytes) load(bytes, file.name);
-  else file.arrayBuffer().then(b => load(new Uint8Array(b), file.name), e => show(`${file.name}: ${String(e)}`));
+  if (bytes) load(bytes, file.name, ask);
+  else {
+    file.arrayBuffer().then(b => load(new Uint8Array(b), file.name, ask),
+      e => { if (ask === asked) show(`${file.name}: ${String(e)}`); });
+  }
   input.value = '';                  // so picking the same file again is a change
+});
+
+/** The menu's ROMs, fetched as the page loads so a choice can start its game at once; a fetch that
+ * fails is tried again at the next choice. */
+const fetched = new Map<string, Uint8Array>();
+const fetching = new Map<string, Promise<Uint8Array>>();
+
+function fetchRom(url: string): Promise<Uint8Array> {
+  let pending = fetching.get(url);
+  if (!pending) {
+    pending = fetch(url, { cache: 'no-store' }).then(async r => {
+      if (!r.ok) throw new Error(`the server answered ${r.status}${r.statusText ? ` ${r.statusText}` : ''}`);
+      return new Uint8Array(await r.arrayBuffer());
+    });
+    fetching.set(url, pending);
+    pending.then(bytes => fetched.set(url, bytes), () => fetching.delete(url));
+  }
+  return pending;
+}
+
+function entries(): HTMLElement[] {
+  return Array.from(gameMenu.querySelectorAll<HTMLElement>('[data-rom]'));
+}
+
+for (const entry of entries()) void fetchRom(new URL(entry.dataset.rom!, location.href).href).catch(() => {});
+
+gameMenu.addEventListener('click', e => {
+  const entry = (e.target as Element).closest<HTMLElement>('[data-rom]');
+  if (!entry || !gameMenu.contains(entry)) return;
+  entry.blur();                      // the keyboard stays the game's
+  const url = new URL(entry.dataset.rom!, location.href).href;
+  const name = (entry.textContent ?? '').trim() || url;
+  const ask = ++asked;
+  const bytes = fetched.get(url);
+  if (bytes) {
+    load(bytes, name, ask);
+    return;
+  }
+  fetchRom(url).then(b => load(b, name, ask),
+    err => { if (ask === asked) show(`${name}: can't be fetched (${err instanceof Error ? err.message : String(err)})`); });
 });
 
 resetButton.addEventListener('click', () => {
@@ -221,6 +272,9 @@ requestAnimationFrame(tick);
 (window as unknown as { nesTest: object }).nesTest = Object.freeze({
   get frames(): number {
     return frames;
+  },
+  get loads(): number {
+    return loads;
   },
   pause(): void {
     paused = true;

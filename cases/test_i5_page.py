@@ -206,22 +206,24 @@ def test_one_loop_runs_after_loads_and_twenty_hide_show_cycles(site, browser, tm
 
 def test_twenty_loads_leave_the_heap_where_the_first_left_it(site, browser, tmp_path):
     """purpose: J3ab (again) and J3's "the JS heap ... within 10 %": switching games twenty times (nes15 and
-    the tone probe in turn, 1 s each) leaves the page's heap, after a GC, within 10 % of the heap after the
-    first load and its first second: no console, buffer, audio node or listener of an old game is kept.
-    origin: design"""
+    the tone probe in turn, 1 s each) leaves the page's heap, after a full collection (a heap snapshot's),
+    within 10 % of the heap after the fifth load and its first second, once the page's code has warmed up:
+    no console, buffer, audio node or listener of an old game is kept.
+    origin: ratify (Jason, 2026-10-30: the reference moved past warm-up, from the first load's second)"""
     with I5Tab(browser, site, hz=60) as tab:
         tab.hooks()
         tone = write(tmp_path, "tone.nes", tone_probe())
         roms = [str(nes15()), tone]
-        tab.load(roms[0])
-        tab.wait(1)
-        first = tab.heap()
-        for k in range(1, 21):
+        for k in range(5):
+            tab.load(roms[k % 2])
+            tab.wait(1)
+        first = tab.settled_heap()
+        for k in range(5, 25):
             tab.load(roms[k % 2])
             tab.wait(1)
         tab.load(roms[0])
         tab.wait(1)
-        last = tab.heap()
+        last = tab.settled_heap()
         assert last <= first * 1.10, f"the heap grew from {first} to {last} bytes over 20 loads"
         assert tab.loaded_once()
         assert not tab.errors, tab.errors

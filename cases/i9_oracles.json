@@ -1,0 +1,23 @@
+{
+ "note": "I9's games fetched by hash into roms/cache/ (gitignored), never committed: their terms allow use but don't state redistribution of every part (roms/LICENSES.md, 'The collection (I9)'). Read by cases/i9_support.py. The vendored games are in roms/games/, committed, and aren't listed here.",
+ "oracles": [
+  {
+   "id": "falling",
+   "path": "falling/52dcb8a/falling.nes",
+   "url": "https://raw.githubusercontent.com/xram64/falling-nes/52dcb8a951200562e696dfc2aba5d4d14edd0078/falling.nes",
+   "sha256": "e22b947542c2d7e595bf84725b333be7af8189c5965b9c53e356a249c7d79943",
+   "author": "Jesse Williams (tragicmuffin / xram64), 2018-19",
+   "licence": "code MIT; the music's composer and terms not stated",
+   "board": "mapper 0 (NROM-256): 32 KiB PRG, 8 KiB CHR-ROM, horizontal, iNES 1.0"
+  },
+  {
+   "id": "linear-collision",
+   "path": "linear-collision/c8cb8af/Main.nes",
+   "url": "https://raw.githubusercontent.com/ComprosoftCEO/LinearCollision/c8cb8af4b9c053f4123c4b43e690fa77b015933a/Main.nes",
+   "sha256": "c963cf991d48dc070bf97b03b9d0a2056f6a713b6e643e57d9e209f35b1fd59e",
+   "author": "Bryan McClain (ComprosoftCEO), 2016-18; music and sound David Estrada",
+   "licence": "GPL-3.0 (repository); the music's own terms not stated",
+   "board": "mapper 0 (NROM-256): 32 KiB PRG, 8 KiB CHR-ROM, horizontal, iNES 1.0"
+  }
+ ]
+}
