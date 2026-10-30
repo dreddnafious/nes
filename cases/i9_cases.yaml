@@ -1,0 +1,151 @@
+# I9: the rows of the parametrized collection-session cases (CONTRACT-I9.md). Read by test_i9_switching.py,
+# test_i9_menu.py and test_i9_games.py (through i9_support.rows). A row with `delta: true` is a case the
+# build doesn't meet yet (a strict expected failure); every way in through the game menu is one, since the
+# menu doesn't exist yet.
+
+# test_i9_switching.py::test_b_loaded_after_a_powers_on_as_on_a_fresh_page: A, then B through `way`; with
+# `before: reset`, A's Reset button is pressed first (J2aa: a load is a power-on, not a Reset).
+state:
+  - id: file-mess-dump7
+    way: file
+    a: mess
+    b: dump7
+  - id: file-mess-dump0
+    way: file
+    a: mess
+    b: dump0
+  - id: file-dump0-reset-dump0
+    way: file
+    a: dump0
+    b: dump0
+    before: reset
+  - id: menu-mess-dump7
+    way: menu
+    a: mess
+    b: dump7
+    delta: true
+  - id: menu-dump0-reset-dump0
+    way: menu
+    a: dump0
+    b: dump0
+    before: reset
+    delta: true
+
+# The ways in for the cases that run either way: the file chooser, and the game menu.
+ways:
+  - id: file
+    way: file
+  - id: menu
+    way: menu
+    delta: true
+
+# test_i9_menu.py::test_a_failed_entry_says_why_and_the_running_game_runs_on: what the entry's request is
+# answered with.
+failures:
+  - id: "404"
+    delta: true
+  - id: "500"
+    delta: true
+  - id: connection-failed
+    delta: true
+  - id: not-nes
+    delta: true
+  - id: truncated
+    delta: true
+  - id: mapper-3000
+    delta: true
+
+# test_i9_menu.py::test_a_failed_entry_on_a_fresh_page_starts_nothing
+fresh_failures:
+  - id: "404"
+    delta: true
+  - id: mapper-3000
+    delta: true
+
+# test_i9_menu.py::test_the_last_load_asked_for_wins
+orders:
+  - id: menu-then-file
+    delta: true
+  - id: menu-then-menu
+    delta: true
+  - id: file-then-menu
+    delta: true
+  - id: menu-then-power
+    delta: true
+
+# test_i9_menu.py::test_each_entry_loads_its_game_as_the_file_picker_does: every vendored game (roms/games/).
+entries:
+  - id: chase
+    file: chase.nes
+    delta: true
+  - id: file-fixers
+    file: file-fixers.nes
+    delta: true
+  - id: thwaite
+    file: thwaite.nes
+    delta: true
+
+# test_i9_games.py::test_j1_each_game_of_the_collection_boots_plays_ends_and_restarts: J1 per game, from each
+# game's own source, as frame budgets for a paused page stepped frame by frame with no key unless the script
+# presses one. title_at: a frame by which the title is up; cycle: frames over which the title's own
+# animation repeats (its blink), so the title is any of those pictures; match: "frames" (the very
+# pictures) or "layout" (the same picture up to its palette, for a title that cycles its colours); start:
+# frames after title_at at which Start is pressed (5 frames each); play: frames after the last press at
+# which the game is in play; end: how it ends with nobody playing well (idle frames of no input, then
+# Start pressed once if press_start, and the title back within `within` frames), or null where it can't
+# end on its own (the game isn't counted in Reach). A vendored game (file:) comes in through the menu; a
+# game fetched by hash (oracle:) through the file chooser.
+games:
+  - id: chase
+    file: chase.nes
+    mapper: 2
+    title_at: 300
+    cycle: 64
+    match: frames
+    start: [10]
+    play: 120
+    end: {idle: 4800, press_start: true, within: 600}
+    source: "game.c: title_screen() drops the logo in and blinks PRESS START (frame_cnt & 32) until Start; 4 lives, the enemy homes in; show_screen(SCREEN_GAMEOVER) waits for Start, then the title runs again from the top"
+    delta: true
+  - id: thwaite
+    file: thwaite.nes
+    mapper: 0
+    title_at: 120
+    cycle: 8
+    match: frames
+    start: [10, 70, 130]
+    play: 300
+    end: {idle: 0, press_start: false, within: 10800}
+    source: "texts.txt/title.s: the first title screen ends with 'Press Start Button'; Start, then Start on '1 Player', then Start skips the cutscene; main.s: losing both silos or every house ends the game, GAME OVER shows for about 5 s, and it returns to the title by itself"
+    delta: true
+  - id: file-fixers
+    file: file-fixers.nes
+    mapper: 4
+    title_at: 60
+    cycle: 8
+    match: frames
+    start: [10]
+    play: 120
+    end: null
+    source: "README and src: the title says 'Press Start to log in'; Start opens the KingdomOS desktop; a turn-based RPG with no idle loss, so it doesn't end on its own"
+    delta: true
+  - id: falling
+    oracle: falling
+    mapper: 0
+    title_at: 120
+    cycle: 64
+    match: frames
+    start: [0]
+    play: 120
+    end: {idle: 5400, press_start: true, within: 300}
+    source: "falling.asm: the title waits for Start; 3 lives, obstacles fall past the player; GAME OVER waits for Start, which returns to the title (gamestate 3 -> 0)"
+  - id: linear-collision
+    oracle: linear-collision
+    mapper: 0
+    title_at: 900
+    cycle: 1
+    match: layout
+    start: [10]
+    play: 300
+    end: {idle: 0, press_start: false, within: 21000}
+    source: "Intro.asm/TitleData.asm: a 10 s intro, then the title with its logo colours cycling; LevelData.asm/Time.asm: the 5:00 clock runs out, a death sound, and 240 frames later it jumps to Reset (intro, then the title)"

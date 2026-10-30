@@ -130,3 +130,36 @@ readme or source, no machine-readable result), `pal_apu_tests` (PAL; Decided Q4 
   but the repository has no licence), *Annalog* (`mdsteele/annalog`, GPL-3.0 code, but sold as a cartridge
   with no direct ROM download), *Famidash* (`tfdsoft/famidash`, MIT, but a clone of a commercial game under
   its name: no clone trading on another's trademark).
+
+## The collection (I9): vendored games, committed in `roms/games/`, and games fetched by hash
+The game menu offers exactly the files in `roms/games/`. Each is committed because its licence allows
+redistribution of the ROM and nothing in it trades on another's mark; each is the author's own published
+build, unaltered.
+
+| File | Game, author | Mapper | Licence | In git? |
+|---|---|---|---|---|
+| `roms/games/chase.nes` | *Chase*, Shiru, 2012 (neslib and FamiTone2 by Shiru); the 512 KiB UxROM build by djkunkel (`djkunkel/chase30`), 2022-23 | 2 (UxROM, iNES 1.0: 512 KiB PRG, 8 KiB CHR-RAM, horizontal) | public domain: `game.c` "Feel free to do anything you want with this code, consider it Public Domain"; the repository's `LICENSE` is the Unlicense; the title screen reads "PD2012 SHIRU"; neslib's notice is zlib-style | **yes**, sha256 `abf2186e096db25f6f294ae6da0a6a2088df24bb78463ae07a682f359d4a536a`, from `https://raw.githubusercontent.com/djkunkel/chase30/b3e88d81f94f3a7deb463a3cffb1e2824fa576c1/chase.nes` |
+| `roms/games/thwaite.nes` | *Thwaite* 0.04, Damian Yerrick (program, graphics, music; extra music Beethoven), 2011-2018 | 0 (NROM-128, iNES 1.0: 16 KiB PRG, 8 KiB CHR-ROM, vertical) | GPL-3.0-or-later (README: "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License ... version 3 ... or later"). Its corresponding source is the author's tag `v0.04` of `github.com/pinobatch/thwaite-nes` (commit `ccd27ccbe3e201755b86c1b5f932b2e11ba74110`). The name is the author's own; the concept is credited to Missile Command but uses none of its marks | **yes**, sha256 `a2df24d9c9f72e56c2fdc4c703becc47a5700ad0158da8208247635ebeb3779c`, the `v0.04` release asset of `pinobatch/thwaite-nes` |
+| `roms/games/file-fixers.nes` | *File Fixers* 0.1.0, Wendel Scardua (ScarduaDev), 2021; music "Inevitable Doom" (celestialghost8) and "cheery"/"upbeat" (Phillip Miller), both public domain on OpenGameArt | 4 (MMC3, iNES 1.0: 64 KiB PRG, 16 KiB CHR-ROM, horizontal, battery) | MIT (the repository's `LICENSE`, "Copyright (c) 2021 Wendel Scardua"); its music is public domain (`src/music/credits.md`). A parody of an operating system's error screen, under its own name ("KingdomOS") | **yes**, sha256 `ba6c88a13bb63f180e5e542258c53e5676e3f1514898bfd16aba4da43c34cc34`, the `0.1.0` release asset of `wendelscardua/file-fixers` (commit `d12863b6d5f02f4c23915895d3117e55e3fa74b3`) |
+| `falling/52dcb8a/falling.nes` (cache) | *Falling* v1.1, Jesse Williams (tragicmuffin / xram64), 2018-19 | 0 (NROM-256, iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, horizontal) | code MIT ("Copyright (c) 2018 tragicmuffin"); the music's composer isn't named, so its terms aren't stated | **no: fetched by hash** (`cases/i9_oracles.json`, from `xram64/falling-nes` at commit `52dcb8a951200562e696dfc2aba5d4d14edd0078`, sha256 `e22b947542c2d7e595bf84725b333be7af8189c5965b9c53e356a249c7d79943`) |
+| `linear-collision/c8cb8af/Main.nes` (cache) | *Linear Collision*, Bryan McClain (ComprosoftCEO), 2016-18; music and sound by David Estrada | 0 (NROM-256, iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, horizontal) | GPL-3.0 (the repository's `LICENSE`); the music's own terms aren't stated apart from it, and its sound engine follows a tutorial with no stated terms | **no: fetched by hash** (`cases/i9_oracles.json`, from `ComprosoftCEO/LinearCollision` at commit `c8cb8af4b9c053f4123c4b43e690fa77b015933a`, sha256 `c963cf991d48dc070bf97b03b9d0a2056f6a713b6e643e57d9e209f35b1fd59e`) |
+
+- **No new board:** no game was found on UNROM 512 (mapper 30) or GTROM (mapper 111) whose terms could be
+  checked. The only test ROMs for them are an unreleased third-party fork of Holy Mapperel
+  (`gzip/holy-mapperel` at `ac2eb2fb814a7c2494087e01873c0ddddc9c1db8`, zlib, build-only), and the only
+  mapper-30 file found (`NotKieranF/unrom_512_template`, Unlicense) is an empty skeleton.
+- **Looked at and left out:**
+  - *Concentration Room* (GPL-3+ with an exception for exact copies): its menu font is "based on Apple's
+    Chicago by Susan Kare", the nes15 precedent. *Stallar* (MIT): its font file is named after Apple's
+    Chicago and its origin wasn't verified. *RHDE* (all-permissive): two players only and no end, so it
+    can't show J1 alone.
+  - *Cybercoaster*: its CC-BY-4.0 is only asserted by a database entry, not the authors. *runner.nes*: no
+    licence at its `v1` tag, and its sprites and music are third-party with no stated terms. *Miroh Jr.*:
+    its README forbids using or redistributing its art and music without permission. *Witch n' Wiz*
+    (the NESdev Compo build, mapper 28): a free build of a game sold at retail.
+  - On names or marks: *Super Tilt Bro.* (WTFPL, mapper 30; its name parodies "Super Smash Bros"), *Twin
+    Dragons* (a commercial NES game's name; a "boomba" enemy), *JezNES* (JezzBall), *petris* (Tetris),
+    *flappy-paratroopa-nes* (a Nintendo character), *nes-pong* (Pong), *Helmet* (Game & Watch), the DVD
+    logo games, *Mega Man II 30th Anniversary Edition*.
+  - No licence or terms: *Tactus*, *Irritating Ship*, *From Below*, *critical-match*, *familybird2*,
+    *filthy-kitchen*, *nes_survival*, *nes-breakout*, *mp3player*; *RoboRun* is PAL/Dendy only (Decided Q4).
