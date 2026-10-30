@@ -36,7 +36,6 @@ def flat(p: Mmc3Probe) -> list:
     return [v for r in rows for v in r]
 
 
-@DELTA
 def test_cli_run_reads_memory_after_mmc3_bank_switching(tmp_path):
     """purpose: `node src/cli/nes.ts run <probe> --frames 30 --mem 0200:1 --mem 0300:n --mem 6000:4` runs
     an MMC3 probe (it switches R6 and R7 in both PRG modes, logs reads, and writes its PRG-RAM after $A001
@@ -65,7 +64,6 @@ def test_cli_run_reads_memory_after_mmc3_bank_switching(tmp_path):
     assert mem.get(0x6000) == [0x12, 0x34, 0x56, 0x78], f"PRG-RAM reads {mem.get(0x6000)}"
 
 
-@DELTA
 def test_cli_screenshot_shows_the_mmc3_irq_split(tmp_path):
     """purpose: `node src/cli/nes.ts screenshot <probe> --frames 30 --out f.png` on an MMC3 status-bar
     probe (latch 100: lines 0-100 at X scroll 0, lines 101 down at X 144) writes a 256x240 PNG that is the
@@ -95,7 +93,6 @@ def demo_text_bad(rgb, shifts) -> list:
     return bad
 
 
-@DELTA
 def test_the_page_plays_the_mmc3_demo_scrolls_its_bands_with_b_and_restarts_it(site, browser):
     """purpose: J1 steps 1-4 and 7, and J4, for an MMC3 program on the page: nesdoug's 33_MMC3 loads through
     #rom-file instead of being refused (#message hidden or empty); at frame 120 its six text rows show on
@@ -133,7 +130,6 @@ def test_the_page_plays_the_mmc3_demo_scrolls_its_bands_with_b_and_restarts_it(s
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_switching_between_mmc3_and_the_other_boards_leaves_nothing_behind(site, browser, tmp_path):
     """purpose: J2 steps 2-4 across mappers (J2d, J2i, J2s): in one page, an MMC3 game with its IRQ split
     running (latch 100), then an MMC1 game (one-screen B), a vertically mirrored UxROM game, an MMC3 game
@@ -158,7 +154,6 @@ def test_switching_between_mmc3_and_the_other_boards_leaves_nothing_behind(site,
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_battery_prg_ram_on_mmc3_survives_reset_and_power_on_the_page_but_not_a_switch(site, browser, tmp_path):
     """purpose: Decided Q3 on an MMC3 board, on the page: the battery probe shows the 32 bytes it finds at
     $6000 on nametable row 12, then saves its own there. After Power, and then Reset, its canvas is the
@@ -202,7 +197,6 @@ def test_battery_prg_ram_on_mmc3_survives_reset_and_power_on_the_page_but_not_a_
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_a_still_unsupported_mapper_is_refused_by_number_while_an_mmc3_game_runs(site, browser, tmp_path):
     """purpose: J1a after I8: with an MMC3 game running on the page, picking Holy Mapperel's TLSROM build
     (mapper 118, an MMC3 on other wiring I8 doesn't build) shows #message naming 118, and the MMC3 game
@@ -224,7 +218,6 @@ def test_a_still_unsupported_mapper_is_refused_by_number_while_an_mmc3_game_runs
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_headless_core_on_the_mmc3_demo_runs_at_least_five_times_real_time():
     """purpose: J3's ">= 5x real time" on an MMC3 program that splits its screen four times a frame: 1,800
     frames (30 s of NTSC time) of nesdoug's 33_MMC3 (128 KiB PRG, 128 KiB CHR-ROM, four IRQs a frame, a
@@ -240,7 +233,6 @@ def test_headless_core_on_the_mmc3_demo_runs_at_least_five_times_real_time():
     assert res["ms"] <= 6000 and shown and loud, f"{res['ms']:.0f} ms for 1800 frames; text {shown}; emphasis {loud}"
 
 
-@DELTA
 def test_headless_core_on_a_512_kib_mmc3_cartridge_with_an_irq_split_runs_at_least_five_times_real_time(tmp_path):
     """purpose: J3's ">= 5x real time" on a real-size MMC3 cartridge (512 KiB PRG, the MMC3's limit, and
     256 KiB CHR-ROM): 1,800 frames of the probe's status bar (an IRQ every frame, a CHR bank and the scroll

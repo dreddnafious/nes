@@ -35,34 +35,28 @@ cases:
     kind: blargg
     purpose: blargg mmc3_test_2 1-clocking (the counter clocked through $2006; reload, decrement, $C000 and $C001, the IRQ at 0, disabled) reports passed.
     origin: design
-    delta: true
   - id: mmc3_test_2/2-details
     kind: blargg
     purpose: blargg mmc3_test_2 2-details (a latch of 255, the counter running while disabled and after the IRQ, $C001 setting no IRQ, and 241 clocks in a rendered frame) reports passed.
     origin: design
-    delta: true
   - id: mmc3_test_2/3-A12_clocking
     kind: blargg
     purpose: blargg mmc3_test_2 3-A12_clocking (clocked only by a rise of PPU A12, by a $2006 write or a $2007 read or write) reports passed.
     origin: design
-    delta: true
   - id: mmc3_test_2/4-scanline_timing
     kind: blargg
     purpose: blargg mmc3_test_2 4-scanline_timing (the IRQ on scanlines 0, 1 and 239 to the PPU clock, with $2000 = $08 and $10) reports passed.
     origin: design
-    delta: true
   - id: mmc3_test_2/5-MMC3
     kind: blargg
     purpose: blargg mmc3_test_2 5-MMC3 (the MMC3B/C's latch-0 behaviour, an IRQ at every clock) reports passed.
     origin: design
-    delta: true
   - id: mmc3_test_2/6-MMC3_alt
     kind: blargg_status
     purpose: on the MMC3B/C, blargg mmc3_test_2 6-MMC3_alt fails exactly at its sub-test 2, the alternate revision's first difference (a reload to 0 after the counter reached 0 by itself sets no IRQ there), reporting status 2.
     origin: design
     status: 2
     text: "IRQ shouldn't be set when reloading to 0 due to counter naturally reaching 0 previously"
-    delta: true
   - id: holy-mapperel/M4_P128K_CR8K
     kind: mapperel
     purpose: Holy Mapperel on TGROM (128 KiB PRG, 8 KiB CHR-RAM, no PRG-RAM in the NES 2.0 header) detects mapper 4 as TGROM, reads back 128K of PRG ROM through all four windows and the CHR-RAM through every 1 KiB window, finds no PRG-RAM, sees 3 IRQs in its frame, and reports detailed result 0000.
@@ -72,7 +66,6 @@ cases:
     wram: "PRG RAM MISSING"
     chr: "8K CHR RAM 0K"
     detail: "DETAILED TEST RESULT: 0000"
-    delta: true
   - id: holy-mapperel/M4_P128K_CR32K
     kind: mapperel
     purpose: Holy Mapperel on an MMC3 board with 32 KiB of CHR-RAM (NES 2.0 byte 11) detects TFROM, reads back 128K of PRG ROM and all 32 1 KiB CHR-RAM banks, finds no PRG-RAM, and reports detailed result 0000.
@@ -82,7 +75,6 @@ cases:
     wram: "PRG RAM MISSING"
     chr: "32K CHR RAM 0K"
     detail: "DETAILED TEST RESULT: 0000"
-    delta: true
   - id: holy-mapperel/M4_P256K_C256K
     kind: mapperel
     purpose: Holy Mapperel on TLROM (256 KiB PRG, 256 KiB CHR-ROM, the MMC3's CHR limit; a 512 KiB file) detects TLROM, reads back all 256K of PRG ROM and all 256 CHR bank tags, finds no PRG-RAM, and reports detailed result 0000.
@@ -92,4 +84,3 @@ cases:
     wram: "PRG RAM MISSING"
     chr: "256K CHR R0M 0K"
     detail: "DETAILED TEST RESULT: 0000"
-    delta: true

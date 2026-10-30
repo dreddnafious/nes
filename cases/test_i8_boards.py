@@ -48,7 +48,6 @@ def look_chr(p: Mmc3Probe, why: str):
 
 # ---------------------------------------------------------------- PRG banks
 
-@DELTA
 @pytest.mark.parametrize("kib", [32, 128, 512])
 def test_r6_and_r7_select_8k_prg_banks_in_both_prg_modes_and_the_last_two_stay_fixed(tmp_path, kib):
     """purpose: bank select ($8000, even) and bank data ($8001, odd) set R6 and R7 as the wiki's PRG table
@@ -75,7 +74,6 @@ def test_r6_and_r7_select_8k_prg_banks_in_both_prg_modes_and_the_last_two_stay_f
 
 # ---------------------------------------------------------------- CHR banks
 
-@DELTA
 @pytest.mark.parametrize("kib", [32, 128, 256])
 def test_r0_to_r5_select_2k_and_1k_chr_banks_with_and_without_a12_inversion(tmp_path, kib):
     """purpose: CHR-ROM banking as the wiki's CHR table gives it: with bank select bit 7 clear, R0 and R1
@@ -98,7 +96,6 @@ def test_r0_to_r5_select_2k_and_1k_chr_banks_with_and_without_a12_inversion(tmp_
     run(p, tmp_path, f"MMC3 {kib} KiB CHR-ROM")
 
 
-@DELTA
 @pytest.mark.parametrize("ram_kib", [8, 32])
 def test_chr_ram_is_banked_as_chr_rom_is(tmp_path, ram_kib):
     """purpose: on a board with CHR-RAM (no CHR-ROM in the header; 8 KiB, or 32 KiB by NES 2.0 byte 11)
@@ -127,7 +124,6 @@ def test_chr_ram_is_banked_as_chr_rom_is(tmp_path, ram_kib):
     run(p, tmp_path, f"MMC3 {ram_kib} KiB CHR-RAM")
 
 
-@DELTA
 def test_chr_rom_is_read_and_never_written(tmp_path):
     """purpose: CHR-ROM in the file is ROM: writes through $2007 to every 1 KiB slot, in both inversions,
     leave the bytes the file has, while the nametables take their writes.
@@ -149,7 +145,6 @@ def test_chr_rom_is_read_and_never_written(tmp_path):
 
 # ---------------------------------------------------------------- the registers
 
-@DELTA
 def test_every_register_answers_its_whole_range_and_bank_select_bits_3_to_5_do_nothing(tmp_path):
     """purpose: "4 pairs of registers at $8000-$9FFF, $A000-$BFFF, $C000-$DFFF, and $E000-$FFFF - even
     addresses select the low register and odd addresses the high": bank select and data written at
@@ -180,7 +175,6 @@ def test_every_register_answers_its_whole_range_and_bank_select_bits_3_to_5_do_n
     run(p, tmp_path, "MMC3 register ranges")
 
 
-@DELTA
 def test_writes_below_8000_never_reach_the_mmc3(tmp_path):
     """purpose: the MMC3's registers answer only $8000-$FFFF: writes of register-like values to $4020,
     $5000, $5FFF never select a bank or change it, and those to $6000-$7FFF go to the PRG-RAM (read back).
@@ -204,7 +198,6 @@ def test_writes_below_8000_never_reach_the_mmc3(tmp_path):
 
 # ---------------------------------------------------------------- nametables
 
-@DELTA
 @pytest.mark.parametrize("hdr", ["v", "h"])
 def test_a000_picks_the_arrangement_whatever_the_header_says(tmp_path, hdr):
     """purpose: $A000 bit 0 picks the nametable arrangement ("0: horizontal (A10); 1: vertical (A11)":
@@ -229,7 +222,6 @@ def test_a000_picks_the_arrangement_whatever_the_header_says(tmp_path, hdr):
     run(p, tmp_path, f"MMC3 arrangement, header {hdr}")
 
 
-@DELTA
 def test_a_four_screen_header_gives_four_nametables_and_a000_does_nothing(tmp_path):
     """purpose: "This bit has no effect on cartridges with hardwired 4-screen VRAM" (header byte 6 bit 3):
     a four-screen MMC3 file keeps four separate nametables ($2000, $2400, $2800, $2C00, each its own
@@ -252,7 +244,6 @@ def test_a_four_screen_header_gives_four_nametables_and_a000_does_nothing(tmp_pa
 
 # ---------------------------------------------------------------- PRG-RAM
 
-@DELTA
 @pytest.mark.parametrize("kind", ["nes2-8k", "nes2-8k-battery", "ines"])
 def test_prg_ram_at_6000_holds_what_is_written_once_a001_enables_it(tmp_path, kind):
     """purpose: "CPU $6000-$7FFF: 8 KiB PRG RAM bank": with $A001 = $80 (chip enabled, writes allowed), a
@@ -281,7 +272,6 @@ def test_prg_ram_at_6000_holds_what_is_written_once_a001_enables_it(tmp_path, ki
     run(p, tmp_path, f"MMC3 PRG-RAM ({kind})")
 
 
-@DELTA
 def test_a001_write_protects_and_disables_the_prg_ram(tmp_path):
     """purpose: $A001, "PRG RAM protect", functional on the MMC3 (NES 2.0, submapper 0): with bits 7-6 =
     11 (enabled, write-protected) reads give the stored bytes and writes are ignored; with bit 7 = 0
@@ -305,7 +295,6 @@ def test_a001_write_protects_and_disables_the_prg_ram(tmp_path):
     run(p, tmp_path, "MMC3 $A001")
 
 
-@DELTA
 def test_a_nes2_header_with_no_prg_ram_has_none_at_6000(tmp_path):
     """purpose: the PRG-RAM is the NES 2.0 header's (byte 10 = 0: none; as I7 pins for MMC1, open item
     J1an): on such an MMC3 file, with $A001 = $80, a byte written at $6000, $6ABC or $7FFF doesn't read
@@ -321,7 +310,6 @@ def test_a_nes2_header_with_no_prg_ram_has_none_at_6000(tmp_path):
     run(p, tmp_path, "MMC3 with no PRG-RAM")
 
 
-@DELTA
 def test_prg_ram_survives_reset_and_a_new_console_from_the_file_starts_as_a_fresh_load(tmp_path):
     """purpose: Decided Q3's core half on an MMC3 board: the battery probe logs the 32 bytes it finds at
     $6000, then writes its save. After Reset (the console's button, NES.reset()) it finds its save
@@ -365,7 +353,6 @@ def clocks(p: Mmc3Probe, n: int, why: str, query=True, reenable=True):
                 p.write(0xE001, 0)
 
 
-@DELTA
 @pytest.mark.parametrize("latch", [1, 2, 5, 16, 255])
 def test_the_counter_reloads_from_the_latch_at_zero_and_counts_down_to_the_irq(tmp_path, latch):
     """purpose: "When the IRQ is clocked (filtered A12 0->1), the counter value is checked - if zero or the
@@ -385,7 +372,6 @@ def test_the_counter_reloads_from_the_latch_at_zero_and_counts_down_to_the_irq(t
     run(p, tmp_path, f"MMC3 counter, latch {latch}")
 
 
-@DELTA
 def test_a_latch_of_0_gives_an_irq_at_every_clock_on_the_mmc3b_and_c(tmp_path):
     """purpose: "Sharp MMC3B and MMC3C generate an IRQ on each scanline while $C000 is $00 ... represented
     by mapper 4 submapper 0" (the revision Decided Q2 targets): with $C000 = 0, every clock reloads 0 and
@@ -410,7 +396,6 @@ def test_a_latch_of_0_gives_an_irq_at_every_clock_on_the_mmc3b_and_c(tmp_path):
     run(p, tmp_path, "MMC3 latch 0")
 
 
-@DELTA
 def test_c000_only_sets_the_latch_and_c001_reloads_at_the_next_clock_without_an_irq(tmp_path):
     """purpose: "Writing to $C000 does not immediately affect the value within the counter - this value is
     only used when the counter is reloaded"; $C001 "clears the MMC3 IRQ counter immediately, and then
@@ -438,7 +423,6 @@ def test_c000_only_sets_the_latch_and_c001_reloads_at_the_next_clock_without_an_
     run(p, tmp_path, "MMC3 $C000/$C001")
 
 
-@DELTA
 def test_e000_acknowledges_and_disables_and_the_counter_keeps_running(tmp_path):
     """purpose: "Writing to $E000 will only prevent the MMC3 from generating IRQs - the counter will
     continue to run"; it "will disable MMC3 interrupts AND acknowledge any pending interrupts"; "Writing to
@@ -475,7 +459,6 @@ def test_e000_acknowledges_and_disables_and_the_counter_keeps_running(tmp_path):
     run(p, tmp_path, "MMC3 $E000/$E001")
 
 
-@DELTA
 def test_only_a_rise_of_ppu_a12_clocks_the_counter(tmp_path):
     """purpose: "The counter is clocked on each rising edge of filtered A12, no matter what caused it, so it
     is possible to ... clock the counter by writing to $2006, regardless of whether PPU is/is not
@@ -505,7 +488,6 @@ def test_only_a_rise_of_ppu_a12_clocks_the_counter(tmp_path):
     run(p, tmp_path, "MMC3 A12 clocking")
 
 
-@DELTA
 def test_with_rendering_off_the_counter_doesnt_move(tmp_path):
     """purpose: the counter counts PPU A12 rises, and with rendering off the PPU makes no fetches: frames
     that pass with $2001 = 0 (waited for by $2002's vblank flag) leave the counter where it was, so the
@@ -547,7 +529,6 @@ def check_rows(p: Mmc3Probe, res: dict, what: str, frames=3):
         assert not bad, f"{what}: frame {k}: {len(bad)} lines differ from the spec's, first {bad[:8]}"
 
 
-@DELTA
 @pytest.mark.parametrize("latch", [0, 1, 2, 47, 100, 160, 238])
 def test_the_irq_split_starts_on_the_line_the_latch_gives(tmp_path, latch):
     """purpose: J4's status bar on MMC3: with the background at $0000 and sprites at $1000, the counter
@@ -564,7 +545,6 @@ def test_the_irq_split_starts_on_the_line_the_latch_gives(tmp_path, latch):
     assert ring(res) == [1] * 64, f"IRQs per frame: {ring(res)}"
 
 
-@DELTA
 @pytest.mark.parametrize("latch,count", [(239, 1), (240, 1), (241, 0), (255, 0)])
 def test_latches_past_the_visible_lines_show_no_split_and_241_clocks_bound_the_irq(tmp_path, latch, count):
     """purpose: 241 clocks a frame (the pre-render line and lines 0-239: "241 times per frame") bound what
@@ -578,7 +558,6 @@ def test_latches_past_the_visible_lines_show_no_split_and_241_clocks_bound_the_i
     assert ring(res) == [count] * 64, f"IRQs per frame: {ring(res)}"
 
 
-@DELTA
 @pytest.mark.parametrize("latch", [0, 1, 2, 63, 64, 120, 240, 255])
 def test_reenabled_every_time_the_irq_comes_every_latch_plus_1_lines(tmp_path, latch):
     """purpose: the counter reloads itself at zero: with the handler acknowledging ($E000) and re-enabling
@@ -593,7 +572,6 @@ def test_reenabled_every_time_the_irq_comes_every_latch_plus_1_lines(tmp_path, l
     assert ring(res) == [want] * 64, f"latch {latch}: IRQs per frame {sorted(set(ring(res)))}, the spec says {want}"
 
 
-@DELTA
 @pytest.mark.parametrize("second", [30, 0])
 def test_a_latch_written_in_the_handler_applies_at_the_next_reload(tmp_path, second):
     """purpose: "updating only $C000 to be applied at start of the next IRQ": the handler of the IRQ at the
@@ -608,7 +586,6 @@ def test_a_latch_written_in_the_handler_applies_at_the_next_reload(tmp_path, sec
     assert ring(res) == [2] * 64, f"IRQs per frame: {ring(res)}"
 
 
-@DELTA
 def test_a_chr_bank_switched_by_the_irq_shows_from_the_second_line_after(tmp_path):
     """purpose: the status bar drawn from other tiles: the handler of the IRQ at the end of line 99 (latch
     100) writes $2005 and then R0 ($8000 = 0, $8001), the background's first 2 KiB; the bank write lands
@@ -624,7 +601,6 @@ def test_a_chr_bank_switched_by_the_irq_shows_from_the_second_line_after(tmp_pat
     assert ring(res) == [1] * 64
 
 
-@DELTA
 @pytest.mark.parametrize("mask", [0x0A, 0x14, 0x1E], ids=["background", "sprites", "both"])
 def test_the_counter_is_clocked_whenever_rendering_is_on(tmp_path, mask):
     """purpose: "whenever rendering is turned on in the PPU, it fetches ... sprite patterns from dots
@@ -638,7 +614,6 @@ def test_the_counter_is_clocked_whenever_rendering_is_on(tmp_path, mask):
     assert ring(res) == [1] * 64
 
 
-@DELTA
 def test_a_frame_drawn_with_rendering_off_has_no_irq_and_the_next_splits_on_its_line(tmp_path):
     """purpose: J4v: a game that blanks the screen for a frame (a loading frame): every other frame is drawn
     with $2001 = 0, so its counter isn't clocked and it has no IRQ; the frames between, rendered, split on
@@ -654,7 +629,6 @@ def test_a_frame_drawn_with_rendering_off_has_no_irq_and_the_next_splits_on_its_
     assert ring(res) == [1, 0] * 32, f"IRQs per frame: {ring(res)}"
 
 
-@DELTA
 def test_8x16_sprites_from_the_right_table_clock_the_counter_once_a_line(tmp_path):
     """purpose: "When using 8x16 sprites PPU A12 must be explicitly tracked": an 8x16 sprite takes its
     table from its tile's bit 0, and "the PPU fetches tile $FF ($1FE0-$1FFF) for each leftover sprite", so
@@ -667,7 +641,6 @@ def test_8x16_sprites_from_the_right_table_clock_the_counter_once_a_line(tmp_pat
     assert ring(res) == [1] * 64
 
 
-@DELTA
 def test_the_irq_split_row_holds_for_600_frames(tmp_path):
     """purpose: J4's "across 600 consecutive frames of scripted play, the status bar's split scanline sits
     on the same row in every frame", on MMC3: frames 40-640 of the latch-150 split all hash to the spec's
@@ -684,7 +657,6 @@ def test_the_irq_split_row_holds_for_600_frames(tmp_path):
 
 # ---------------------------------------------------------------- the IRQ against the features it meets
 
-@DELTA
 def test_the_apu_frame_irq_and_the_mmc3_irq_share_the_irq_line(tmp_path):
     """purpose: the APU's frame IRQ ($4017 = $00: 4-step, IRQ on) and the MMC3's both pull the CPU's /IRQ
     line; the handler takes the APU's first when $4015 bit 6 says so (reading $4015 acknowledges it) and
@@ -705,7 +677,6 @@ def test_the_apu_frame_irq_and_the_mmc3_irq_share_the_irq_line(tmp_path):
     assert abs(apu - nmis * 29780.5 / 29830) <= 3, f"{apu} APU frame IRQs in {nmis} frames"
 
 
-@DELTA
 def test_an_irq_during_oam_dma_is_taken_after_it_and_never_lost(tmp_path):
     """purpose: the main loop runs OAM DMA back to back ($4014, 513-514 cycles each, the CPU halted), so
     the MMC3's IRQ (latch 100, at the end of line 99) is asserted during a DMA nearly every frame; the CPU
@@ -732,7 +703,6 @@ SPLIT_X = 248      # sprite 0's X: the hit lands at dots 249-255, so the main lo
 SOLID = 0xFE       # the sprite tile, solid colour 1 in every 1 KiB CHR bank
 
 
-@DELTA
 def test_a_chr_bank_switched_after_sprite_0_hits_shows_from_the_next_line(tmp_path):
     """purpose: J4p/J4q on MMC3: a status bar made with sprite 0 and one bank data write: R0 (the
     background's first 2 KiB, bank select left at 0) is written with the playfield's bank in the NMI and
@@ -770,7 +740,6 @@ def test_a_chr_bank_switched_after_sprite_0_hits_shows_from_the_next_line(tmp_pa
 
 # ---------------------------------------------------------------- Reset, power, and the loader
 
-@DELTA
 def test_reset_and_power_rerun_an_mmc3_game_that_sets_its_own_banks(tmp_path):
     """purpose: "the values in R6, R7, and $8000 are unspecified at power on, the reset vector must point
     into $E000-$FFFF, and code must initialize these": a probe whose reset code does so, run to its end
@@ -805,7 +774,6 @@ def test_reset_and_power_rerun_an_mmc3_game_that_sets_its_own_banks(tmp_path):
         assert o[2 * i + 1] == want, f"after {what} the log differs from the spec's"
 
 
-@DELTA
 def test_power_on_is_the_same_every_time(tmp_path):
     """purpose: what the MMC3's registers hold at power-on is unspecified and isn't pinned here, but runs
     are deterministic (Decided): a probe that reads the three switchable or swappable windows ($8000,

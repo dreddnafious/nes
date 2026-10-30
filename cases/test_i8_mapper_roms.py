@@ -122,7 +122,6 @@ def demo(steps: list, timeout=240) -> dict:
     return drive_i6(i8_oracle("nesdoug-33_MMC3"), steps, timeout=timeout)
 
 
-@DELTA
 def test_nesdoug_mmc3_demo_draws_its_text_from_its_banks_and_prg_ram_and_emphasises_below_its_second_split():
     """purpose: J1 steps 2-3 on an MMC3 program: by frame 120 nesdoug's demo shows every line of its six
     text rows at column 1, read with its own font ("BANK0", "BANK1", "BANK2  HI", "BANK3  G4" drawn by
@@ -141,7 +140,6 @@ def test_nesdoug_mmc3_demo_draws_its_text_from_its_banks_and_prg_ram_and_emphasi
         assert not loud and not quiet, f"emphasis wrong on lines {loud[:6]} (want all three) and {quiet[:6]} (want none)"
 
 
-@DELTA
 def test_nesdoug_mmc3_demo_scrolls_its_four_bands_at_their_own_speeds_while_b_is_held():
     """purpose: J4 on an MMC3 program: holding B for 64 frames scrolls the demo's four bands, each by its
     own X: if band 2 (lines 50-77) moved n pixels (n frames' worth, 60-64 of them), band 1 (lines 0-46)
