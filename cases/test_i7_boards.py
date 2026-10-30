@@ -26,7 +26,6 @@ def run(p: Mmc1Probe, tmp_path, what: str, frames=60, timeout=180):
 
 # ---------------------------------------------------------------- the serial port
 
-@DELTA
 @pytest.mark.parametrize("kib", [128, 256])
 def test_a_register_takes_five_writes_low_bit_first_and_the_fifth_address_picks_it(tmp_path, kib):
     """purpose: the MMC1's registers are loaded through its serial port (NESdev "MMC1", Interface): five
@@ -58,7 +57,6 @@ def test_a_register_takes_five_writes_low_bit_first_and_the_fifth_address_picks_
     run(p, tmp_path, f"MMC1 {kib} KiB")
 
 
-@DELTA
 @pytest.mark.parametrize("mode", [0, 1, 2, 3])
 @pytest.mark.parametrize("kib", [64, 128, 256])
 def test_every_prg_bank_in_each_prg_mode(tmp_path, kib, mode):
@@ -79,7 +77,6 @@ def test_every_prg_bank_in_each_prg_mode(tmp_path, kib, mode):
     run(p, tmp_path, f"MMC1 {kib} KiB, PRG mode {mode}")
 
 
-@DELTA
 @pytest.mark.parametrize("start_mode", [0, 2])
 def test_a_bit_7_write_clears_the_shift_register_and_fixes_the_last_bank(tmp_path, start_mode):
     """purpose: a write with bit 7 set, anywhere in $8000-$FFFF, clears the shift register and ORs the
@@ -109,7 +106,6 @@ def test_a_bit_7_write_clears_the_shift_register_and_fixes_the_last_bank(tmp_pat
     run(p, tmp_path, f"MMC1 reset from PRG mode {start_mode}")
 
 
-@DELTA
 @pytest.mark.parametrize("name,byte", [("inc", "ff"), ("inc", "low"), ("dec", "low"), ("ror", "low"), ("rra,x", "low")])
 def test_a_read_modify_write_lands_only_its_first_write_but_a_reset_always(tmp_path, name, byte):
     """purpose: "When the serial port is written to on consecutive cycles, it ignores every write after
@@ -152,7 +148,6 @@ def test_a_read_modify_write_lands_only_its_first_write_but_a_reset_always(tmp_p
     run(p, tmp_path, f"{name.upper()} on the serial port")
 
 
-@DELTA
 def test_writes_below_8000_never_reach_the_mmc1(tmp_path):
     """purpose: the serial port answers only $8000-$FFFF (/ROMSEL): in the middle of a load, writes of
     $80, $FF and $01 to $4020, $5000, $5FFF, $6000 and $7FFF neither reset nor shift the register, so
@@ -178,7 +173,6 @@ def test_writes_below_8000_never_reach_the_mmc1(tmp_path):
 
 # ---------------------------------------------------------------- mirroring
 
-@DELTA
 @pytest.mark.parametrize("hdr", ["v", "h"])
 def test_mirroring_is_control_bits_0_and_1_whatever_the_header_says(tmp_path, hdr):
     """purpose: the control register's bits 1-0 pick the nametable arrangement ("0: one-screen, screen A;
@@ -208,7 +202,6 @@ def test_mirroring_is_control_bits_0_and_1_whatever_the_header_says(tmp_path, hd
 
 # ---------------------------------------------------------------- CHR
 
-@DELTA
 @pytest.mark.parametrize("kib", [16, 32, 128])
 def test_chr_banks_in_8k_and_4k_mode(tmp_path, kib):
     """purpose: CHR-ROM banking as the wiki gives it: in 8 KiB mode (control bit 4 clear) CHR bank 0
@@ -233,7 +226,6 @@ def test_chr_banks_in_8k_and_4k_mode(tmp_path, kib):
     run(p, tmp_path, f"MMC1 {kib} KiB CHR-ROM")
 
 
-@DELTA
 def test_chr_ram_is_two_4k_banks_in_4k_mode_and_is_never_rom(tmp_path):
     """purpose: on a board with 8 KiB of CHR-RAM (header byte 5 = 0), "that makes 2 banks": bytes
     written through $2007 in 8 KiB mode read back there; in 4 KiB mode CHR bank 0 = 1 shows the upper
@@ -264,7 +256,6 @@ def test_chr_ram_is_two_4k_banks_in_4k_mode_and_is_never_rom(tmp_path):
     run(p, tmp_path, "MMC1 CHR-RAM")
 
 
-@DELTA
 def test_chr_rom_is_read_and_never_written(tmp_path):
     """purpose: CHR-ROM in the file is ROM: writes through $2007 in either CHR mode leave every byte as
     the file has it, while the nametables take their writes.
@@ -287,7 +278,6 @@ def test_chr_rom_is_read_and_never_written(tmp_path):
 
 # ---------------------------------------------------------------- PRG-RAM
 
-@DELTA
 @pytest.mark.parametrize("kind", ["nes2-8k", "nes2-8k-battery", "ines"])
 def test_prg_ram_at_6000_holds_what_is_written_through_bank_switching(tmp_path, kind):
     """purpose: an MMC1 cartridge's PRG-RAM at $6000-$7FFF (NES 2.0 byte 10: 8 KiB, volatile or
@@ -314,7 +304,6 @@ def test_prg_ram_at_6000_holds_what_is_written_through_bank_switching(tmp_path, 
     run(p, tmp_path, f"MMC1 PRG-RAM ({kind})")
 
 
-@DELTA
 def test_sxrom_32k_prg_ram_is_four_banks_chosen_by_chr_bank_bits_3_2(tmp_path):
     """purpose: SXROM (NES 2.0: 32 KiB of battery-backed PRG-RAM, 8 KiB CHR-RAM, as Nova the Squirrel's
     header gives) banks its PRG-RAM in 8 KiB at $6000-$7FFF by CHR bank 0's bits 3-2 ("Select 8 KiB
@@ -344,7 +333,6 @@ def test_sxrom_32k_prg_ram_is_four_banks_chosen_by_chr_bank_bits_3_2(tmp_path):
     run(p, tmp_path, "SXROM PRG-RAM")
 
 
-@DELTA
 def test_surom_512k_reaches_both_halves_through_chr_bank_bit_4(tmp_path):
     """purpose: SUROM (512 KiB PRG-ROM, 8 KiB CHR-RAM, 8 KiB PRG-RAM: NES 2.0 sizes) selects the 256 KiB
     half with CHR bank 0's bit 4 ("Select 256 KiB PRG-ROM bank"), and "The 256 KiB outer PRG bank
@@ -373,7 +361,6 @@ def test_surom_512k_reaches_both_halves_through_chr_bank_bit_4(tmp_path):
 
 # ---------------------------------------------------------------- the picture
 
-@DELTA
 @pytest.mark.parametrize("chr_bank,screen", [(5, 1), (0x1A, 0), (31, 1)])
 def test_the_picture_comes_from_the_chr_bank_and_screen_mmc1_chose(tmp_path, chr_bank, screen):
     """purpose: the frame is drawn from what the MMC1 maps: the background's tiles from the 4 KiB CHR-ROM
@@ -424,7 +411,6 @@ def split_probe() -> tuple:
     return p, first[:row * 256] + second[row * 256:], y
 
 
-@DELTA
 def test_a_chr_bank_loaded_mid_frame_takes_effect_from_the_next_line(tmp_path):
     """purpose: J4's status bar on MMC1: CHR bank 0 (4 KiB mode, the background's table) reloaded after
     sprite 0 hits (on line y + 1 at x 248-254; the load's fifth write, the one that commits, lands in that
@@ -445,7 +431,6 @@ def test_a_chr_bank_loaded_mid_frame_takes_effect_from_the_next_line(tmp_path):
 
 # ---------------------------------------------------------------- Reset, power, and the loader
 
-@DELTA
 def test_reset_and_power_rerun_an_mmc1_game_that_sets_its_own_banks(tmp_path):
     """purpose: the wiki gives no reliable power-on state for the MMC1, so games write $80 and load every
     register in their reset code, and keep that code where every 16 KiB bank can reach it. A probe that
@@ -481,7 +466,6 @@ def test_reset_and_power_rerun_an_mmc1_game_that_sets_its_own_banks(tmp_path):
         assert o[2 * i + 1] == want, f"after {what} the log differs from the spec's"
 
 
-@DELTA
 def test_power_on_is_the_same_every_time(tmp_path):
     """purpose: what the MMC1's registers hold at power-on is unknown on hardware ("other tests have found
     that this is fragile") and isn't pinned here, but runs are deterministic (Decided): a probe whose

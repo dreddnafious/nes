@@ -92,7 +92,6 @@ def press(button: int, after=40) -> list:
     return [["buttons", button], ["frames", 6], ["buttons", 0], ["frames", after], ["frame"]]
 
 
-@DELTA
 def test_nova_the_squirrel_boots_to_its_title_and_keeps_its_save_tag_in_prg_ram():
     """purpose: J1 steps 2-3 on an SXROM game: Nova the Squirrel's reset code (boot.s) resets the MMC1,
     loads its control and CHR registers (InitMapper), clears $6000-$7DFF of its PRG-RAM, and writes its
@@ -112,7 +111,6 @@ def test_nova_the_squirrel_boots_to_its_title_and_keeps_its_save_tag_in_prg_ram(
     assert again == t60, f"after Reset the title differs by {diff_count(again, t60)} pixels"
 
 
-@DELTA
 def test_nova_the_squirrel_warns_on_its_title_only_when_the_header_gives_no_prg_ram(tmp_path):
     """purpose: the NES 2.0 header's PRG-RAM size is the cartridge's (NESdev "MMC1": "All other SxROM
     variants are denoted by their functional PRG/CHR-ROM/RAM sizes in the NES 2.0 header"): ShowTitle
@@ -134,7 +132,6 @@ def test_nova_the_squirrel_warns_on_its_title_only_when_the_header_gives_no_prg_
         f"the title with no PRG-RAM differs by only {diff_count(a, b)} pixels: no No-WRAM warning, or one on both"
 
 
-@DELTA
 def test_nova_the_squirrel_start_opens_its_menu_and_the_pad_moves_through_it():
     """purpose: J1 step 4 on an SXROM game: Start on the title opens the main menu (ShowMainMenu, in
     another PRG bank: "Start the game!", "View controls", "Game options", "Extra features"); Down moves
@@ -198,7 +195,6 @@ def to_gameplay() -> list:
             ["buttons", START], ["frames", 5], ["buttons", 0], ["frames", 120]]
 
 
-@DELTA
 def test_minekart_madness_boots_to_its_credits_and_its_title_from_chr_bank_2():
     """purpose: J1 steps 2-3 on an SKROM game (CHR-ROM in 4 KiB banks): Minekart Madness powers on to its
     credits (load_screen_boot: screen_boot's "CREATED BY", "DESIGN,CODE  MATT HUGHSON" and three more
@@ -216,7 +212,6 @@ def test_minekart_madness_boots_to_its_credits_and_its_title_from_chr_bank_2():
     assert not bad, f"{len(bad)} of 72 logo cells aren't CHR bank 2's tiles, first {bad[:6]}"
 
 
-@DELTA
 def test_minekart_madness_plays_its_rules_its_clock_and_the_pad():
     """purpose: J1 step 4 on an SKROM game: Start on the title shows the rules (screen_rules: "YOU HAVE
     2:30!", "GATHER", "UNTIL TIME EXPIRES", "GOOD LUCK!"); Start again starts play, with the status bar
@@ -244,7 +239,6 @@ def test_minekart_madness_plays_its_rules_its_clock_and_the_pad():
     assert diff_count(frames_of(jump)[-1], p2) >= 50, f"holding A changed only {diff_count(frames_of(jump)[-1], p2)} pixels"
 
 
-@DELTA
 def test_minekart_madness_ends_when_its_time_runs_out_and_returns_to_its_title():
     """purpose: J1 steps 6-7 on an SKROM game: left alone in play, the clock runs out (2:30, 9,000 frames:
     timer_expired, kill_player), the player falls, and the game ends on its GAME OVER screen

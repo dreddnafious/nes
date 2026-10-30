@@ -27,7 +27,6 @@ def mem_lines(stdout: str) -> dict:
     return out
 
 
-@DELTA
 def test_cli_run_reads_memory_after_mmc1_bank_switching(tmp_path):
     """purpose: `node src/cli/nes.ts run <probe> --frames 30 --mem 0200:1 --mem 0300:n --mem 6000:4` runs
     an MMC1 probe (it loads PRG banks through the serial port, logs reads, and writes its PRG-RAM) and
@@ -52,7 +51,6 @@ def test_cli_run_reads_memory_after_mmc1_bank_switching(tmp_path):
     assert mem.get(0x6000) == [0x12, 0x34, 0x56, 0x78], f"PRG-RAM reads {mem.get(0x6000)}"
 
 
-@DELTA
 def test_cli_screenshot_shows_the_mmc1_picture(tmp_path):
     """purpose: `node src/cli/nes.ts screenshot <probe> --frames 30 --out f.png` on an MMC1 picture probe
     (background from 4 KiB CHR-ROM bank 22, one-screen mirroring on page 1) writes a 256x240 PNG that is
@@ -82,7 +80,6 @@ def mk_rows(rgb, want: dict) -> dict:
     return {r: lines[r] for r in want}
 
 
-@DELTA
 def test_the_page_plays_an_mmc1_game_from_its_credits_into_play_and_restarts_it(site, browser):
     """purpose: J1 steps 1-4 and 7 for an MMC1 game: the page loads Minekart Madness (SKROM) through
     #rom-file instead of refusing it (#message hidden or empty); its canvas shows the credits at frame 60
@@ -120,7 +117,6 @@ def test_the_page_plays_an_mmc1_game_from_its_credits_into_play_and_restarts_it(
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_switching_between_mmc1_and_the_discrete_boards_leaves_nothing_behind(site, browser, tmp_path):
     """purpose: J2 steps 2-4 across mappers (J2d, J2i): in one page, an MMC1 game (4 KiB CHR bank 5,
     one-screen B), then a vertically mirrored UxROM game (I6), then an MMC1 game showing CHR bank 26 on
@@ -147,7 +143,6 @@ def mapperel_wram(rgb) -> str:
     return next((ln for ln in lines if "PRG RAM" in ln), f"<no PRG-RAM line: {lines[:6]}>")
 
 
-@DELTA
 def test_battery_prg_ram_survives_power_on_the_page_but_not_a_switch(site, browser, tmp_path):
     """purpose: Decided Q3 on an MMC1 board, read by the cartridge itself: Holy Mapperel writes the tag
     "SAVEDATA" into its PRG-RAM at the end of its test and, on its next start, shows " + BATTERY" if the
@@ -182,7 +177,6 @@ def test_battery_prg_ram_survives_power_on_the_page_but_not_a_switch(site, brows
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_a_still_unsupported_mapper_is_refused_by_number_while_an_mmc1_game_runs(site, browser, tmp_path):
     """purpose: J1a after I7: with an MMC1 game running on the page, picking a file for mapper 105
     (NES-EVENT, an MMC1 relative I7 doesn't build) shows #message naming 105, and the MMC1 game keeps
@@ -206,7 +200,6 @@ def test_a_still_unsupported_mapper_is_refused_by_number_while_an_mmc1_game_runs
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_headless_core_on_an_mmc1_cartridge_runs_at_least_five_times_real_time():
     """purpose: J3's ">= 5x real time" holds on a real-size MMC1 cartridge: 1,800 frames (30 s of NTSC
     time) of Nova the Squirrel (256 KiB PRG, SXROM; its NMI switches PRG banks every frame for its music)
