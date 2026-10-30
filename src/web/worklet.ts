@@ -19,6 +19,14 @@ declare class AudioWorkletProcessor {
 const TARGET_S = 0.05;
 /** The most the reading speed moves off 1.0. */
 const MAX_ADJUST = 0.005;
+/** The reading speed's change per unit of fill error (the fill's distance from the target, over the
+ * target): MAX_ADJUST is reached a quarter of the target away. A page locked to a 60.00 or 59.94 Hz
+ * display makes its sound 0.16 or 0.27 % slow, so the fill settles 4 or 7 ms under the target, in
+ * about 2.5 s, and stays there: the latency doesn't grow over a sitting. */
+const GAIN = 0.02;
+/** The fill the speed follows is smoothed over about three frames (per render quantum), so the
+ * frame-at-a-time sawtooth of the fill doesn't wobble the pitch. */
+const SMOOTH = 0.05;
 
 class NesOutput extends AudioWorkletProcessor {
   private readonly fifo = new Float32Array(1 << 16);
@@ -27,6 +35,7 @@ class NesOutput extends AudioWorkletProcessor {
   private tail = 0;          // the integer part of the read position
   private frac = 0;          // its fraction
   private fill = 0;
+  private level = 0;         // the smoothed fill (see SMOOTH)
   private playing = false;
   private readonly target = Math.round(sampleRate * TARGET_S);
   // The high-pass filter: y[n] = a (y[n-1] + x[n] - x[n-1]).
@@ -48,6 +57,7 @@ class NesOutput extends AudioWorkletProcessor {
     this.head = this.tail = 0;
     this.frac = 0;
     this.fill = 0;
+    this.level = 0;
     this.playing = false;
     this.primed = false;
   }
@@ -74,7 +84,10 @@ class NesOutput extends AudioWorkletProcessor {
       this.tail = (this.tail + drop) & this.mask;
       this.fill -= drop;
     }
-    if (!this.playing && this.fill >= this.target) this.playing = true;
+    if (!this.playing && this.fill >= this.target) {
+      this.playing = true;
+      this.level = this.fill;
+    }
   }
 
   process(_inputs: Float32Array[][], outputs: Float32Array[][]): boolean {
@@ -82,7 +95,9 @@ class NesOutput extends AudioWorkletProcessor {
     const n = out[0].length;
     let i = 0;
     if (this.playing) {
-      const step = 1 + Math.max(-MAX_ADJUST, Math.min(MAX_ADJUST, (this.fill - this.target) / this.target * MAX_ADJUST));
+      this.level += (this.fill - this.level) * SMOOTH;
+      const err = (this.level - this.target) / this.target;
+      const step = 1 + Math.max(-MAX_ADJUST, Math.min(MAX_ADJUST, err * GAIN));
       for (; i < n && this.fill >= 2; i++) {
         const s0 = this.fifo[this.tail];
         const s1 = this.fifo[(this.tail + 1) & this.mask];

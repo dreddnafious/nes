@@ -16,7 +16,6 @@ def start(tab: I5Tab, rom: str, settle=WARMUP_S):
     tab.wait(settle)
 
 
-@DELTA
 @pytest.mark.parametrize("hz", [60, 59.94])
 def test_at_a_60_hz_display_every_refresh_shows_exactly_one_new_frame(site, browser, hz, tmp_path):
     """purpose: J1o's "no doubled or skipped frame at 60 Hz" and the frame pacing open item, on its proposed
