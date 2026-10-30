@@ -123,31 +123,6 @@ npm run smoke             # the smoke run: every mapper, end to end in the brows
 a few approval gates, all of it ran unattended after the opening design session. It took about 26
 hours.**
 
-The harness ran Claude (Opus) through *climbs*. A climb turns a design brief into a frozen set of tests, then
-builds until every test passes. The person's part was the design session at the start of each climb: what
-"done" means, the user journeys, and the roadmap. After that came a gate at each new increment's tests
-(three were the person's; the harness's written rules decided the rest), and the merge gate at the end.
-Everything else was the agent's.
-
-The brief that started it is [`brief.md`](brief.md). In the person's words, a game must "start. You can
-play it. It ends. You can restart it without having to reload the browser or do anything unusual. It
-includes audio."
-
-**How a climb works:**
-1. **Corpus first.** Each increment's promises are written as test cases before any code, from the brief,
-   the hardware documentation (NESdev) and the test ROMs. The cases are reviewed for coverage and then
-   approved and frozen. After that the agent can't edit, weaken or delete a case. A case with a defect in
-   the case itself, not in its promise, can be fixed only through a narrow lane that proves the fix weakens
-   nothing.
-2. **Climb to green.** The agent builds until the frozen corpus passes, counting each run and watching for
-   a plateau. An increment it can't finish honestly is parked with a written account of what it tried,
-   rather than gamed.
-3. **Held-out tests.** A separate agent writes tests the builder never sees, from the same brief. They are
-   sealed and run only once the corpus is green.
-4. **Ship and review.** Each increment is its own pull request, stacked on the last. Two fresh reviewer
-   agents and GitHub Copilot read it, and what they find is triaged, fixed with a test, or left to the
-   person.
-
 **The rules it worked under:**
 - **Accuracy:** "accurate" means passing the test ROMs.
 - **Honesty:** no other emulator may be copied, called or vendored, and a test checks that nothing under
@@ -157,10 +132,10 @@ includes audio."
 
 | | |
 |---|---|
-| Elapsed time | about 26 hours over 29-30 October 2026, in two climbs (12.6 h and 13.6 h). About 6 of those hours were spent waiting on the person at gates and design sessions |
+| Elapsed time | about 26 hours over 29-30 October 2026, in two passes (12.6 h and 13.6 h). About 6 of those hours were spent waiting on the person at gates and design sessions |
 | Increments | 9, merged as 10 stacked pull requests ([#1](https://github.com/dreddnafious/nes/pull/1)-[#10](https://github.com/dreddnafious/nes/pull/10)) |
 | Test cases | 563, all passing, from 138 test ROMs and oracles |
-| Held-out tests | every sealed set passed: 15 of 15 in the first climb, 8 of 8 at the end of the second |
+| Held-out tests | every sealed set passed: 15 of 15 in the first pass, 8 of 8 at the end of the second |
 | Code | about 3,500 lines of TypeScript (2,600 of them the core) |
 | Human code | none; the person wrote the brief's intent and approved at the gates |
 
