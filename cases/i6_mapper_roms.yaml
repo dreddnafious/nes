@@ -1,0 +1,38 @@
+# I6: Holy Mapperel (Damian Yerrick, zlib licence), a cartridge-board test that detects the mapper by how
+# it answers mirroring and bank writes, measures the PRG and CHR sizes from the bank tags it finds,
+# tests every bank, and shows the result on screen. Read by test_i6_mapper_roms.py. Each ROM is fetched
+# by hash (cases/i6_oracles.json, cut from the pinned v0.02 release archive).
+#
+# The result screen (src/main.s, README "Displayed result"), read with the font from the ROM's own
+# CHR-ROM build, gives, one per line:
+#   - the detected iNES mapper number in three digits and the board name ("U*ROM", "A*ROM", "CNROM"; the
+#     '*' becomes the board letter only when the PRG-RAM it finds matches a known board, and PRG-RAM on
+#     these boards isn't pinned, so either is accepted);
+#   - "<n>K PRG ROM" from the bank tags it read back;
+#   - the CHR size, "ROM" or "RAM", and "OK" (the bank tags or a RAM pattern test read back right);
+#   - "DETAILED TEST RESULT: dddd", WRAM, PRG ROM, IRQ and CHR, where "Zero is normal; anything else
+#     reflects something unexpected".
+# The PRG-RAM line isn't pinned: none of these boards has PRG-RAM, and whether an emulator gives an
+# iNES 1.0 file some is the build's choice (Decided, run: NROM's 8 KiB).
+#
+# A ROM that crashes beeps Morse code instead (README "Morse codes": "WB" wrong bank at startup, "LB"
+# the last bank not left in, ...), and its screen never shows the lines: the case fails on them.
+cases:
+  - id: holy-mapperel/M2_P128K_CR8K_V
+    purpose: Holy Mapperel on a 128 KiB UNROM (mapper 2, 8 KiB CHR-RAM, vertical) detects mapper 2, reads back 128K of PRG ROM and 8K of CHR RAM, and reports detailed result 0000.
+    origin: design
+    board: "002 U[*N]R0M"
+    prg: "128K PRG R0M"
+    chr: "8K CHR RAM 0K"
+  - id: holy-mapperel/M3_P32K_C32K_H
+    purpose: Holy Mapperel on a 32 KiB CNROM (mapper 3, 32 KiB CHR-ROM, horizontal) detects mapper 3, reads back 32K of PRG ROM and all four CHR-ROM banks' tags, and reports detailed result 0000.
+    origin: design
+    board: "003 CNR0M"
+    prg: "32K PRG R0M"
+    chr: "32K CHR R0M 0K"
+  - id: holy-mapperel/M7_P128K_CR8K
+    purpose: Holy Mapperel on a 128 KiB AxROM (mapper 7, 8 KiB CHR-RAM) detects mapper 7 by its single-screen page switching, reads back 128K of PRG ROM in 32 KiB banks and 8K of CHR RAM, and reports detailed result 0000.
+    origin: design
+    board: "007 A[*N0]R0M"
+    prg: "128K PRG R0M"
+    chr: "8K CHR RAM 0K"

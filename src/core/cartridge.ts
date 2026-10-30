@@ -151,13 +151,27 @@ export class NROM implements Mapper {
   }
 }
 
-/** Mapper 3: NROM's PRG, with 8 KiB CHR banks chosen by any write to $8000-$FFFF. The board has
- * bus conflicts: the value latched is the one written ANDed with the ROM byte at that address. */
+/** What a write to the bank register latches. NES 2.0 submapper 1 says the board has no bus conflicts
+ * (the value written is latched); submapper 2 says AND (the value ANDed with the ROM byte at that
+ * address). Submapper 0 and iNES 1.0 files take `fallback`, the board's own default. */
+function latched(info: RomInfo, rom: number, value: number, fallback: 'and' | 'none'): number {
+  const rule = info.nes2 && info.submapper === 1 ? 'none' : info.nes2 && info.submapper === 2 ? 'and' : fallback;
+  return rule === 'and' ? value & rom : value;
+}
+
+/** Mapper 3 (CNROM): NROM's PRG, with 8 KiB CHR banks chosen by any write to $8000-$FFFF. Without a
+ * submapper the board's AND bus conflicts are kept, as the discrete board has them. */
 export class CNROM extends NROM {
   private chrBank = 0;
+  private readonly chrBanks: number;
+
+  constructor(info: RomInfo) {
+    super(info);
+    this.chrBanks = Math.max(1, info.chr.length >> 13);
+  }
 
   override cpuWrite(addr: number, value: number): void {
-    if (addr >= 0x8000) this.chrBank = value & this.cpuPeek(addr);
+    if (addr >= 0x8000) this.chrBank = latched(this.info, this.cpuPeek(addr), value, 'and') % this.chrBanks;
     else super.cpuWrite(addr, value);
   }
 
@@ -170,10 +184,68 @@ export class CNROM extends NROM {
   }
 }
 
+/** Mapper 2 (UxROM): the 16 KiB PRG bank chosen by any write to $8000-$FFFF at $8000-$BFFF, the last
+ * bank fixed at $C000-$FFFF; 8 KiB of CHR, unbanked; mirroring fixed by the header. All 8 bits of the
+ * register reach the ROM (4 MiB with an NES 2.0 header); a number past the bank count wraps. */
+export class UxROM extends NROM {
+  private bank = 0;
+  private readonly banks: number;
+  private readonly rom: Uint8Array;
+
+  constructor(info: RomInfo) {
+    super(info);
+    this.rom = info.prg;
+    this.banks = Math.max(1, info.prg.length >> 14);
+  }
+
+  override cpuPeek(addr: number): number {
+    if (addr >= 0xc000) return this.rom[((this.banks - 1) << 14) | (addr & 0x3fff)];
+    if (addr >= 0x8000) return this.rom[(this.bank << 14) | (addr & 0x3fff)];
+    return super.cpuPeek(addr);
+  }
+
+  override cpuWrite(addr: number, value: number): void {
+    if (addr >= 0x8000) this.bank = latched(this.info, this.cpuPeek(addr), value, 'none') % this.banks;
+    else super.cpuWrite(addr, value);
+  }
+}
+
+/** Mapper 7 (AxROM): the 32 KiB PRG bank in register bits 0-2 at $8000-$FFFF, and bit 4 choosing the
+ * 1 KiB of nametable RAM all four nametables show (single-screen). 8 KiB of CHR, unbanked. */
+export class AxROM extends NROM {
+  private bank = 0;
+  private readonly banks: number;
+  private readonly rom: Uint8Array;
+
+  constructor(info: RomInfo) {
+    super(info);
+    this.rom = info.prg;
+    this.banks = Math.max(1, info.prg.length >> 15);
+    this.mirroring = MIRROR_SINGLE_LOW;
+  }
+
+  override cpuPeek(addr: number): number {
+    if (addr >= 0x8000) return this.rom[((this.bank << 15) | (addr & 0x7fff)) % this.rom.length];
+    return super.cpuPeek(addr);
+  }
+
+  override cpuWrite(addr: number, value: number): void {
+    if (addr < 0x8000) {
+      super.cpuWrite(addr, value);
+      return;
+    }
+    const v = latched(this.info, this.cpuPeek(addr), value, 'none');
+    this.bank = (v & 0x07) % this.banks;
+    this.mirroring = v & 0x10 ? MIRROR_SINGLE_HIGH : MIRROR_SINGLE_LOW;
+  }
+}
+
 export function createMapper(info: RomInfo): Mapper {
   switch (info.mapper) {
     case 0: return new NROM(info);
+    case 2: return new UxROM(info);
     case 3: return new CNROM(info);
+    case 7: return new AxROM(info);
     default: throw new RomError(`mapper ${info.mapper} is not supported`);
   }
 }

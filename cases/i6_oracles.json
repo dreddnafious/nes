@@ -1,0 +1,67 @@
+{
+ "note": "I6's oracles: a mapper test ROM set and two homebrew programs on mappers 2 and 3. Fetched by hash into roms/cache/ (gitignored), never committed (Decided: oracle ROMs are fetched by hash; roms/LICENSES.md records each one's terms). Read by cases/i6_support.py. Holy Mapperel's ROMs are cut from its release archive: the archive is pinned by SHA-256, each ROM is a slice of one raw LZMA2 block of it (offset and size below), and the slice is pinned by its own SHA-256.",
+ "archives": [
+  {
+   "id": "holy-mapperel-0.02",
+   "path": "holy-mapperel/holy-mapperel-bin-0.02.7z",
+   "url": "https://github.com/pinobatch/holy-mapperel/releases/download/v0.02/holy-mapperel-bin-0.02.7z",
+   "sha256": "70f85671e21f293599baebb662faeb06a4c04e9c9ceb283d96d4197f09e4ce7a",
+   "author": "Damian Yerrick (PinoBatch)",
+   "licence": "zlib",
+   "blocks": [
+    {"offset": 32, "size": 5155},
+    {"offset": 5187, "size": 12103}
+   ]
+  }
+ ],
+ "oracles": [
+  {
+   "id": "holy-mapperel/M2_P128K_CR8K_V",
+   "path": "holy-mapperel/M2_P128K_CR8K_V.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 4061227,
+   "size": 131088,
+   "sha256": "c7e83755bd9adbb7c705ea9f29535442af7390444632f9f824fcf4c00632069b",
+   "board": "mapper 2 (UNROM): 128 KiB PRG, 8 KiB CHR-RAM, vertical mirroring, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M3_P32K_C32K_H",
+   "path": "holy-mapperel/M3_P32K_C32K_H.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 4323403,
+   "size": 65552,
+   "sha256": "499891c6d8c7a1e7631bdc601d9d624938842735f92fe1fda7b19ef9fae514b7",
+   "board": "mapper 3 (CNROM): 32 KiB PRG, 32 KiB CHR-ROM, horizontal mirroring, iNES 1.0"
+  },
+  {
+   "id": "holy-mapperel/M7_P128K_CR8K",
+   "path": "holy-mapperel/M7_P128K_CR8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 5847243,
+   "size": 131088,
+   "sha256": "4aa0050f36ae17e17701506821e5147df5b843bcdf2827468fa9c66e4b7ac1ba",
+   "board": "mapper 7 (AxROM): 128 KiB PRG, 8 KiB CHR-RAM, NES 2.0"
+  },
+  {
+   "id": "240pee",
+   "path": "240p-test-mini/v0.23/240pee.nes",
+   "url": "https://github.com/pinobatch/240p-test-mini/releases/download/v0.23/240pee.nes",
+   "sha256": "04f01d7372f66ea2befe325b9bd655a9fcc395a31fa46d9466286bb8f9d2e62e",
+   "author": "Damian Yerrick (PinoBatch), after Artemio Urbina's 240p Test Suite",
+   "licence": "GPL-2.0-or-later",
+   "board": "mapper 2 (UNROM): 64 KiB PRG, 8 KiB CHR-RAM, vertical mirroring, NES 2.0"
+  },
+  {
+   "id": "cheril-the-goddess",
+   "path": "mk1_nes/05_cheril_the_goddess_v1.nes",
+   "url": "https://raw.githubusercontent.com/mojontwins/MK1_NES/ec3fbccda9d8ca93e993568c03ba20d7d1570fb5/examples/05_cheril_the_goddess_v1/dev/cart.nes",
+   "sha256": "e03d52dd214a998997c003593d2d5921fd9679cea02a385d789f8e14d037ba16",
+   "author": "The Mojon Twins, 2015 (engine MK1 NES; neslib and famitone by Shiru)",
+   "licence": "engine LGPL-3.0; the examples 'free to produce'; game assets donationware (MK1_NES README)",
+   "board": "mapper 3 (CNROM): 32 KiB PRG, 32 KiB CHR-ROM, horizontal mirroring, iNES 1.0"
+  }
+ ]
+}

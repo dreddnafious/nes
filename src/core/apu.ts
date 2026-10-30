@@ -256,6 +256,10 @@ export class APU {
     this.triStep = 0;
     this.dmcLevel &= 1;
     this.dirty = true;
+    // The sample being averaged when Reset was pressed starts again: none of the sound from before
+    // the reset reaches a sample made after it (the timing, `phase`, runs on).
+    this.sum = 0;
+    this.summed = 0;
   }
 
   // ---- the stream ----
