@@ -8,3 +8,5 @@ __pycache__/
 *.pyc
 out/
 .pytest_cache/
+roms/cache/
+.oracle-src/
