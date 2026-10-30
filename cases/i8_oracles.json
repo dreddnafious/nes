@@ -1,0 +1,130 @@
+{
+ "note": "I8's oracles: MMC3 (mapper 4) test ROMs and one homebrew program on MMC3. Fetched by hash into roms/cache/ (gitignored), never committed (Decided: oracle ROMs are fetched by hash; roms/LICENSES.md records each one's terms). Read by cases/i8_support.py. Holy Mapperel's MMC3 builds (and its mapper-118 build, for the refusal) are cut from the same pinned v0.02 release archive I6 and I7 use: each ROM is a slice of the archive's second raw LZMA2 block, pinned by its own SHA-256. blargg's mmc3_test_2 singles come from christopherpow/nes-test-roms at the corpus's pinned commit; nesdoug's 33_MMC3 demo from its repository at a pinned commit.",
+ "collection": "christopherpow/nes-test-roms",
+ "commit": "95d8f621ae55cee0d09b91519a8989ae0e64753b",
+ "archives": [
+  {
+   "id": "holy-mapperel-0.02",
+   "path": "holy-mapperel/holy-mapperel-bin-0.02.7z",
+   "url": "https://github.com/pinobatch/holy-mapperel/releases/download/v0.02/holy-mapperel-bin-0.02.7z",
+   "sha256": "70f85671e21f293599baebb662faeb06a4c04e9c9ceb283d96d4197f09e4ce7a",
+   "author": "Damian Yerrick (PinoBatch)",
+   "licence": "zlib",
+   "blocks": [
+    {
+     "offset": 32,
+     "size": 5155
+    },
+    {
+     "offset": 5187,
+     "size": 12103
+    }
+   ]
+  }
+ ],
+ "oracles": [
+  {
+   "id": "mmc3_test_2/1-clocking",
+   "path": "mmc3_test_2/rom_singles/1-clocking.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/mmc3_test_2/rom_singles/1-clocking.nes",
+   "sha256": "b06d8a97f0ca672be92c841d6af7d1e650696e86e9cc0cf6eeb90d67a6ab499b",
+   "suite": "mmc3_test_2",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 4 (MMC3), iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, vertical; its $6000 protocol needs PRG-RAM it never enables through $A001"
+  },
+  {
+   "id": "mmc3_test_2/2-details",
+   "path": "mmc3_test_2/rom_singles/2-details.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/mmc3_test_2/rom_singles/2-details.nes",
+   "sha256": "e7af16c764b119e60effb7b1cfeec3dd8e2e657041283693cdbbeedb4081f1e3",
+   "suite": "mmc3_test_2",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 4 (MMC3), iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, vertical; its $6000 protocol needs PRG-RAM it never enables through $A001"
+  },
+  {
+   "id": "mmc3_test_2/3-A12_clocking",
+   "path": "mmc3_test_2/rom_singles/3-A12_clocking.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/mmc3_test_2/rom_singles/3-A12_clocking.nes",
+   "sha256": "b375f15b9f9d372c8084b9c50928be9e41a3ac48be831ce82d203c18891433ad",
+   "suite": "mmc3_test_2",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 4 (MMC3), iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, vertical; its $6000 protocol needs PRG-RAM it never enables through $A001"
+  },
+  {
+   "id": "mmc3_test_2/4-scanline_timing",
+   "path": "mmc3_test_2/rom_singles/4-scanline_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/mmc3_test_2/rom_singles/4-scanline_timing.nes",
+   "sha256": "14a220b9d1272acc7a820ab38e9762a7cdf2d54c65e753be87f23dfcaf1bb845",
+   "suite": "mmc3_test_2",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 4 (MMC3), iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, vertical; its $6000 protocol needs PRG-RAM it never enables through $A001"
+  },
+  {
+   "id": "mmc3_test_2/5-MMC3",
+   "path": "mmc3_test_2/rom_singles/5-MMC3.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/mmc3_test_2/rom_singles/5-MMC3.nes",
+   "sha256": "e0824123d60b83868dac1189b28250f8e10376a01be468a5a74aa59937cb32ca",
+   "suite": "mmc3_test_2",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 4 (MMC3), iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, vertical; its $6000 protocol needs PRG-RAM it never enables through $A001"
+  },
+  {
+   "id": "mmc3_test_2/6-MMC3_alt",
+   "path": "mmc3_test_2/rom_singles/6-MMC3_alt.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/mmc3_test_2/rom_singles/6-MMC3_alt.nes",
+   "sha256": "56698b6918453d161a8d4e51f66e363d6966b054939c8176c53c401a6b55269b",
+   "suite": "mmc3_test_2",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 4 (MMC3), iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM, vertical; its $6000 protocol needs PRG-RAM it never enables through $A001"
+  },
+  {
+   "id": "holy-mapperel/M4_P128K_CR8K",
+   "path": "holy-mapperel/M4_P128K_CR8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 4520043,
+   "size": 131088,
+   "sha256": "edb301630dae50a8470c1fb914f436434a150c886d9537d072275b751a9b4125",
+   "board": "mapper 4 (TGROM): 128 KiB PRG, 8 KiB CHR-RAM, no PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M4_P128K_CR32K",
+   "path": "holy-mapperel/M4_P128K_CR32K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 4388955,
+   "size": 131088,
+   "sha256": "428387f3178e1b594f9932af1138e1c5f60f1e0b30ec2f89f5f3c142db1af72d",
+   "board": "mapper 4 (TFROM-class): 128 KiB PRG, 32 KiB CHR-RAM (NES 2.0 byte 11), no PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M4_P256K_C256K",
+   "path": "holy-mapperel/M4_P256K_C256K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 4651131,
+   "size": 524304,
+   "sha256": "278041824af3a0530d6a1367fa1a1d3bb544d2dd1e97ad8372673f7fe0379b17",
+   "board": "mapper 4 (TLROM): 256 KiB PRG, 256 KiB CHR-ROM, no PRG-RAM, NES 2.0 (a 512 KiB file)"
+  },
+  {
+   "id": "holy-mapperel/M118_P128K_C64K",
+   "path": "holy-mapperel/M118_P128K_C64K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 554827,
+   "size": 196624,
+   "sha256": "a8439589f83ae14c66c53dbfea3b139c6b9dd7f22b44ec24108b0655e0979cfd",
+   "board": "mapper 118 (TKSROM/TLSROM, an MMC3 board on other wiring): 128 KiB PRG, 64 KiB CHR-ROM, iNES 1.0; refused by I8"
+  },
+  {
+   "id": "nesdoug-33_MMC3",
+   "path": "nesdoug-33_MMC3/d03805b/hello_mmc3.nes",
+   "url": "https://raw.githubusercontent.com/nesdoug/33_MMC3/d03805b13ed0d4d696744a8f6ad578e9882fc0eb/BUILD/hello_mmc3.nes",
+   "sha256": "4fe7f2bec4823c1194744a5e53d1f917cedb804d4cc5fabed9460a316a7dfe68",
+   "author": "Doug Fraker (nesdoug), 2019-2023; neslib by Shiru; MMC1 banked_call by cppchriscpp (MIT)",
+   "licence": "MIT (the 33_MMC3 repository's License.txt, \"Copyright (c) 2019 Doug Fraker\")",
+   "board": "mapper 4 (MMC3), iNES 1.0: 128 KiB PRG, 128 KiB CHR-ROM, 8 KiB PRG-RAM (byte 8 = 1), no battery"
+  }
+ ]
+}

@@ -76,9 +76,17 @@ export class PPU {
   private drawn = 0;
 
   private mapper: Mapper;
+  /** PPU dots since power-on. */
+  private ticks = 0;
+  /** Whether the cartridge watches PPU A12 (the MMC3's counter), and A12 as it last saw it. */
+  private readonly a12Watch: boolean;
+  private a12 = 0;
+  /** A12 of each of this line's eight sprite pattern fetches (dots 257-320), one bit per slot. */
+  private spA12 = 0;
 
   constructor(mapper: Mapper) {
     this.mapper = mapper;
+    this.a12Watch = typeof mapper.ppuA12 === 'function';
   }
 
   /** The PPU's part of the Reset button: $2000, $2001, the write toggle and the read buffer clear. */
@@ -100,12 +108,16 @@ export class PPU {
   step(): void {
     const line = this.scanline;
     const dot = this.dot;
+    this.ticks++;
     if (line < HEIGHT || line === PRERENDER_LINE) {
       if (line === PRERENDER_LINE && dot === 1) {
         this.status &= 0x1f;  // vblank, sprite-0 hit and overflow clear
         this.updateNmi();
       }
-      if ((this.mask & 0x18) !== 0) this.render(line, dot);
+      if ((this.mask & 0x18) !== 0) {
+        this.render(line, dot);
+        if (this.a12Watch) this.fetchA12(dot);
+      }
       if (dot === 257 && line < HEIGHT) this.finishLine();
       else if (dot === 338 && line === PRERENDER_LINE) this.skipDot = this.oddFrame && (this.mask & 0x18) !== 0;
     } else if (line === VBLANK_LINE && dot === 1) {
@@ -158,6 +170,7 @@ export class PPU {
     } else if (dot === 257) {
       this.v = (this.v & ~0x041f) | (this.t & 0x041f);
       this.oamAddr = 0;
+      if (this.a12Watch) this.spA12 = this.spriteA12();
       if (line < HEIGHT) this.fetchSprites(line);
     } else if (dot >= 280 && dot <= 304) {
       if (line === PRERENDER_LINE) this.v = (this.v & ~0x7be0) | (this.t & 0x7be0);
@@ -165,6 +178,44 @@ export class PPU {
       this.fetchTile(dot - 328);
       this.incHori();
     }
+  }
+
+  /** PPU A12 on this dot of a rendering line: each 8-dot fetch group puts its nametable and attribute
+   * addresses (A12 low) on the bus for 4 dots, then its two pattern addresses for 4: the background's
+   * table (dots 1-256, 321-336) or each sprite slot's (257-320). Dots 0 and 337-340 fetch nametables. */
+  private fetchA12(dot: number): void {
+    let high = 0;
+    if (dot >= 257 && dot <= 320) {
+      if ((dot - 257) & 4) high = (this.spA12 >> ((dot - 257) >> 3)) & 1;
+    } else if (dot >= 1 && dot <= 336) {
+      if ((dot - 1) & 4) high = (this.ctrl >> 4) & 1;
+    }
+    if (high !== this.a12) this.setA12(high);
+  }
+
+  /** The A12 of the eight sprite slots' pattern fetches: 8x8 sprites from $2000 bit 3's table; 8x16 from
+   * each found sprite's tile bit 0, and tile $FF (the right table) for the slots left over. */
+  private spriteA12(): number {
+    if (!(this.ctrl & 0x20)) return this.ctrl & 0x08 ? 0xff : 0;
+    let m = 0xff;
+    for (let i = 0; i < this.secondaryCount; i++) {
+      if (!(this.oam[(this.secondary[i] << 2) + 1] & 1)) m &= ~(1 << i);
+    }
+    return m;
+  }
+
+  private setA12(high: number): void {
+    this.a12 = high;
+    this.mapper.ppuA12!(high, this.ticks);
+  }
+
+  /** Outside the rendering fetches the PPU's address bus holds v: a $2006 write or a $2007 access that
+   * moves it shows on A12. */
+  private busFromV(): void {
+    if (!this.a12Watch) return;
+    if ((this.mask & 0x18) !== 0 && (this.scanline < HEIGHT || this.scanline === PRERENDER_LINE)) return;
+    const high = (this.v >> 12) & 1;
+    if (high !== this.a12) this.setA12(high);
   }
 
   private incHori(): void {
@@ -426,6 +477,7 @@ export class PPU {
           this.refresh(v, 0xff);
         }
         this.v = (this.v + (this.ctrl & 0x04 ? 32 : 1)) & 0x7fff;
+        this.busFromV();
         return v;
       }
       default:
@@ -467,12 +519,14 @@ export class PPU {
         } else {
           this.t = (this.t & 0x7f00) | value;
           this.v = this.t;
+          this.busFromV();
         }
         this.w ^= 1;
         break;
       case 7:
         this.memWrite(this.v, value);
         this.v = (this.v + (this.ctrl & 0x04 ? 32 : 1)) & 0x7fff;
+        this.busFromV();
         break;
     }
   }
