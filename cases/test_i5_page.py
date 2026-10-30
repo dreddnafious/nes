@@ -80,8 +80,7 @@ def test_j3_a_long_sitting_stays_smooth(site, browser, tmp_path):
         tab.wait(55)
         heap1 = tab.heap()
         tab.wait(10)
-        before = tab.page.evaluate("window.nesTest.frames")
-        tab.hide()
+        before = tab.hide()
         tab.wait(12)
         hidden_frames = tab.page.evaluate("window.nesTest.frames") - before
         n_before_show = len(tab.ticks())
