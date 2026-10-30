@@ -105,7 +105,8 @@ export interface Mapper {
   cpuRead(addr: number): number;
   /** The same read with no side effects. */
   cpuPeek(addr: number): number;
-  cpuWrite(addr: number, value: number): void;
+  /** A CPU write at $4020-$FFFF, made on CPU cycle `cycle` (cycles since power-on). */
+  cpuWrite(addr: number, value: number, cycle: number): void;
   chrRead(addr: number): number;
   chrWrite(addr: number, value: number): void;
 }
@@ -240,9 +241,142 @@ export class AxROM extends NROM {
   }
 }
 
+/** Mapper 1 (MMC1B, the SxROM boards). Spec: https://www.nesdev.org/wiki/MMC1
+ * - The serial port ($8000-$FFFF): bit 7 set clears the shift register and ORs control with $0C;
+ *   otherwise bit 0 is shifted in, low bit first, and the fifth write loads the register its
+ *   address's bits 14-13 pick (control, CHR bank 0, CHR bank 1, PRG bank). A write on the cycle right
+ *   after another (a read-modify-write's second) is ignored, unless it's a bit-7 reset.
+ * - Control: bits 1-0 mirroring (one-screen A, one-screen B, vertical, horizontal); bits 3-2 PRG mode
+ *   (0/1 32 KiB, 2 first bank fixed at $8000, 3 last bank fixed at $C000); bit 4 CHR mode (8/4 KiB).
+ * - PRG bank bits 3-0 the 16 KiB bank; bit 4 disables PRG-RAM (MMC1B). No bus conflicts.
+ * - SUROM/SXROM (512 KiB PRG): CHR bank 0 bit 4 picks the 256 KiB half, the fixed bank included.
+ *   SXROM/SOROM (32/16 KiB PRG-RAM): CHR bank 0 bits 3-2 (bit 3) pick the 8 KiB PRG-RAM bank.
+ * - PRG-RAM: the NES 2.0 header's size (0: none); an iNES 1.0 file gets 8 KiB.
+ * - NES 2.0 submapper 5 (SEROM, SHROM, SH1ROM): 32 KiB of PRG, not banked. */
+export class MMC1 implements Mapper {
+  readonly info: RomInfo;
+  mirroring = MIRROR_SINGLE_LOW;
+  readonly prgRam: Uint8Array;
+  private readonly prg: Uint8Array;
+  private readonly chr: Uint8Array;
+  // Power-on: unknown on hardware; chosen as control $0C (the last bank fixed at $C000), the rest 0.
+  private control = 0x0c;
+  private chr0 = 0;
+  private chr1 = 0;
+  private prgBank = 0;
+  private shift = 0;
+  private shiftCount = 0;
+  private lastWrite = -2;
+  /** Offsets into PRG for $8000 and $C000, CHR for $0000 and $1000, PRG-RAM for $6000 (-1 disabled). */
+  private prgLo = 0;
+  private prgHi = 0;
+  private chrLo = 0;
+  private chrHi = 0;
+  private ramBase = -1;
+
+  constructor(info: RomInfo) {
+    this.info = info;
+    this.prg = info.prg;
+    this.chr = info.chr;
+    this.prgRam = new Uint8Array(info.nes2 ? info.prgRamSize : 0x2000);
+    this.update();
+  }
+
+  private update(): void {
+    const c = this.control;
+    this.mirroring = [MIRROR_SINGLE_LOW, MIRROR_SINGLE_HIGH, MIRROR_VERTICAL, MIRROR_HORIZONTAL][c & 3];
+    const banks = this.prg.length >> 14;
+    if (this.info.nes2 && this.info.submapper === 5) {
+      this.prgLo = 0;
+      this.prgHi = banks > 1 ? 0x4000 : 0;
+    } else {
+      // 512 KiB: the outer 256 KiB half from CHR bank 0 bit 4; the 16 banks of a half wrap within it.
+      const outer = banks > 16 && (this.chr0 & 0x10) ? 16 : 0;
+      const per = Math.min(16, banks);
+      const bank = (b: number): number => (outer + (b % per)) << 14;
+      const mode = (c >> 2) & 3;
+      const reg = this.prgBank & 0x0f;
+      if (mode < 2) {
+        this.prgLo = bank(reg & 0x0e);
+        this.prgHi = bank((reg & 0x0e) | 1);
+      } else if (mode === 2) {
+        this.prgLo = bank(0);
+        this.prgHi = bank(reg);
+      } else {
+        this.prgLo = bank(reg);
+        this.prgHi = bank(per - 1);
+      }
+    }
+    const chrLen = this.chr.length;
+    if (c & 0x10) {
+      this.chrLo = (this.chr0 << 12) % chrLen;
+      this.chrHi = (this.chr1 << 12) % chrLen;
+    } else {
+      this.chrLo = ((this.chr0 & 0x1e) << 12) % chrLen;
+      this.chrHi = (this.chrLo + 0x1000) % chrLen;
+    }
+    const ram = this.prgRam.length;
+    if (ram === 0 || (this.prgBank & 0x10)) {
+      this.ramBase = -1;
+    } else {
+      const ramBank = ram >= 0x8000 ? (this.chr0 >> 2) & 3 : ram >= 0x4000 ? (this.chr0 >> 3) & 1 : 0;
+      this.ramBase = (ramBank << 13) % ram;
+    }
+  }
+
+  cpuRead(addr: number): number {
+    return this.cpuPeek(addr);
+  }
+
+  cpuPeek(addr: number): number {
+    if (addr >= 0xc000) return this.prg[this.prgHi | (addr & 0x3fff)];
+    if (addr >= 0x8000) return this.prg[this.prgLo | (addr & 0x3fff)];
+    if (addr >= 0x6000 && this.ramBase >= 0) return this.prgRam[this.ramBase + ((addr & 0x1fff) % this.prgRam.length)];
+    return -1;
+  }
+
+  cpuWrite(addr: number, value: number, cycle: number): void {
+    if (addr < 0x8000) {
+      if (addr >= 0x6000 && this.ramBase >= 0) this.prgRam[this.ramBase + ((addr & 0x1fff) % this.prgRam.length)] = value;
+      return;
+    }
+    const consecutive = cycle - this.lastWrite === 1;
+    this.lastWrite = cycle;
+    if (value & 0x80) {
+      this.shift = 0;
+      this.shiftCount = 0;
+      this.control |= 0x0c;
+      this.update();
+      return;
+    }
+    if (consecutive) return;
+    this.shift |= (value & 1) << this.shiftCount;
+    if (++this.shiftCount < 5) return;
+    const v = this.shift;
+    this.shift = 0;
+    this.shiftCount = 0;
+    switch ((addr >> 13) & 3) {
+      case 0: this.control = v; break;
+      case 1: this.chr0 = v; break;
+      case 2: this.chr1 = v; break;
+      default: this.prgBank = v;
+    }
+    this.update();
+  }
+
+  chrRead(addr: number): number {
+    return this.chr[(addr & 0x1000 ? this.chrHi : this.chrLo) | (addr & 0x0fff)];
+  }
+
+  chrWrite(addr: number, value: number): void {
+    if (this.info.chrIsRam) this.chr[(addr & 0x1000 ? this.chrHi : this.chrLo) | (addr & 0x0fff)] = value;
+  }
+}
+
 export function createMapper(info: RomInfo): Mapper {
   switch (info.mapper) {
     case 0: return new NROM(info);
+    case 1: return new MMC1(info);
     case 2: return new UxROM(info);
     case 3: return new CNROM(info);
     case 7: return new AxROM(info);

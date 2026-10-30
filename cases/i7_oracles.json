@@ -1,0 +1,198 @@
+{
+ "note": "I7's oracles: MMC1 (mapper 1) test ROMs and two homebrew games on MMC1. Fetched by hash into roms/cache/ (gitignored), never committed (Decided: oracle ROMs are fetched by hash; roms/LICENSES.md records each one's terms). Read by cases/i7_support.py. Holy Mapperel's MMC1 builds are cut from the same pinned v0.02 release archive as I6's: each ROM is a slice of one raw LZMA2 block of it (offset and size below), pinned by its own SHA-256. blargg's multi-test builds come from christopherpow/nes-test-roms at the corpus's pinned commit.",
+ "collection": "christopherpow/nes-test-roms",
+ "commit": "95d8f621ae55cee0d09b91519a8989ae0e64753b",
+ "archives": [
+  {
+   "id": "holy-mapperel-0.02",
+   "path": "holy-mapperel/holy-mapperel-bin-0.02.7z",
+   "url": "https://github.com/pinobatch/holy-mapperel/releases/download/v0.02/holy-mapperel-bin-0.02.7z",
+   "sha256": "70f85671e21f293599baebb662faeb06a4c04e9c9ceb283d96d4197f09e4ce7a",
+   "author": "Damian Yerrick (PinoBatch)",
+   "licence": "zlib",
+   "blocks": [
+    {
+     "offset": 32,
+     "size": 5155
+    },
+    {
+     "offset": 5187,
+     "size": 12103
+    }
+   ]
+  }
+ ],
+ "oracles": [
+  {
+   "id": "holy-mapperel/M1_P128K_C128K",
+   "path": "holy-mapperel/M1_P128K_C128K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 1079179,
+   "size": 262160,
+   "sha256": "a3f520601c1cc92842f02b415b803d6b8c95bbf0c34ff6baaca34a79b127765b",
+   "board": "mapper 1 (SLROM): 128 KiB PRG, 128 KiB CHR-ROM, no PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P128K_C128K_S8K",
+   "path": "holy-mapperel/M1_P128K_C128K_S8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 1341339,
+   "size": 262160,
+   "sha256": "2263d212fe9c8e857f89c846962e7e78f3ba885e1413644b94e50cfff65ecd08",
+   "board": "mapper 1 (SKROM): 128 KiB PRG, 128 KiB CHR-ROM, 8 KiB battery-backed PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P128K_C128K_W8K",
+   "path": "holy-mapperel/M1_P128K_C128K_W8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 1603499,
+   "size": 262160,
+   "sha256": "f1d76578b70617d49440c123a30b40f5c6b4a53836aa50fb078c734bac8e0868",
+   "board": "mapper 1 (SKROM): 128 KiB PRG, 128 KiB CHR-ROM, 8 KiB PRG-RAM (no battery), NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P128K_C32K",
+   "path": "holy-mapperel/M1_P128K_C32K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 1865659,
+   "size": 163856,
+   "sha256": "77f77f779720741185bc07442d16dee6b99856ab8ccdb20762cde17570d0e88e",
+   "board": "mapper 1 (SFROM): 128 KiB PRG, 32 KiB CHR-ROM, no PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P128K_C32K_S8K",
+   "path": "holy-mapperel/M1_P128K_C32K_S8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 2029515,
+   "size": 163856,
+   "sha256": "c6101b411ee99f6b0c8e6ec0abe32b9fcfa5c32cef8017dd728bb3c992d16efd",
+   "board": "mapper 1 (SJROM): 128 KiB PRG, 32 KiB CHR-ROM, 8 KiB battery-backed PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P128K_C32K_W8K",
+   "path": "holy-mapperel/M1_P128K_C32K_W8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 2193371,
+   "size": 163856,
+   "sha256": "3d330d32bb45d41ce6c9666b80f580ff2912444b44f833ee89d062794abdfe32",
+   "board": "mapper 1 (SJROM): 128 KiB PRG, 32 KiB CHR-ROM, 8 KiB PRG-RAM (no battery), NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P128K_CR8K",
+   "path": "holy-mapperel/M1_P128K_CR8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 2357227,
+   "size": 131088,
+   "sha256": "0595f0896d71d6e54ad19b00a2cdfb6d1665e3166167a06935c5971105ed5793",
+   "board": "mapper 1 (SGROM): 128 KiB PRG, 8 KiB CHR-RAM, no PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P512K_CR8K_S32K",
+   "path": "holy-mapperel/M1_P512K_CR8K_S32K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 2488315,
+   "size": 524304,
+   "sha256": "7db5b5191ce842d44a5a8cb132a58d7116741053d4bd0f8a5def832be80e655a",
+   "board": "mapper 1 (SXROM): 512 KiB PRG, 8 KiB CHR-RAM, 32 KiB battery-backed PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "holy-mapperel/M1_P512K_CR8K_S8K",
+   "path": "holy-mapperel/M1_P512K_CR8K_S8K.nes",
+   "archive": "holy-mapperel-0.02",
+   "block": 1,
+   "offset": 3012619,
+   "size": 524304,
+   "sha256": "c3f239ea8f2fa1023a272b5e1b5add884b583e79ffd6487771cc53a1f4566b5c",
+   "board": "mapper 1 (SUROM): 512 KiB PRG, 8 KiB CHR-RAM, 8 KiB battery-backed PRG-RAM, NES 2.0"
+  },
+  {
+   "id": "instr_test-v5/all_instrs",
+   "path": "instr_test-v5/all_instrs.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/instr_test-v5/all_instrs.nes",
+   "sha256": "353870c157242e3d428ef7387109deaee0d2e158bdb432ab9aae4e657072c785",
+   "suite": "instr_test-v5",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 1, iNES 1.0: 256 KiB PRG (16 banks), 8 KiB CHR-RAM"
+  },
+  {
+   "id": "instr_test-v5/official_only",
+   "path": "instr_test-v5/official_only.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/instr_test-v5/official_only.nes",
+   "sha256": "589b8835deb5cbc69618dac193a3dbd675540f7f2794e2d2a92e97beb8abc3cb",
+   "suite": "instr_test-v5",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 1, iNES 1.0: 256 KiB PRG, 8 KiB CHR-RAM"
+  },
+  {
+   "id": "instr_timing/instr_timing",
+   "path": "instr_timing/instr_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/instr_timing/instr_timing.nes",
+   "sha256": "3d1bca14266f1e25b75a34ddd29c9df1ce9c6d990c8663a218f72e7861660fb0",
+   "suite": "instr_timing",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 1, iNES 1.0: 32 KiB PRG, 8 KiB CHR-RAM"
+  },
+  {
+   "id": "instr_misc/instr_misc",
+   "path": "instr_misc/instr_misc.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/instr_misc/instr_misc.nes",
+   "sha256": "b6762e20a285216304dfd2b5e1f192459354b23a5e48b2f5f9fb7cb0dac51243",
+   "suite": "instr_misc",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 1, iNES 1.0: 64 KiB PRG, 8 KiB CHR-RAM"
+  },
+  {
+   "id": "cpu_interrupts_v2/cpu_interrupts",
+   "path": "cpu_interrupts_v2/cpu_interrupts.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/cpu_interrupts_v2/cpu_interrupts.nes",
+   "sha256": "ccbac4e824eb96ecfe8b82d331a083be186eb6776aa57e25c52251eaf7df9c4f",
+   "suite": "cpu_interrupts_v2",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 1, iNES 1.0: 80 KiB PRG (5 banks), 8 KiB CHR-RAM"
+  },
+  {
+   "id": "ppu_vbl_nmi/ppu_vbl_nmi",
+   "path": "ppu_vbl_nmi/ppu_vbl_nmi.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/ppu_vbl_nmi/ppu_vbl_nmi.nes",
+   "sha256": "8dbab1be785585c399cf055ef02147b788ab75fd80e81cf9568a2feafc03fb7d",
+   "suite": "ppu_vbl_nmi",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 1, iNES 1.0: 256 KiB PRG, 8 KiB CHR-RAM"
+  },
+  {
+   "id": "apu_test/apu_test",
+   "path": "apu_test/apu_test.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/apu_test.nes",
+   "sha256": "00d4722bae1c82a14528dd3220462d3fb9ce4b14b8cec996619dea23e07fef0a",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)",
+   "board": "mapper 1, iNES 1.0: 128 KiB PRG, 8 KiB CHR-RAM"
+  },
+  {
+   "id": "nova-the-squirrel",
+   "path": "nova-the-squirrel/v1.0.6a/nova.nes",
+   "url": "https://github.com/NovaSquirrel/NovaTheSquirrel/releases/download/v1.0.6a/nova.nes",
+   "sha256": "e4780e90b9d1587489bfb797d2ca395be21371ea9262fa9f87f99324ec6960ab",
+   "author": "NovaSquirrel, 2014-2019",
+   "licence": "code GPL-3.0-or-later; assets CC BY-NC-SA 4.0 (README 'License')",
+   "board": "mapper 1 (SXROM-style): 256 KiB PRG, 8 KiB CHR-RAM, 32 KiB battery-backed PRG-RAM, vertical, NES 2.0"
+  },
+  {
+   "id": "minekart-madness",
+   "path": "minekart-madness/v1.0/minekart_madness_mmc1.nes",
+   "url": "https://github.com/mhughson/mbh-cart/releases/download/v1.0/minekart_madness_mmc1.nes",
+   "sha256": "45d18d8b3662e6c08043759e550e658bcd23e48394a00f24de5e5fbe57e4900a",
+   "author": "Matt Hughson (design, code), Haller Zoltan (art), TUI (music, sfx), 2022; neslib and famitone by Shiru",
+   "licence": "MIT (the mbh-cart repository's LICENSE)",
+   "board": "mapper 1 (SKROM): 128 KiB PRG, 128 KiB CHR-ROM, 8 KiB battery-backed PRG-RAM, vertical, NES 2.0"
+  }
+ ]
+}

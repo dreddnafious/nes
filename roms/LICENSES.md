@@ -33,6 +33,8 @@ allowed, redistribution not stated). A game whose terms are unclear isn't used.
 | `nes15-1.0.0/gfx/title.nam`, `bgd.pal`, `spr.pal` | the title screen's name table and the two palettes, from the game's published source | | the same BSD licence | no: fetched by hash; the I3 cases build the title's expected picture from them |
 | `MK1_NES/examples/05_cheril_the_goddess_v1/dev/cart.nes` | *Cheril the Goddess* (v1), The Mojon Twins, 2015 | 3 (CNROM: 32 KiB PRG, 32 KiB CHR-ROM, horizontal) | engine LGPL-3.0; the README: the example games "are now free to produce, which means you can put them into carts and sell them, as long as you tell us first"; "the game assets ... are donationware". Its title screen says "COPYLEFT 2015 BY THE MOJON TWINS". Use allowed; redistribution of the ROM file isn't stated in so many words | **no: fetched by hash** (`cases/i6_oracles.json`, from `mojontwins/MK1_NES` at commit `ec3fbcc…`, sha256 `e03d52dd214a998997c003593d2d5921fd9679cea02a385d789f8e14d037ba16`) |
 | `240pee.nes` (v0.23) | *240p Test Suite* for NES, Damian Yerrick (PinoBatch), after Artemio Urbina's 240p Test Suite | 2 (UNROM: 64 KiB PRG, 8 KiB CHR-RAM, vertical, NES 2.0) | GPL-2.0-or-later (README: "free software under the GNU General Public License, version 2 or later"; the GitHub repo's licence is GPL-2.0) | **no: fetched by hash** (`cases/i6_oracles.json`, the `v0.23` release asset of `pinobatch/240p-test-mini`, sha256 `04f01d7372f66ea2befe325b9bd655a9fcc395a31fa46d9466286bb8f9d2e62e`); Decided: oracle ROMs are fetched by hash. A test utility, not a game: it boots and plays but has no end, so it isn't counted in Reach |
+| `nova-the-squirrel/v1.0.6a/nova.nes` | *Nova the Squirrel* v1.0.6a, NovaSquirrel, 2014-2019 | 1 (MMC1, SXROM-style: 256 KiB PRG, 8 KiB CHR-RAM, 32 KiB battery-backed PRG-RAM, vertical, NES 2.0) | code GPL-3.0-or-later (repo `LICENSE.txt`; README "All code is available under the GPL license version 3 or later"); assets CC BY-NC-SA 4.0 (README: "the game may not be sold without permission ... Permission is not granted to use the character and design of Nova in anything else"). Redistribution allowed (non-commercial, attributed) | **no: fetched by hash** (`cases/i7_oracles.json`, the `v1.0.6a` release asset of `NovaSquirrel/NovaTheSquirrel`, sha256 `e4780e90b9d1587489bfb797d2ca395be21371ea9262fa9f87f99324ec6960ab`); Decided: oracle ROMs are fetched by hash. The README says the game "takes inspiration from" commercial games and was made "without copyright infringement" |
+| `minekart-madness/v1.0/minekart_madness_mmc1.nes` | *Minekart Madness* v1.0 (MMC1 build), Matt Hughson (design, code), Haller Zoltan (art), TUI (music, sfx), 2022; neslib/famitone by Shiru | 1 (MMC1, SKROM: 128 KiB PRG, 128 KiB CHR-ROM, 8 KiB battery PRG-RAM, vertical, NES 2.0) | MIT (the `mhughson/mbh-cart` repository's `LICENSE`, "Copyright (c) 2022 Matthew Hughson"); the release notes: "an MMC1 Mapper version of the game, which is compatible with every emulator". The art and music are credited to others on its own credits screen; the MIT grant is the repository owner's | **no: fetched by hash** (`cases/i7_oracles.json`, the `v1.0` release asset of `mhughson/mbh-cart`, sha256 `45d18d8b3662e6c08043759e550e658bcd23e48394a00f24de5e5fbe57e4900a`): the contributors' own terms for the art and music aren't stated apart from the repository's licence |
 
 - **nes15's source:** the copy in `christopherpow/nes-test-roms` at commit `95d8f62…` (the directory
   `nes15-1.0.0/`, which carries the author's own `LICENSE`, `README` and source). The README states "This
@@ -83,3 +85,23 @@ readme or source, no machine-readable result), `pal_apu_tests` (PAL; Decided Q4 
   `other/oam3.nes`, `other/quantum_disco_brothers_by_wAMMA.nes`, `other/CMC80s.NES`, `other/TANESPOT.NES`)
   carry no author's terms that could be checked; the collection's `240pee/240pee.nes` is an older build of
   the same 240p Test Suite, replaced by the author's own tagged release.
+
+## MMC1 test ROMs (I7's oracles): fetched by hash, not committed
+| Suite | Author | Checks |
+|---|---|---|
+| Holy Mapperel v0.02, SxROM builds (`M1_P128K_C128K`, `_C128K_S8K`, `_C128K_W8K`, `_C32K`, `_C32K_S8K`, `_C32K_W8K`, `_CR8K`, `M1_P512K_CR8K_S8K`, `_S32K`) | Damian Yerrick (PinoBatch), 2013-2017 | Detects the MMC1 board from its NES 2.0 sizes and behaviour, reads back every PRG and CHR bank's tag and every PRG-RAM byte, and shows the result on screen. |
+| Multi-test builds: `instr_test-v5` (`all_instrs`, `official_only`), `instr_timing`, `instr_misc`, `cpu_interrupts_v2`, `ppu_vbl_nmi`, `apu_test` | Shay Green (blargg) | The same tests as the single-test builds the corpus runs on NROM, packed one per PRG bank of an MMC1 cartridge; report through `$6000`. |
+
+- **Source and terms:** Holy Mapperel as for I6 (the pinned `holy-mapperel-bin-0.02.7z` release asset,
+  zlib licence; each ROM a pinned slice of one of its LZMA2 blocks). The blargg builds from
+  `christopherpow/nes-test-roms` at commit `95d8f62…`, with the same terms as the test ROMs above (no
+  licence granting redistribution). All pinned by SHA-256 in `cases/i7_oracles.json`.
+- **Left out, and why:** `MMC1_A12/mmc1_a12.nes` (Bregalad; no readme or stated terms, judged by eye, and
+  it checks SNROM's PRG-RAM disable, which the wiki says is "not strictly required"); `blargg_nes_cpu_test5`
+  (screen-only, and its tests are covered by `instr_test-v5`); the collection's other mapper-1 files
+  (`other/8bitpeoples_-_deadline_console_invitro.nes`, `other/midscanline.nes`, `other/pulsar.nes`,
+  `blargg_litewall`, `scrolltest/scroll.nes`): demos whose authors' terms couldn't be checked.
+- **Homebrew looked at and left out:** *Lizard* (Brad Smith; source CC BY 4.0, but its assets "may not be
+  reused or redistributed" and the ROM is only on itch.io), *Raven's Gate* (MMC1 build, a commercial
+  pay-what-you-want release), and PinoBatch's *Thwaite*, *Concentration Room* and *RHDE* and
+  NovaSquirrel's *DABG* (their release headers say mapper 0, NROM).
