@@ -1,0 +1,303 @@
+{
+ "collection": "christopherpow/nes-test-roms",
+ "commit": "95d8f621ae55cee0d09b91519a8989ae0e64753b",
+ "note": "I4's oracles: the APU, frame-counter IRQ, DMC DMA and interrupt test ROMs. Fetched by hash into roms/cache/ (gitignored); never committed: these files carry no explicit redistribution licence (see roms/LICENSES.md). Read by cases/i4_support.py.",
+ "oracles": [
+  {
+   "id": "apu_test/1-len_ctr",
+   "path": "apu_test/rom_singles/1-len_ctr.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/1-len_ctr.nes",
+   "sha256": "aacf86c1d773badd11392e54506a43a06a3dd0b67a4c255909d1daf770a4a1e2",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_test/2-len_table",
+   "path": "apu_test/rom_singles/2-len_table.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/2-len_table.nes",
+   "sha256": "c002ff1483b4dfb36a6eb004d49739cd58a2dff16e0bac167d5a7c12235caeeb",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_test/3-irq_flag",
+   "path": "apu_test/rom_singles/3-irq_flag.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/3-irq_flag.nes",
+   "sha256": "dd888551665937391a2d691b1f96d1858316dbfce4951306146e9e396367f079",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_test/4-jitter",
+   "path": "apu_test/rom_singles/4-jitter.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/4-jitter.nes",
+   "sha256": "bff573d72d0f134fe307f0bb8b968b8d2ffdb85e8aadad9c152839068d6db32a",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_test/5-len_timing",
+   "path": "apu_test/rom_singles/5-len_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/5-len_timing.nes",
+   "sha256": "4d88f8cc0b21303dc151af4d0f4169d79284634a73082d7ea1ae5cfafedd1e46",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_test/6-irq_flag_timing",
+   "path": "apu_test/rom_singles/6-irq_flag_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/6-irq_flag_timing.nes",
+   "sha256": "fc1daff82dd1a49c7c1242392ffbf1c6f44fb70156868582117f2a844cc4dffd",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_test/7-dmc_basics",
+   "path": "apu_test/rom_singles/7-dmc_basics.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/7-dmc_basics.nes",
+   "sha256": "547324867ee0ba2aa11401001d8d1288530aa4e0ecaaac1667ce79980a388ec1",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_test/8-dmc_rates",
+   "path": "apu_test/rom_singles/8-dmc_rates.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_test/rom_singles/8-dmc_rates.nes",
+   "sha256": "5d9a79a505b37fa277cacc95a362f7e2a56e59ace7a698213d78432cc06a8867",
+   "suite": "apu_test",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/01.len_ctr",
+   "path": "blargg_apu_2005.07.30/01.len_ctr.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/01.len_ctr.nes",
+   "sha256": "e1e3a29ab5369ab84a6f5f2f426c64bde86b9a1d26a906739d43fbf624bb8829",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/02.len_table",
+   "path": "blargg_apu_2005.07.30/02.len_table.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/02.len_table.nes",
+   "sha256": "63cc6a57fae3da5e30df9520d02b723c5b93789e8a6eef6793f876345b245b51",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/03.irq_flag",
+   "path": "blargg_apu_2005.07.30/03.irq_flag.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/03.irq_flag.nes",
+   "sha256": "6f71c7e3de4b6c00da92c20a86c1c2095196a55dc201ee3286004ecf33a08c2f",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/04.clock_jitter",
+   "path": "blargg_apu_2005.07.30/04.clock_jitter.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/04.clock_jitter.nes",
+   "sha256": "46fa69b26fe8c24dc1d0b5908f90ab0141972eeb607bd563d28f53d6f4543fe6",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/05.len_timing_mode0",
+   "path": "blargg_apu_2005.07.30/05.len_timing_mode0.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/05.len_timing_mode0.nes",
+   "sha256": "606802d6849ccfcf74e907a8512c03a50d443752d1f616e62a242a1fa7eca0ff",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/06.len_timing_mode1",
+   "path": "blargg_apu_2005.07.30/06.len_timing_mode1.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/06.len_timing_mode1.nes",
+   "sha256": "0f34e26d56ad235d8d6d63565ed4728fbd0b9b8590a4fd4048eaf64283b429d4",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/07.irq_flag_timing",
+   "path": "blargg_apu_2005.07.30/07.irq_flag_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/07.irq_flag_timing.nes",
+   "sha256": "851c9698941d51da34b4bfbc9644aa08ee41b39c6c814cc9b8412c204ea68085",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/08.irq_timing",
+   "path": "blargg_apu_2005.07.30/08.irq_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/08.irq_timing.nes",
+   "sha256": "0a20a2b9ca9a8e78d65b500b161294c889399f0ff048edd104b07b15255946ca",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/09.reset_timing",
+   "path": "blargg_apu_2005.07.30/09.reset_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/09.reset_timing.nes",
+   "sha256": "bb04f8328a51abb2d17e6e5362b8375f3cbfbf0641733d068b22f23e7dc588e6",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/10.len_halt_timing",
+   "path": "blargg_apu_2005.07.30/10.len_halt_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/10.len_halt_timing.nes",
+   "sha256": "cbdaa9a5cf9c19ba2360d3349a47922eec25a3e610374d963c422f2b67c57ac9",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "blargg_apu_2005/11.len_reload_timing",
+   "path": "blargg_apu_2005.07.30/11.len_reload_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/blargg_apu_2005.07.30/11.len_reload_timing.nes",
+   "sha256": "40e633285a4a8710780bfd80d346dee62406f4be161eb75615f469cd9e84e132",
+   "suite": "blargg_apu_2005.07.30",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "cpu_interrupts_v2/1-cli_latency",
+   "path": "cpu_interrupts_v2/rom_singles/1-cli_latency.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/cpu_interrupts_v2/rom_singles/1-cli_latency.nes",
+   "sha256": "e402d36118f77dcbbe8ddca90c15fc76a46bcb30b25cb028c383e4a621de5fc0",
+   "suite": "cpu_interrupts_v2",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "cpu_interrupts_v2/2-nmi_and_brk",
+   "path": "cpu_interrupts_v2/rom_singles/2-nmi_and_brk.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/cpu_interrupts_v2/rom_singles/2-nmi_and_brk.nes",
+   "sha256": "6e6bf6205930afcfebdc213c583df53986a688a8b36f8856b805ef4c1853e6eb",
+   "suite": "cpu_interrupts_v2",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "cpu_interrupts_v2/3-nmi_and_irq",
+   "path": "cpu_interrupts_v2/rom_singles/3-nmi_and_irq.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/cpu_interrupts_v2/rom_singles/3-nmi_and_irq.nes",
+   "sha256": "3008a9524d174a8aca562ff0361eba81da53e38cf1ebb5125322fe151f14d945",
+   "suite": "cpu_interrupts_v2",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "cpu_interrupts_v2/4-irq_and_dma",
+   "path": "cpu_interrupts_v2/rom_singles/4-irq_and_dma.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/cpu_interrupts_v2/rom_singles/4-irq_and_dma.nes",
+   "sha256": "6d7b4c1947ada64679af56cf0c227286b2408afe1747dfaa4dc7363d57ff87f6",
+   "suite": "cpu_interrupts_v2",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "cpu_interrupts_v2/5-branch_delays_irq",
+   "path": "cpu_interrupts_v2/rom_singles/5-branch_delays_irq.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/cpu_interrupts_v2/rom_singles/5-branch_delays_irq.nes",
+   "sha256": "f9e10b4a24d8f3cd3e51fb7457c72858aab96a6467fdbbd806d0661c2d32fdc7",
+   "suite": "cpu_interrupts_v2",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_reset/4015_cleared",
+   "path": "apu_reset/4015_cleared.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_reset/4015_cleared.nes",
+   "sha256": "ef83bc2831f0ddb9e563ac5cbcfa21b129f092911ef42adabae7d47b3e990d95",
+   "suite": "apu_reset",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_reset/4017_timing",
+   "path": "apu_reset/4017_timing.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_reset/4017_timing.nes",
+   "sha256": "0e6072c6dcee98fb73dc7f3af2e48face78be300e8510515ed48dc75d15c1f13",
+   "suite": "apu_reset",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_reset/4017_written",
+   "path": "apu_reset/4017_written.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_reset/4017_written.nes",
+   "sha256": "022bd3b45a733179d9a0a9bf0311d09ca81419d7e7434e6f559e42650b39616b",
+   "suite": "apu_reset",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_reset/irq_flag_cleared",
+   "path": "apu_reset/irq_flag_cleared.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_reset/irq_flag_cleared.nes",
+   "sha256": "e2435b213bf21065b7c9c645359500c1c860a7395d12d051232ab14dad1b0bb5",
+   "suite": "apu_reset",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_reset/len_ctrs_enabled",
+   "path": "apu_reset/len_ctrs_enabled.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_reset/len_ctrs_enabled.nes",
+   "sha256": "e05546cbfaa1414d9193b0212084b324ea6b13130af5f171a34c9e574f5ac373",
+   "suite": "apu_reset",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "apu_reset/works_immediately",
+   "path": "apu_reset/works_immediately.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/apu_reset/works_immediately.nes",
+   "sha256": "c750113762ee375319b1bfbf65c457875dbb194649d7e7b3594fba38eb8eefa1",
+   "suite": "apu_reset",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "dmc_dma_during_read4/dma_2007_read",
+   "path": "dmc_dma_during_read4/dma_2007_read.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/dmc_dma_during_read4/dma_2007_read.nes",
+   "sha256": "a2e0fa3f6f155cbe0b8c9517b2f6a57f1fd68f13711c11d6d2fe5676c522d7b2",
+   "suite": "dmc_dma_during_read4",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "dmc_dma_during_read4/dma_2007_write",
+   "path": "dmc_dma_during_read4/dma_2007_write.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/dmc_dma_during_read4/dma_2007_write.nes",
+   "sha256": "54c75d491c685fb4cfff281bcf3e199a41e95f6c523e2b0607d67ba039f19f84",
+   "suite": "dmc_dma_during_read4",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "dmc_dma_during_read4/dma_4016_read",
+   "path": "dmc_dma_during_read4/dma_4016_read.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/dmc_dma_during_read4/dma_4016_read.nes",
+   "sha256": "c6af72e11c197b449129921a9992db2351d9121bb593b3d0ab71895b646b0ebe",
+   "suite": "dmc_dma_during_read4",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "dmc_dma_during_read4/double_2007_read",
+   "path": "dmc_dma_during_read4/double_2007_read.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/dmc_dma_during_read4/double_2007_read.nes",
+   "sha256": "779e6e7db863a7405a3dda8723b8517a23d271e78ce4802970fb0a7d3039ce6b",
+   "suite": "dmc_dma_during_read4",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "dmc_dma_during_read4/read_write_2007",
+   "path": "dmc_dma_during_read4/read_write_2007.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/dmc_dma_during_read4/read_write_2007.nes",
+   "sha256": "bc5281ca3f12a6d0ac9fe1a5e727ecc3cac5fc6a47f45ac130d644f0dbd522cf",
+   "suite": "dmc_dma_during_read4",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "sprdma_and_dmc_dma/sprdma_and_dmc_dma",
+   "path": "sprdma_and_dmc_dma/sprdma_and_dmc_dma.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/sprdma_and_dmc_dma/sprdma_and_dmc_dma.nes",
+   "sha256": "db3199bc1b0bdc07a316b3ab999d8fd8bb361456d2154e364c132cb06a26a10f",
+   "suite": "sprdma_and_dmc_dma",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "sprdma_and_dmc_dma/sprdma_and_dmc_dma_512",
+   "path": "sprdma_and_dmc_dma/sprdma_and_dmc_dma_512.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/sprdma_and_dmc_dma/sprdma_and_dmc_dma_512.nes",
+   "sha256": "3789f5134b0561b4344e3f4ce08b4d2a416f67435e083917a80d87fdb9d3583c",
+   "suite": "sprdma_and_dmc_dma",
+   "author": "Shay Green (blargg)"
+  }
+ ]
+}

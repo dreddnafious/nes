@@ -1,0 +1,179 @@
+# I4: the APU, frame-IRQ, DMC-DMA and interrupt test ROMs, all NROM. Read by test_i4_apu_roms.py. The
+# denominator is this fixed list (J4e): a hang, a timeout, a crash or a ROM that won't load counts as a
+# fail, never a skip. Every ROM is fetched by hash from cases/i4_oracles.json.
+#
+# kind "blargg": the ROM reports through $6000 (signature DE B0 61, $80 running, $81 reset, $00-$7F
+#   result), read by the frozen I1 driver cases/drive.ts. Pass = status $00 and "Passed" in the text.
+# kind "apu2005": blargg_apu_2005.07.30, which reports only on screen (and by beeps). Its readme: "A
+#   result code of 1 always indicates that all tests were passed"; the report routine prints the code
+#   as "$01". The case runs a fixed 900 frames (15 s; each test finishes in a few) and reads the screen
+#   with the font the ROM loads into CHR-RAM. Pass = a line reading "$01".
+# kind "console": dmc_dma_during_read4, an older blargg shell with no $6000 output; it prints to the
+#   screen only, with its ascii.chr font copied into CHR-RAM. Pass = a line "Passed" (the tests that
+#   check_crc), or, for the two tests whose output depends on CPU-PPU synchronization at power-on and
+#   which only print their CRC, the last line being one of the CRCs the source lists as a hardware
+#   result (`accept`).
+#
+# Revision: the target is RP2A03G. Every ROM here passes on an NTSC NES per its readme or source (the
+# 2005 tests: "They have been tested on an actual NES and all give a passing result").
+#
+# Left out (see the I4 report): apu_mixer (judged by ear: "there should be near silence between the
+# beeps"); dmc_tests (no readme, no source, no machine-readable result); pal_apu_tests (PAL: Q4 is NTSC
+# only); the multi-test builds apu_test.nes and cpu_interrupts.nes (their singles are here).
+cases:
+  # ---- apu_test (blargg, 2010 shell, $6000)
+  - id: apu_test/1-len_ctr
+    kind: blargg
+    purpose: apu_test 1-len_ctr reports passed (the four length counters load, clock, halt and clear through $4015 and $4017 as the readme lists).
+    origin: design
+  - id: apu_test/2-len_table
+    kind: blargg
+    purpose: apu_test 2-len_table reports passed (all 32 length-table entries).
+    origin: design
+  - id: apu_test/3-irq_flag
+    kind: blargg
+    purpose: apu_test 3-irq_flag reports passed (the frame IRQ flag sets only in mode $00, reading $4015 clears it, writing $40/$C0 to $4017 clears it).
+    origin: design
+  - id: apu_test/4-jitter
+    kind: blargg
+    purpose: apu_test 4-jitter reports passed (a $4017 write on an odd CPU cycle starts the frame counter one cycle later; the frame IRQ flag's timing).
+    origin: design
+  - id: apu_test/5-len_timing
+    kind: blargg
+    purpose: apu_test 5-len_timing reports passed (the first three length clocks of mode 0 and of mode 1, neither too soon nor too late).
+    origin: design
+  - id: apu_test/6-irq_flag_timing
+    kind: blargg
+    purpose: apu_test 6-irq_flag_timing reports passed (the frame IRQ flag is set three times in a row, 29831 clocks after writing $00 to $4017).
+    origin: design
+  - id: apu_test/7-dmc_basics
+    kind: blargg
+    purpose: apu_test 7-dmc_basics reports passed (DMC start, restart, stop, length reload from $4013, the one-byte buffer, the IRQ flag and looping, items 2-19 of the readme).
+    origin: design
+  - id: apu_test/8-dmc_rates
+    kind: blargg
+    purpose: apu_test 8-dmc_rates reports passed (the DMC's 16 rates).
+    origin: design
+  # ---- blargg_apu_2005.07.30 (screen only)
+  - id: blargg_apu_2005/01.len_ctr
+    kind: apu2005
+    purpose: blargg_apu_2005 01.len_ctr shows $01 (basic length counter operation).
+    origin: design
+  - id: blargg_apu_2005/02.len_table
+    kind: apu2005
+    purpose: blargg_apu_2005 02.len_table shows $01 (all length table entries).
+    origin: design
+  - id: blargg_apu_2005/03.irq_flag
+    kind: apu2005
+    purpose: blargg_apu_2005 03.irq_flag shows $01 (the frame IRQ flag's basic operation).
+    origin: design
+  - id: blargg_apu_2005/04.clock_jitter
+    kind: apu2005
+    purpose: blargg_apu_2005 04.clock_jitter shows $01 (a mode change by $4017 happens only on even APU clocks).
+    origin: design
+  - id: blargg_apu_2005/05.len_timing_mode0
+    kind: apu2005
+    purpose: blargg_apu_2005 05.len_timing_mode0 shows $01 (length clocks of mode 0 at 14915 and 29831 clocks after the write).
+    origin: design
+  - id: blargg_apu_2005/06.len_timing_mode1
+    kind: apu2005
+    purpose: blargg_apu_2005 06.len_timing_mode1 shows $01 (length clocks of mode 1 at 1, 14915 and 37283).
+    origin: design
+  - id: blargg_apu_2005/07.irq_flag_timing
+    kind: apu2005
+    purpose: blargg_apu_2005 07.irq_flag_timing shows $01 (the flag set three times in a row 29831 clocks after writing $00).
+    origin: design
+  - id: blargg_apu_2005/08.irq_timing
+    kind: apu2005
+    purpose: blargg_apu_2005 08.irq_timing shows $01 (the IRQ handler runs at the earliest 29833 clocks after writing $00 to $4017).
+    origin: design
+  - id: blargg_apu_2005/09.reset_timing
+    kind: apu2005
+    purpose: blargg_apu_2005 09.reset_timing shows $01 (after power-up the APU acts as if $00 had been written to $4017 9-12 clocks before the first instruction).
+    origin: design
+  - id: blargg_apu_2005/10.len_halt_timing
+    kind: apu2005
+    purpose: blargg_apu_2005 10.len_halt_timing shows $01 (a halt-flag change takes effect after the length clock at 14915, not before; both sides of that clock, halting and unhalting).
+    origin: design
+  - id: blargg_apu_2005/11.len_reload_timing
+    kind: apu2005
+    purpose: blargg_apu_2005 11.len_reload_timing shows $01 (a length reload written during the length clock is ignored when the counter is non-zero, and works just before, just after, or when it is zero).
+    origin: design
+  # ---- cpu_interrupts_v2 (blargg, $6000; needs the APU's frame IRQ, and DMA)
+  - id: cpu_interrupts_v2/1-cli_latency
+    kind: blargg
+    purpose: cpu_interrupts_v2 1-cli_latency reports passed (CLI, SEI, PLP and RTI delay or don't delay the IRQ as the readme says, on the APU frame IRQ).
+    origin: design
+  - id: cpu_interrupts_v2/2-nmi_and_brk
+    kind: blargg
+    purpose: cpu_interrupts_v2 2-nmi_and_brk reports passed (its CRC of the NMI-interrupting-BRK table).
+    origin: design
+  - id: cpu_interrupts_v2/3-nmi_and_irq
+    kind: blargg
+    purpose: cpu_interrupts_v2 3-nmi_and_irq reports passed (its CRC of the NMI-interrupting-IRQ table).
+    origin: design
+  - id: cpu_interrupts_v2/4-irq_and_dma
+    kind: blargg
+    purpose: cpu_interrupts_v2 4-irq_and_dma reports passed (an IRQ at each clock around sprite DMA lands after the instruction the readme's table gives).
+    origin: design
+  - id: cpu_interrupts_v2/5-branch_delays_irq
+    kind: blargg
+    purpose: cpu_interrupts_v2 5-branch_delays_irq reports passed (a taken non-page-crossing branch ignores an IRQ during its last clock).
+    origin: design
+  # ---- apu_reset (blargg, $6000; asks for the Reset button)
+  - id: apu_reset/4015_cleared
+    kind: blargg
+    purpose: apu_reset 4015_cleared reports passed ($4015 reads clear at power and after Reset).
+    origin: design
+  - id: apu_reset/4017_timing
+    kind: blargg
+    purpose: apu_reset 4017_timing reports passed (at power, and at Reset with the last value written, it is as if $4017 were written 9-12 clocks before the reset vector runs).
+    origin: design
+  - id: apu_reset/4017_written
+    kind: blargg
+    purpose: apu_reset 4017_written reports passed ($4017 is $00 at power; Reset rewrites the last value written).
+    origin: design
+  - id: apu_reset/irq_flag_cleared
+    kind: blargg
+    purpose: apu_reset irq_flag_cleared reports passed (the frame IRQ flag is clear at power and after Reset).
+    origin: design
+  - id: apu_reset/len_ctrs_enabled
+    kind: blargg
+    purpose: apu_reset len_ctrs_enabled reports passed (the length counters are enabled at power and after Reset; the triangle's is unaffected).
+    origin: design
+  - id: apu_reset/works_immediately
+    kind: blargg
+    purpose: apu_reset works_immediately reports passed ($4017, $4015 and the length counters work from the first instruction, at power and after Reset).
+    origin: design
+  # ---- dmc_dma_during_read4 (blargg, older shell: screen only)
+  - id: dmc_dma_during_read4/dma_2007_read
+    kind: console
+    purpose: dmc_dma_during_read4 dma_2007_read prints one of the CRCs its source lists for hardware (159A7A8F or 5E3DF9C4) (a DMC DMA during a $2007 read causes 2-3 extra $2007 reads).
+    origin: design
+    accept: ["159A7A8F", "5E3DF9C4"]
+  - id: dmc_dma_during_read4/dma_2007_write
+    kind: console
+    purpose: dmc_dma_during_read4 dma_2007_write prints Passed (a DMC DMA during a $2007 write has no effect).
+    origin: design
+  - id: dmc_dma_during_read4/dma_4016_read
+    kind: console
+    purpose: dmc_dma_during_read4 dma_4016_read prints Passed (a DMC DMA during a $4016 read causes one extra $4016 read, so a game's controller bits shift; J4g).
+    origin: design
+  - id: dmc_dma_during_read4/double_2007_read
+    kind: console
+    purpose: dmc_dma_during_read4 double_2007_read prints one of the CRCs its source lists for hardware (85CFD627, F018C287, 440EF923 or E52F41A5) (two $2007 reads on successive cycles, by LDA $20F7,X with a page cross).
+    origin: design
+    accept: ["85CFD627", "F018C287", "440EF923", "E52F41A5"]
+  - id: dmc_dma_during_read4/read_write_2007
+    kind: console
+    purpose: dmc_dma_during_read4 read_write_2007 prints Passed (a $2007 read just before a write behaves normally).
+    origin: design
+  # ---- sprdma_and_dmc_dma (blargg, $6000)
+  - id: sprdma_and_dmc_dma/sprdma_and_dmc_dma
+    kind: blargg
+    purpose: sprdma_and_dmc_dma reports passed (DMC DMA landing during sprite DMA, at each clock; NTSC only, as the ROM says).
+    origin: design
+  - id: sprdma_and_dmc_dma/sprdma_and_dmc_dma_512
+    kind: blargg
+    purpose: sprdma_and_dmc_dma_512 reports passed (the same test built with two timing constants and its expected CRC changed; there is no readme to say more).
+    origin: design
