@@ -25,7 +25,6 @@ ONE_MAPPER_S = 180          # a run narrowed to one mapper: bounded well inside 
 
 # ---------------------------------------------------------------- the core's registry (J5c)
 
-@DELTA
 def test_the_core_s_registry_is_exactly_the_mappers_it_accepts(tmp_path):
     """purpose: the smoke run's mapper list comes from the core's registry, never a hand list (J5c), so the
     registry must be the truth: `MAPPERS` from src/core/index.ts is ascending, each number once, and is
@@ -79,7 +78,6 @@ def good_report(clean_run):
     return res, rep
 
 
-@DELTA
 def test_j5_a_smoke_run_i_can_see(clean_run):
     """purpose: J5 walked through as its consumer does it, on the commit HEAD names, checked out clean:
       1. one command, `npm run smoke`, with no flag;
@@ -111,7 +109,6 @@ def test_j5_a_smoke_run_i_can_see(clean_run):
     assert last and "report.md" in last[0] and rep.dir.name in last[0], f"the last line of output: {last}"
 
 
-@DELTA
 def test_the_report_is_whole_and_its_result_is_the_exit_code(clean_run):
     """purpose: the report's own invariants (J5b, J5c, Decided), on the good build's full run:
       - its mappers are the core's registry, all of it, and `only` is null;
@@ -129,7 +126,6 @@ def test_the_report_is_whole_and_its_result_is_the_exit_code(clean_run):
         f"exit {res.returncode} with result {rep.json['result']}"
 
 
-@DELTA
 def test_the_markdown_twin_names_each_check_and_its_result(clean_run):
     """purpose: "a report that names each check and its result, kept as a file", for a person: report.md
     names the commit (its 40 hex digits), the tree as clean or dirty, the run's result on a line that says
@@ -154,7 +150,6 @@ def test_the_markdown_twin_names_each_check_and_its_result(clean_run):
     assert not missing, f"rows report.md doesn't name in order: {missing[:8]}"
 
 
-@DELTA
 def test_each_picture_check_saves_the_frame_it_judged(clean_run):
     """purpose: the frame PNGs saved beside the report (J5's settled fork): every game-menu, title, key, reset
     and power row that ran names in `png` a file in the run's own directory that is a 256 x 240 PNG.
@@ -171,7 +166,6 @@ def test_each_picture_check_saves_the_frame_it_judged(clean_run):
     assert not bad, f"rows without a 256x240 PNG beside the report: {bad[:8]}"
 
 
-@DELTA
 def test_a_clean_checkout_is_reported_clean_and_left_clean(clean_run):
     """purpose: J5e and J5l's clean side: run in a clean checkout, the report names the commit the checkout
     is at (HEAD, 40 hex digits) and says the tree was not dirty; and the run writes nothing git tracks
@@ -186,7 +180,6 @@ def test_a_clean_checkout_is_reported_clean_and_left_clean(clean_run):
 
 # ---------------------------------------------------------------- J5a: nothing checked is a failure
 
-@DELTA
 def test_a_run_that_checks_nothing_fails():
     """purpose: J5a: "all passed" is never vacuous. Asked only for a mapper the registry doesn't have (66),
     the run has zero checks: it exits non-zero, and still writes its report, which says FAILED with no row
@@ -237,7 +230,6 @@ def test_a_build_broken_on_purpose_fails_the_check_it_breaks(row):
 
 # ---------------------------------------------------------------- J5e, J5l: the checkout as it stands
 
-@DELTA
 def test_a_dirty_checkout_is_reported_dirty_and_served_as_it_stands_between_runs():
     """purpose: J5e and J5l: the report describes the code it served, never a stale build. In a copy of the
     checkout with an uncommitted change, `npm run smoke -- --mapper 3` passes and its report says the commit
@@ -269,7 +261,6 @@ def test_a_dirty_checkout_is_reported_dirty_and_served_as_it_stands_between_runs
 
 # ---------------------------------------------------------------- J5b: Chromium killed
 
-@DELTA
 def test_chromium_killed_mid_run_fails_the_run_with_every_check_accounted_for():
     """purpose: J5b: Chromium crashes in the middle of the whole run (every Chromium process under it killed
     with SIGKILL once a check has passed). The run still ends, within its bound, non-zero; its report is
@@ -293,7 +284,6 @@ def test_chromium_killed_mid_run_fails_the_run_with_every_check_accounted_for():
 
 # ---------------------------------------------------------------- J5d, J5m: runs at once, runs in a row
 
-@DELTA
 def test_two_runs_at_once_and_one_after_keep_three_reports_and_latest_is_the_last():
     """purpose: J5d and J5m: two runs of `npm run smoke -- --mapper 0` started together in one checkout both
     pass, each on its own port, each with its own directory under out/smoke/ (named by the commit, so
