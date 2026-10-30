@@ -125,7 +125,6 @@ def test_the_same_file_picked_twice_boots_it_again(site, browser):
         assert tab.loaded_once() and not tab.errors, (tab.navigations, tab.errors)
 
 
-@DELTA
 def test_the_same_menu_entry_chosen_twice_boots_it_again(site, browser, tmp_path):
     """purpose: J2u and J2f through the menu: choosing the entry that is running loads it again: with
     boot_probe (routed through the first entry) at frame 10 after a Reset (RAM counter 2, RAM not clean),
@@ -154,7 +153,6 @@ def test_the_same_menu_entry_chosen_twice_boots_it_again(site, browser, tmp_path
 
 # ---------------------------------------------------------------- Q3 across a switch, through the menu
 
-@DELTA
 def test_a_battery_save_survives_power_but_not_a_load_through_the_menu(site, browser, tmp_path):
     """purpose: Decided Q3 through the menu (A → B → A starts A without its save): boot_probe (battery
     PRG-RAM) chosen from the menu boots with battery counter 1; Power keeps the save (counter 2, RAM clean);

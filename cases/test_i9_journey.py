@@ -70,7 +70,6 @@ def wait_title(tab: CollectionTab, seen: set, seconds: float) -> bool:
     return False
 
 
-@DELTA
 def test_j2_an_evening_with_the_collection(site, browser):
     """purpose: J2 walked through in one Playwright session and one page load, A → B → A:
       1. A (Chase, mapper 2) is chosen from the game menu: its title at the frame it has reached is, pixel

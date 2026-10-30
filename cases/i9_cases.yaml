@@ -23,13 +23,11 @@ state:
     way: menu
     a: mess
     b: dump7
-    delta: true
   - id: menu-dump0-reset-dump0
     way: menu
     a: dump0
     b: dump0
     before: reset
-    delta: true
 
 # The ways in for the cases that run either way: the file chooser, and the game menu.
 ways:
@@ -37,53 +35,37 @@ ways:
     way: file
   - id: menu
     way: menu
-    delta: true
 
 # test_i9_menu.py::test_a_failed_entry_says_why_and_the_running_game_runs_on: what the entry's request is
 # answered with.
 failures:
   - id: "404"
-    delta: true
   - id: "500"
-    delta: true
   - id: connection-failed
-    delta: true
   - id: not-nes
-    delta: true
   - id: truncated
-    delta: true
   - id: mapper-3000
-    delta: true
 
 # test_i9_menu.py::test_a_failed_entry_on_a_fresh_page_starts_nothing
 fresh_failures:
   - id: "404"
-    delta: true
   - id: mapper-3000
-    delta: true
 
 # test_i9_menu.py::test_the_last_load_asked_for_wins
 orders:
   - id: menu-then-file
-    delta: true
   - id: menu-then-menu
-    delta: true
   - id: file-then-menu
-    delta: true
   - id: menu-then-power
-    delta: true
 
 # test_i9_menu.py::test_each_entry_loads_its_game_as_the_file_picker_does: every vendored game (roms/games/).
 entries:
   - id: chase
     file: chase.nes
-    delta: true
   - id: file-fixers
     file: file-fixers.nes
-    delta: true
   - id: thwaite
     file: thwaite.nes
-    delta: true
 
 # test_i9_games.py::test_j1_each_game_of_the_collection_boots_plays_ends_and_restarts: J1 per game, from each
 # game's own source, as frame budgets for a paused page stepped frame by frame with no key unless the script
@@ -106,7 +88,6 @@ games:
     play: 120
     end: {idle: 4800, press_start: true, within: 600}
     source: "game.c: title_screen() drops the logo in and blinks PRESS START (frame_cnt & 32) until Start; 4 lives, the enemy homes in; show_screen(SCREEN_GAMEOVER) waits for Start, then the title runs again from the top"
-    delta: true
   - id: thwaite
     file: thwaite.nes
     mapper: 0
@@ -117,7 +98,6 @@ games:
     play: 300
     end: {idle: 0, press_start: false, within: 10800}
     source: "texts.txt/title.s: the first title screen ends with 'Press Start Button'; Start, then Start on '1 Player', then Start skips the cutscene; main.s: losing both silos or every house ends the game, GAME OVER shows for about 5 s, and it returns to the title by itself"
-    delta: true
   - id: file-fixers
     file: file-fixers.nes
     mapper: 4
@@ -128,7 +108,6 @@ games:
     play: 120
     end: null
     source: "README and src: the title says 'Press Start to log in'; Start opens the KingdomOS desktop; a turn-based RPG with no idle loss, so it doesn't end on its own"
-    delta: true
   - id: falling
     oracle: falling
     mapper: 0

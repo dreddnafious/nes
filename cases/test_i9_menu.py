@@ -37,7 +37,6 @@ def is_title(title):
 
 # ---------------------------------------------------------------- the menu and the vendored games
 
-@DELTA
 def test_the_menu_beside_the_file_picker_offers_exactly_the_vendored_games(site, browser):
     """purpose: the menu exists and offers the collection: on a fresh page, #game-menu holds one visible
     entry for each file in roms/games/, no more and no fewer (its data-rom resolves to /roms/games/<file> on
@@ -187,7 +186,6 @@ def test_a_failed_entry_on_a_fresh_page_starts_nothing(site, browser, kind):
         assert not tab.errors, tab.errors
 
 
-@DELTA
 def test_an_evening_with_a_refused_file_and_a_failed_entry_between_two_games(site, browser, tmp_path):
     """purpose: J2af (and the first climb's J2l) walked whole: A (the dump probe, from the menu) → a refused
     file (mapper 3000) → A runs on, its picture kept → a failed entry (404) → A still runs → B (pad_probe,
@@ -316,7 +314,6 @@ def test_after_a_load_every_game_key_is_the_games_only(site, browser, tmp_path, 
 
 # ---------------------------------------------------------------- the hidden tab (I5) meets the menu
 
-@DELTA
 def test_a_menu_load_while_the_tab_is_hidden_waits_until_it_shows(site, browser):
     """purpose: J3ae through the menu (I5: "a game loaded while hidden waits"): with the tab hidden, a menu
     entry (answering I5's tone probe) is chosen; the game is loaded (nesTest.loads 1) at frame 0 and stays
