@@ -145,13 +145,63 @@ window.addEventListener('keyup', e => {
 }, true);
 window.addEventListener('blur', () => keys.clear());
 
-/** Paced by an accumulator against real time, never by counting rAF calls, so the game runs at
- * 60.1 frames a second whatever the display's rate. */
+/** A display within 1 % of 60 Hz (60.00 and 59.94 are the common ones) is locked to: each refresh
+ * runs exactly one frame, so none is doubled or skipped, and the game runs at most 1 % off NTSC's
+ * 60.0988. The worklet's resampling holds the sound's buffer across the difference. */
+const LOCK_MIN_HZ = 59.4;
+const LOCK_MAX_HZ = 60.6;
+/** The refresh rate is measured over the last INTERVALS refresh intervals; a gap of more than
+ * GAP_MS (a hidden tab, a stall) isn't an interval. */
+const INTERVALS = 31;
+const MIN_INTERVALS = 15;
+const GAP_MS = 100;
+const intervals = new Float64Array(INTERVALS).fill(Infinity);   // unmeasured slots sort last
+const sorted = new Float64Array(INTERVALS);
+let counted = 0;
+let nextInterval = 0;
+let lastStamp = -1;
+
+function measure(now: number): void {
+  const d = lastStamp < 0 ? 0 : now - lastStamp;
+  lastStamp = now;
+  if (d <= 0 || d > GAP_MS) return;
+  intervals[nextInterval] = d;
+  nextInterval = (nextInterval + 1) % INTERVALS;
+  if (counted < INTERVALS) counted++;
+}
+
+/** Is the display measured within 1 % of 60 Hz? */
+function locked(): boolean {
+  if (counted < MIN_INTERVALS) return false;
+  sorted.set(intervals);
+  sorted.sort();
+  // The mean, not the median: timers and timestamps land on whole milliseconds (16 and 17 for a
+  // 16.68 ms refresh), which only the mean averages out. A late refresh (over 1.5x the median)
+  // is left out of it.
+  const cut = 1.5 * sorted[counted >> 1];
+  let sum = 0;
+  let n = 0;
+  for (let i = 0; i < counted && sorted[i] <= cut; i++, n++) sum += sorted[i];
+  const hz = 1000 * n / sum;
+  return hz >= LOCK_MIN_HZ && hz <= LOCK_MAX_HZ;
+}
+
+/** At a 60 Hz display, one frame a refresh. Otherwise paced by an accumulator against real time,
+ * never by counting rAF calls, so the game runs at 60.1 frames a second whatever the display's
+ * rate. Either way a stall or a hidden tab is never raced through: at most one frame on return. */
 function tick(now: number): void {
   if (paused) return;
   requestAnimationFrame(tick);
+  measure(now);
   if (!nes) {
     last = now;
+    return;
+  }
+  if (locked()) {
+    behind = 0;
+    last = now;
+    runFrame();
+    draw();
     return;
   }
   behind += Math.max(0, now - last);
