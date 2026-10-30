@@ -109,7 +109,15 @@ export interface Mapper {
   cpuWrite(addr: number, value: number, cycle: number): void;
   chrRead(addr: number): number;
   chrWrite(addr: number, value: number): void;
+  /** The console's interrupt line, for a cartridge that drives /IRQ (bit IRQ_MAPPER). */
+  irqHost?: { irq: number };
+  /** For a cartridge that watches PPU A12: told each change of it, with the PPU dot (since power-on)
+   * the change came on. */
+  ppuA12?(high: number, dot: number): void;
 }
+
+/** The cartridge's bit on the console's /IRQ line (the APU's are IRQ_FRAME and IRQ_DMC). */
+export const IRQ_MAPPER = 0x04;
 
 /** Mapper 0: 16 or 32 KiB PRG at $8000 (16 KiB mirrored), 8 KiB CHR, and PRG-RAM at $6000. */
 export class NROM implements Mapper {
@@ -373,12 +381,141 @@ export class MMC1 implements Mapper {
   }
 }
 
+/** Mapper 4 (MMC3B/C, the TxROM boards; NES 2.0 submapper 0). Spec: https://www.nesdev.org/wiki/MMC3
+ * - Registers by `addr & $E001`: $8000 bank select (bits 2-0 the register R0-R7, bit 6 PRG mode, bit 7
+ *   CHR A12 inversion), $8001 bank data, $A000 arrangement (0 vertical, 1 horizontal; nothing with a
+ *   four-screen header), $A001 PRG-RAM protect (bit 7 enable, bit 6 write-protect; NES 2.0 files only),
+ *   $C000 IRQ latch, $C001 IRQ reload, $E000 IRQ disable and acknowledge, $E001 IRQ enable. No bus conflicts.
+ * - PRG, 8 KiB banks: mode 0 R6, R7, second-last, last; mode 1 second-last, R7, R6, last (R6/R7 6 bits).
+ * - CHR, 1 KiB units: R0/R1 2 KiB (low bit ignored) at $0000/$0800, R2-R5 1 KiB at $1000-$1C00; inversion
+ *   swaps the halves. Bank numbers past the end wrap, for ROM and RAM alike.
+ * - PRG-RAM: the NES 2.0 header's size (0: none), 8 KiB on iNES 1.0, where $A001 is ignored and the RAM
+ *   is always enabled ("many implementations of iNES Mapper 004 simply omit the write protection").
+ * - The IRQ counter, clocked by a rise of PPU A12 after it has been low for three falling edges of M2:
+ *   reloaded from the latch when it's 0 or $C001 asked, else decremented; then at 0, with IRQs enabled,
+ *   /IRQ is asserted until $E000 (the MMC3B/C: a latch of 0 asserts it at every clock). */
+export class MMC3 implements Mapper {
+  readonly info: RomInfo;
+  mirroring: number;
+  readonly prgRam: Uint8Array;
+  irqHost = { irq: 0 };
+  private readonly prg: Uint8Array;
+  private readonly chr: Uint8Array;
+  // Power-on: unknown on hardware; chosen as bank select 0, R0-R7 0, 2, 4, 5, 6, 7, 0, 1, the header's
+  // arrangement, and the PRG-RAM enabled and writable.
+  private select = 0;
+  private readonly r = Uint8Array.of(0, 2, 4, 5, 6, 7, 0, 1);
+  private ramCtl = 0x80;
+  private latch = 0;
+  private counter = 0;
+  private reload = false;
+  private enabled = false;
+  /** The PPU dot A12 last fell on (long ago at power-on). */
+  private a12Fell = -30;
+  /** Offsets into PRG for the four 8 KiB CPU windows, and into CHR for the eight 1 KiB PPU slots. */
+  private readonly prgOff = new Int32Array(4);
+  private readonly chrOff = new Int32Array(8);
+
+  constructor(info: RomInfo) {
+    this.info = info;
+    this.prg = info.prg;
+    this.chr = info.chr;
+    this.mirroring = info.mirroring;
+    this.prgRam = new Uint8Array(info.nes2 ? info.prgRamSize : 0x2000);
+    this.update();
+  }
+
+  private update(): void {
+    const r = this.r;
+    const count = Math.max(1, this.prg.length >> 13);
+    const r6 = ((r[6] & 0x3f) % count) << 13;
+    const r7 = ((r[7] & 0x3f) % count) << 13;
+    const second = ((count - 2 + count) % count) << 13;
+    const swapped = (this.select & 0x40) !== 0;
+    this.prgOff[0] = swapped ? second : r6;
+    this.prgOff[1] = r7;
+    this.prgOff[2] = swapped ? r6 : second;
+    this.prgOff[3] = (count - 1) << 13;
+    const chrCount = Math.max(1, this.chr.length >> 10);
+    const inv = this.select & 0x80 ? 4 : 0;
+    for (let slot = 0; slot < 8; slot++) {
+      const s = slot ^ inv;
+      const bank = s < 4 ? (r[s >> 1] & 0xfe) | (s & 1) : r[s - 2];
+      this.chrOff[slot] = (bank % chrCount) << 10;
+    }
+  }
+
+  private ramOn(): boolean {
+    return this.prgRam.length > 0 && (!this.info.nes2 || (this.ramCtl & 0x80) !== 0);
+  }
+
+  cpuRead(addr: number): number {
+    return this.cpuPeek(addr);
+  }
+
+  cpuPeek(addr: number): number {
+    if (addr >= 0x8000) return this.prg[this.prgOff[(addr >> 13) & 3] | (addr & 0x1fff)];
+    if (addr >= 0x6000 && this.ramOn()) return this.prgRam[(addr & 0x1fff) % this.prgRam.length];
+    return -1;
+  }
+
+  cpuWrite(addr: number, value: number): void {
+    if (addr < 0x6000) return;
+    if (addr < 0x8000) {
+      if (this.ramOn() && (!this.info.nes2 || (this.ramCtl & 0x40) === 0)) {
+        this.prgRam[(addr & 0x1fff) % this.prgRam.length] = value;
+      }
+      return;
+    }
+    switch (addr & 0xe001) {
+      case 0x8000: this.select = value; this.update(); break;
+      case 0x8001: this.r[this.select & 7] = value; this.update(); break;
+      case 0xa000:
+        if (this.info.mirroring !== MIRROR_FOUR_SCREEN) this.mirroring = value & 1 ? MIRROR_HORIZONTAL : MIRROR_VERTICAL;
+        break;
+      case 0xa001: this.ramCtl = value; break;
+      case 0xc000: this.latch = value; break;
+      case 0xc001: this.counter = 0; this.reload = true; break;
+      case 0xe000: this.enabled = false; this.irqHost.irq &= ~IRQ_MAPPER; break;
+      default: this.enabled = true;
+    }
+  }
+
+  chrRead(addr: number): number {
+    return this.chr[this.chrOff[(addr >> 10) & 7] | (addr & 0x3ff)];
+  }
+
+  chrWrite(addr: number, value: number): void {
+    if (this.info.chrIsRam) this.chr[this.chrOff[(addr >> 10) & 7] | (addr & 0x3ff)] = value;
+  }
+
+  /** A rise counts after A12 has been low for more than 10 PPU dots (over three M2 cycles). That filters
+   * the fetch schedule's short lows: the 4-dot ones inside a line, and, with the background at $1000,
+   * the 9 dots from a line's last nametable fetches to the next line's first pattern fetch (blargg's
+   * 4-scanline_timing: one clock a line there, at dot 325). */
+  ppuA12(high: number, dot: number): void {
+    if (!high) {
+      this.a12Fell = dot;
+      return;
+    }
+    if (dot - this.a12Fell <= 10) return;
+    if (this.counter === 0 || this.reload) {
+      this.counter = this.latch;
+      this.reload = false;
+    } else {
+      this.counter--;
+    }
+    if (this.counter === 0 && this.enabled) this.irqHost.irq |= IRQ_MAPPER;
+  }
+}
+
 export function createMapper(info: RomInfo): Mapper {
   switch (info.mapper) {
     case 0: return new NROM(info);
     case 1: return new MMC1(info);
     case 2: return new UxROM(info);
     case 3: return new CNROM(info);
+    case 4: return new MMC3(info);
     case 7: return new AxROM(info);
     default: throw new RomError(`mapper ${info.mapper} is not supported`);
   }

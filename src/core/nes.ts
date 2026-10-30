@@ -24,6 +24,7 @@ export class NES implements CpuBus {
   /** Power on with a ROM file; throws RomError for a file it can't or won't run. */
   constructor(rom: Uint8Array) {
     this.mapper = createMapper(parseRom(rom));
+    if (this.mapper.irqHost) this.mapper.irqHost = this;
     this.cpu = new CPU(this);
     this.ppu = new PPU(this.mapper);
     this.apu = new APU(this);
