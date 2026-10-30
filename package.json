@@ -9,7 +9,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p .",
-    "test": ".venv/bin/python -m pytest cases tests -p no:cacheprovider -q"
+    "test": ".venv/bin/python -m pytest cases tests -p no:cacheprovider -q",
+    "smoke": ".venv/bin/python -B smoke/smoke.py"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
