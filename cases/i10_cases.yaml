@@ -1,0 +1,37 @@
+# I10: the broken builds of test_i10_smoke.py::test_a_build_broken_on_purpose_fails_the_check_it_breaks
+# (CONTRACT-I10.md, "How the cases break a build on purpose"). Each row is one copy of the checkout with one
+# patch (`patch`, with `arg`), run with `npm run smoke -- --mapper <mapper>` (one mapper, to keep the run
+# short; the full run is the green case's). The run must exit non-zero, and its report must name `check` as
+# FAILED, on every subject of the mapper when `every: true` (else on at least one), with no other check
+# FAILED: what depends on it NOT RUN, everything else PASSED (or N/A for a probe's game-menu).
+# A row with `delta: true` is a case the build doesn't meet yet (a strict expected failure): every row is
+# one, since there is no smoke command yet.
+broken:
+  # J5, J5c: a mapper the registry lists but the core refuses, each mapper of the registry in turn (every
+  # number is a boundary). The load is the root cause; nothing after it runs.
+  - {id: refused-mapper-0, patch: refuse-mapper, arg: 0, mapper: 0, check: file-input, every: true, delta: true}
+  - {id: refused-mapper-1, patch: refuse-mapper, arg: 1, mapper: 1, check: file-input, every: true, delta: true}
+  - {id: refused-mapper-2, patch: refuse-mapper, arg: 2, mapper: 2, check: file-input, every: true, delta: true}
+  - {id: refused-mapper-3, patch: refuse-mapper, arg: 3, mapper: 3, check: file-input, every: true, delta: true}
+  - {id: refused-mapper-4, patch: refuse-mapper, arg: 4, mapper: 4, check: file-input, every: true, delta: true}
+  - {id: refused-mapper-7, patch: refuse-mapper, arg: 7, mapper: 7, check: file-input, every: true, delta: true}
+  # J5a, J5c: a number added to the registry that no game or probe covers.
+  - {id: registry-without-a-subject, patch: add-to-registry, arg: 66, mapper: 66, check: covered, every: true, delta: true}
+  # J5 step 3, the real entry points: the file input's change swallowed (the page never sees the pick).
+  - {id: file-input-dead, patch: file-input-dead, mapper: 3, check: file-input, every: true, delta: true}
+  # J5k: the game menu with no entries (the menu check is mandatory now I9 has merged).
+  - {id: menu-empty, patch: empty-menu, mapper: 0, check: game-menu, delta: true}
+  # J5i: a blank canvas, and a palette whose every colour is wrong though every index stays distinct.
+  - {id: canvas-blank, patch: canvas-blank, mapper: 1, check: title, every: true, delta: true}
+  - {id: palette-red-blue-swapped, patch: swap-red-blue, mapper: 4, check: title, delta: true}
+  # J5h: a key unmapped in keyboard.ts: Start on a game whose title animates by itself (Chase, mapper 2), and
+  # A on a probe-only mapper (each probe checks all eight keys).
+  - {id: start-unmapped, patch: unmap-key, arg: Enter, mapper: 2, check: key, every: true, delta: true}
+  - {id: a-unmapped, patch: unmap-key, arg: KeyX, mapper: 7, check: key, every: true, delta: true}
+  # J5g: silence at the output (everything reaching the destination through a zero gain).
+  - {id: audio-silenced, patch: audio-silenced, mapper: 4, check: sound, every: true, delta: true}
+  # J5f: a page that makes its sound's context before any gesture and never resumes it.
+  - {id: sound-never-resumed, patch: never-resumed, mapper: 4, check: sound, every: true, delta: true}
+  # J5j: a dead Reset button, and a Power that only resets (keeps RAM).
+  - {id: reset-dead, patch: reset-dead, mapper: 0, check: reset, every: true, delta: true}
+  - {id: power-keeps-ram, patch: power-resets, mapper: 0, check: power, every: true, delta: true}
