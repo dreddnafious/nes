@@ -105,3 +105,28 @@ readme or source, no machine-readable result), `pal_apu_tests` (PAL; Decided Q4 
   reused or redistributed" and the ROM is only on itch.io), *Raven's Gate* (MMC1 build, a commercial
   pay-what-you-want release), and PinoBatch's *Thwaite*, *Concentration Room* and *RHDE* and
   NovaSquirrel's *DABG* (their release headers say mapper 0, NROM).
+
+## MMC3 test ROMs and homebrew (I8's oracles): fetched by hash, not committed
+| Suite / file | Author | Mapper | Terms | Checks |
+|---|---|---|---|---|
+| `mmc3_test_2` singles (`1-clocking`, `2-details`, `3-A12_clocking`, `4-scanline_timing`, `5-MMC3`, `6-MMC3_alt`) | Shay Green (blargg) | 4 (iNES 1.0: 32 KiB PRG, 8 KiB CHR-ROM) | the collection's: no licence granting redistribution | The MMC3's IRQ counter, clocked by hand and to the PPU clock; `6-MMC3_alt` tests the other revision: red in the raw count (Decided Q2), pinned by failing at its sub-test 2. |
+| Holy Mapperel v0.02, MMC3 builds (`M4_P128K_CR8K`, `M4_P128K_CR32K`, `M4_P256K_C256K`) and `M118_P128K_C64K` (for a refusal) | Damian Yerrick (PinoBatch), 2013-2017 | 4 (NES 2.0), 118 | zlib ("redistribute it freely") | Detects the board, reads back every PRG and CHR bank's tag through each window, checks the IRQ, shows the result on screen. |
+| `nesdoug-33_MMC3/d03805b/hello_mmc3.nes` | Doug Fraker (nesdoug), 2019-2023; neslib by Shiru; banked_call by Christopher Parker (cppchriscpp, MIT, per its `MMC3/Credit.txt`) | 4 (iNES 1.0: 128 KiB PRG, 128 KiB CHR-ROM, 8 KiB PRG-RAM) | MIT (the `nesdoug/33_MMC3` repository's `License.txt`, "Copyright (c) 2019 Doug Fraker") | A demo, not a game: four IRQ scroll bands, PRG banking through R6, PRG-RAM, CHR bank animation. Not counted in Reach (no end). |
+
+- **Source and terms:** `mmc3_test_2` from `christopherpow/nes-test-roms` at commit `95d8f62…`, with the
+  same terms as the test ROMs above. Holy Mapperel as for I6 and I7 (the pinned `holy-mapperel-bin-0.02.7z`
+  release asset; each ROM a pinned slice of its second LZMA2 block). `hello_mmc3.nes` is the build the
+  author committed in his repository (`BUILD/hello_mmc3.nes` at commit `d03805b13ed0d4d696744a8f6ad578e9882fc0eb`);
+  MIT allows redistribution, but under Decided ("Oracle ROMs are fetched by hash, never committed") it is
+  fetched. Its graphics (`Alpha.chr`, `Gears.chr`) and music come with the repository under the same
+  licence; nothing in it names another's trademark. All pinned by SHA-256 in `cases/i8_oracles.json`.
+- **Left out, and why:** `mmc3_test` (the older build of the same tests: its singles are subsets of
+  `mmc3_test_2`'s, and its `6-MMC6` tests the same other-revision behaviour as `6-MMC3_alt`) and
+  `mmc3_irq_tests` (an older, screen-only build of the same tests on a devcart runtime); the collection's
+  other mapper-4 files (`other/BladeBuster.nes`, `other/DROPOFF7.NES`, `other/high-hopes.nes`,
+  `other/max-300.nes`, `other/rastesam4.nes`, `stomper/smwstomp.nes`): no author's terms that could be
+  checked (and `smwstomp` names a commercial game).
+- **Homebrew looked at and left out:** *NES Quest* (`cfrantz/ld43`, Ludum Dare 43; an MMC3 IRQ status bar,
+  but the repository has no licence), *Annalog* (`mdsteele/annalog`, GPL-3.0 code, but sold as a cartridge
+  with no direct ROM download), *Famidash* (`tfdsoft/famidash`, MIT, but a clone of a commercial game under
+  its name: no clone trading on another's trademark).
