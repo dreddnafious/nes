@@ -7,6 +7,8 @@ Every probe draws the same screen, from banks only its mapper reaches when it wo
   white while the button is held (it shows two frames after the press);
 - row 12: sixteen striped cells, whose tile numbers come from a PRG bank the probe switches in and whose
   pattern comes from a CHR bank it switches in (any other bank holds a checker instead);
+- row 20: a green cell once Start has been pressed, until the next power-on or Reset, so a screen of
+  play is never the title;
 and plays a steady pulse tone (about 440 Hz) from power-on, so its sound is there on its title.
 
 Spec: https://www.nesdev.org/wiki/MMC1, https://www.nesdev.org/wiki/INES_Mapper_003,
@@ -74,11 +76,12 @@ def assemble(prog: list, org: int) -> tuple:
 # ---------------------------------------------------------------- what every probe draws
 
 PALETTE = bytes([0x0F, 0x16, 0x2A, 0x30] * 8)       # black, red, green, white
-ROW_MAPPER, ROW_BUTTONS, ROW_SIGNATURE, ROW_MARKER = 4, 8, 12, 16
+ROW_MAPPER, ROW_BUTTONS, ROW_SIGNATURE, ROW_MARKER, ROW_PLAYED = 4, 8, 12, 16, 20
 BUTTON_COLUMN = 4                                   # buttons at columns 4, 6, ..., 18
 T_EMPTY, T_HELD, T_RELEASED, T_GREEN, T_STRIPES, T_CHECKER = 0, 1, 2, 3, 4, 5
 BUF = 0x0400                                        # the button row: 16 tiles, a button then a gap
 FLAG = 0x0010                                       # set by the NMI: a frame has been shown
+PLAYED = 0x0011                                     # the "played" cell's tile: green once Start is pressed
 
 
 def _tile(rows_lo: list, rows_hi: list) -> bytes:
@@ -140,15 +143,21 @@ def _program(mapper: int, mapper_reset: list, setup: list, sig_addr: int, after_
     # the tone: pulse 1, duty 50 %, constant volume 12, no sweep, period 253 (1789773 / 16 / 254 = 440 Hz)
     prog += [("lda#", 0x01), ("sta", 0x4015), ("lda#", 0xBC), ("sta", 0x4000), ("lda#", 0x08), ("sta", 0x4001),
              ("lda#", 0xFD), ("sta", 0x4002), ("lda#", 0x00), ("sta", 0x4003)]
-    prog += [("lda#", 0), ("sta", FLAG), ("sta", 0x2005), ("sta", 0x2005), ("lda#", 0x80), ("sta", 0x2000)]
-    # the loop: once a frame, controller 1's eight buttons into the buffer
+    prog += [("lda#", 0), ("sta", FLAG), ("sta", PLAYED), ("sta", 0x2005), ("sta", 0x2005),
+             ("lda#", 0x80), ("sta", 0x2000)]
+    # the loop: once a frame, controller 1's eight buttons into the buffer; Start, once pressed, lights
+    # the "played" cell until the next boot, so the screen of play is never the title (a dead Reset
+    # leaves it lit)
     prog += ["main:", ("lda", FLAG), ("beq", "main"), ("lda#", 0), ("sta", FLAG),
              ("lda#", 1), ("sta", 0x4016), ("lda#", 0), ("sta", 0x4016),
              ("ldx#", 0), "rd:", ("lda", 0x4016), ("and#", 1), ("beq", "up"),
              ("lda#", T_HELD), ("bne", "put"), "up:", ("lda#", T_RELEASED), "put:", ("sta,x", BUF),
-             ("inx",), ("inx",), ("cpx#", 16), ("bne", "rd"), ("jmp", "main")]
+             ("inx",), ("inx",), ("cpx#", 16), ("bne", "rd"),
+             ("lda", BUF + 6), ("cmp#", T_HELD), ("bne", "main"), ("lda#", T_GREEN), ("sta", PLAYED),
+             ("jmp", "main")]
     prog += ["nmi:", ("pha",), ("txa",), ("pha",), ("bit", 0x2002)] + _set_vram(_row(ROW_BUTTONS, BUTTON_COLUMN)) + [
-        ("ldx#", 0), "cp:", ("lda,x", BUF), ("sta", 0x2007), ("inx",), ("cpx#", 16), ("bne", "cp"),
+        ("ldx#", 0), "cp:", ("lda,x", BUF), ("sta", 0x2007), ("inx",), ("cpx#", 16), ("bne", "cp")] + _set_vram(
+        _row(ROW_PLAYED, BUTTON_COLUMN)) + [("lda", PLAYED), ("sta", 0x2007),
         ("lda#", 0), ("sta", 0x2005), ("sta", 0x2005), ("lda#", 0x80), ("sta", 0x2000),
         ("lda#", 0x0A), ("sta", 0x2001), ("lda#", 1), ("sta", FLAG),
         ("pla",), ("tax",), ("pla",), ("rti",),

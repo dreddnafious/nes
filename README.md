@@ -34,6 +34,10 @@ leads to the last run. It exits non-zero if any check failed or didn't run. The 
 `cases/CONTRACT-I10.md`. The vendored games are the subjects, plus the run's own probes
 (`smoke/probes.py`) on mappers with no vendored game.
 
+A game added to `roms/games/` fails its `title` check until it has a reference. Give it a row in
+`smoke/subjects.json` (its title frame, and where its sound is), run
+`.venv/bin/python -B smoke/make_references.py <name>`, look at the picture it made, and commit both.
+
 ## Play in the browser
 ```sh
 node src/web/serve.ts --port 8080
