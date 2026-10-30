@@ -1,0 +1,9 @@
+{
+ "_about": "Per subject, read by smoke/smoke.py (a subject not listed takes its DEFAULTS). frame: the frame N its title is judged at (smoke/references/<name>.png is the canvas at N), and where Start is pressed from; key_frames: how long a key is held, the screen compared frame by frame with no key; play: frames of play after Start, before Reset or Power; sound: where its sound window is, 'title' (it sounds on its title: the window follows a click) or 'start' (its title is silent: the window follows Start, pressed for 5 frames at each of sound_starts, frames after N).",
+ "chase": {"frame": 310, "key_frames": 30, "play": 120, "sound": "start", "sound_starts": [0]},
+ "file-fixers": {"frame": 70, "key_frames": 30, "play": 120, "sound": "title"},
+ "thwaite": {"frame": 130, "key_frames": 30, "play": 60, "sound": "start", "sound_starts": [0, 60]},
+ "probe-mmc1": {"frame": 30, "key_frames": 4, "play": 30, "sound": "title"},
+ "probe-cnrom": {"frame": 30, "key_frames": 4, "play": 30, "sound": "title"},
+ "probe-axrom": {"frame": 30, "key_frames": 4, "play": 30, "sound": "title"}
+}

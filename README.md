@@ -20,6 +20,24 @@ test ROMs; see `cases/CONTRACT.md` for the surface the tests drive.
 - The test ROMs aren't in git. The corpus fetches each one by URL and SHA-256 on first use (see
   `cases/oracles.json` and `roms/LICENSES.md`).
 
+## Smoke run
+```sh
+npm run smoke                     # every mapper the core supports
+npm run smoke -- --mapper 4       # only mapper 4's checks (repeatable)
+```
+It serves this checkout's page on a free local port and drives it in headless Chromium the way a person
+does: it loads a game or probe on every mapper the core lists (`MAPPERS` in `src/core/index.ts`) through the
+file input and the game menu, checks the title against `smoke/references/`, presses keys, listens at the
+sound's output, and presses Reset and Power. It needs nothing from the network. The report goes to
+`out/smoke/<run>/report.md`, with a JSON twin and the frames it judged as PNGs, and `out/smoke/latest`
+leads to the last run. It exits non-zero if any check failed or didn't run. The checks are listed in
+`cases/CONTRACT-I10.md`. The vendored games are the subjects, plus the run's own probes
+(`smoke/probes.py`) on mappers with no vendored game.
+
+A game added to `roms/games/` fails its `title` check until it has a reference. Give it a row in
+`smoke/subjects.json` (its title frame, and where its sound is), run
+`.venv/bin/python -B smoke/make_references.py <name>`, look at the picture it made, and commit both.
+
 ## Play in the browser
 ```sh
 node src/web/serve.ts --port 8080

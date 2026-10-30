@@ -514,14 +514,22 @@ export class MMC3 implements Mapper {
   }
 }
 
+/** The boards the core makes, by iNES mapper number. */
+const BOARDS = new Map<number, (info: RomInfo) => Mapper>([
+  [0, info => new NROM(info)],
+  [1, info => new MMC1(info)],
+  [2, info => new UxROM(info)],
+  [3, info => new CNROM(info)],
+  [4, info => new MMC3(info)],
+  [7, info => new AxROM(info)],
+]);
+
+/** The iNES mapper numbers the core supports, ascending (cases/CONTRACT-I10.md): every other number is
+ * refused with a RomError naming it. */
+export const MAPPERS: readonly number[] = Object.freeze([...BOARDS.keys()].sort((a, b) => a - b));
+
 export function createMapper(info: RomInfo): Mapper {
-  switch (info.mapper) {
-    case 0: return new NROM(info);
-    case 1: return new MMC1(info);
-    case 2: return new UxROM(info);
-    case 3: return new CNROM(info);
-    case 4: return new MMC3(info);
-    case 7: return new AxROM(info);
-    default: throw new RomError(`mapper ${info.mapper} is not supported`);
-  }
+  const make = BOARDS.get(info.mapper);
+  if (!make) throw new RomError(`mapper ${info.mapper} is not supported`);
+  return make(info);
 }
