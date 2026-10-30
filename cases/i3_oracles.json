@@ -1,0 +1,47 @@
+{
+ "collection": "christopherpow/nes-test-roms",
+ "commit": "95d8f621ae55cee0d09b91519a8989ae0e64753b",
+ "note": "I3's oracles: the controller test ROM and the homebrew game nes15 with its title's source data. Fetched by hash into roms/cache/ (gitignored); never committed (see roms/LICENSES.md: test_buttons carries no redistribution licence; nes15's is BSD, but its README says its font seems to come from a commercial game, so this repo doesn't redistribute it). Read by cases/i3_support.py.",
+ "oracles": [
+  {
+   "id": "read_joy3/test_buttons",
+   "path": "read_joy3/test_buttons.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/read_joy3/test_buttons.nes",
+   "sha256": "15f53317fd2adf8454256fdafb4ea6c5fb27940166adcdadd17e9e6fb94fdfac",
+   "suite": "read_joy3",
+   "author": "Shay Green (blargg)"
+  },
+  {
+   "id": "nes15",
+   "path": "nes15-1.0.0/nes15-NTSC.nes",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/nes15-1.0.0/nes15-NTSC.nes",
+   "sha256": "01b0507abdee44e6b78edcbe95f1de951c9d7ec39e7fcc5306f5e06b732ef92c",
+   "suite": "nes15 1.0.0",
+   "author": "Mathew Brenaman"
+  },
+  {
+   "id": "nes15/title.nam",
+   "path": "nes15-1.0.0/gfx/title.nam",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/nes15-1.0.0/gfx/title.nam",
+   "sha256": "524404000827d47e180e77ca52fb6901858e911bf98ac74587b34d3cf362c494",
+   "suite": "nes15 1.0.0",
+   "author": "Mathew Brenaman"
+  },
+  {
+   "id": "nes15/bgd.pal",
+   "path": "nes15-1.0.0/gfx/bgd.pal",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/nes15-1.0.0/gfx/bgd.pal",
+   "sha256": "c83201e3ba4ef38144e8d87ee38df871c0a190e91c52b5b20ec8be37965c9155",
+   "suite": "nes15 1.0.0",
+   "author": "Mathew Brenaman"
+  },
+  {
+   "id": "nes15/spr.pal",
+   "path": "nes15-1.0.0/gfx/spr.pal",
+   "url": "https://raw.githubusercontent.com/christopherpow/nes-test-roms/95d8f621ae55cee0d09b91519a8989ae0e64753b/nes15-1.0.0/gfx/spr.pal",
+   "sha256": "717eb3fa9daff3e38324a70780902d8285c88beaaa2a8217b11f9f5453e7cc2c",
+   "suite": "nes15 1.0.0",
+   "author": "Mathew Brenaman"
+  }
+ ]
+}

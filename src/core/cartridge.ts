@@ -28,6 +28,8 @@ export interface RomInfo {
   battery: boolean;
   mirroring: number;
   trainer: boolean;
+  /** The TV system: 0 NTSC, 1 PAL, 2 either, 3 Dendy (NES 2.0 byte 12; iNES 1.0 byte 9 bit 0). */
+  region: number;
 }
 
 const HEADER = 16;
@@ -87,14 +89,18 @@ export function parseRom(data: Uint8Array): RomInfo {
     chr = data.slice(start + prgSize, start + prgSize + chrSize);
   }
   const prgRamSize = nes2 ? shiftSize(data[10] & 0x0f) + shiftSize(data[10] >> 4) : 0x2000;
+  const region = nes2 ? data[12] & 3 : !archaic && (data[9] & 1) ? 1 : 0;
   const mirroring = (f6 & 0x08) ? MIRROR_FOUR_SCREEN : (f6 & 0x01) ? MIRROR_VERTICAL : MIRROR_HORIZONTAL;
-  return { mapper, submapper, nes2, prg, chr, chrIsRam, prgRamSize, battery: (f6 & 0x02) !== 0, mirroring, trainer };
+  return { mapper, submapper, nes2, prg, chr, chrIsRam, prgRamSize, battery: (f6 & 0x02) !== 0, mirroring, trainer,
+    region };
 }
 
 /** What the console sees of a cartridge: CPU $4020-$FFFF, PPU $0000-$1FFF, and the mirroring. */
 export interface Mapper {
   readonly info: RomInfo;
   mirroring: number;
+  /** The PRG-RAM at $6000 (battery-backed when info.battery says so). */
+  readonly prgRam: Uint8Array;
   /** A CPU read at $4020-$FFFF; -1 where the cart drives nothing (open bus). */
   cpuRead(addr: number): number;
   /** The same read with no side effects. */
@@ -110,7 +116,7 @@ export class NROM implements Mapper {
   mirroring: number;
   private prg: Uint8Array;
   private chr: Uint8Array;
-  private prgRam: Uint8Array;
+  readonly prgRam: Uint8Array;
 
   constructor(info: RomInfo) {
     this.info = info;
