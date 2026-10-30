@@ -163,7 +163,7 @@ export class NES implements CpuBus {
         this.apu.writeRegister(addr, value);
       }
     } else {
-      this.mapper.cpuWrite(addr, value);
+      this.mapper.cpuWrite(addr, value, this.cpu.cycles);
     }
   }
 
