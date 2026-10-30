@@ -241,8 +241,11 @@ class I5Tab(Tab):
         super().__init__(browser, site, init_script=TAP5_JS + "\n" + SIM_JS % {"hz": hz})
         self._cdp = None
 
-    def hide(self):
-        self.page.evaluate("window.__i5.hide()")
+    def hide(self) -> int:
+        """Hide the tab, and return nesTest.frames at that moment: read in the same task, so no refresh
+        can land between the reading and the hiding."""
+        return self.page.evaluate("() => { const f = window.nesTest ? window.nesTest.frames : -1; "
+                                  "window.__i5.hide(); return f; }")
 
     def show(self, jump_ms=0):
         self.page.evaluate("ms => window.__i5.show(ms)", jump_ms)

@@ -132,8 +132,7 @@ def test_hidden_for_an_hour_the_game_carries_on_where_it_left_off(site, browser,
     origin: design"""
     with I5Tab(browser, site, hz=60) as tab:
         start(tab, write(tmp_path, "tone.nes", tone_probe()), settle=3)
-        before = tab.page.evaluate("window.nesTest.frames")
-        tab.hide()
+        before = tab.hide()
         tab.wait(2)
         assert tab.page.evaluate("window.nesTest.frames") == before, "frames were emulated while hidden"
         n = len(tab.ticks())
